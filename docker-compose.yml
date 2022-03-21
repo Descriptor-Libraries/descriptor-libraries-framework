@@ -1,0 +1,41 @@
+version: "3.3"
+services:
+  
+  nginx:
+    image: 'phosphines-nginx:latest'
+    build:
+      context: .
+      dockerfile: nginx.dockerfile
+    ports:
+      - "80:80"
+
+  database:
+    image: 'phosphines-database:latest'
+    build:
+      context: ./backend
+      dockerfile: database.dockerfile
+    shm_size: '4gb'
+    ports:
+      - "5432:5432"
+    volumes:
+      - "./data:/var/lib/postgresql/data"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+
+  backend:
+    image: 'phosphines-backend:latest'
+    build:
+      context: ./backend
+      dockerfile: backend.dockerfile
+    ports:
+      - "8080:80"
+    environment:
+      POSTGRES_SERVER: database
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWD: ''
+      POSTGRES_DB: phosphines
+      
+  cdk-depict:
+    image: 'simolecule/cdkdepict:1.3'
+    ports:
+      - "8081:8080"

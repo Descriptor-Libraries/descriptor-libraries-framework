@@ -1,0 +1,4 @@
+alembic==1.4.2
+psycopg2-binary==2.8.5
+SQLAlchemy==1.3.17
+tenacity==6.2.0

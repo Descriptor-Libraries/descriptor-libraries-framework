@@ -1,0 +1,9 @@
+@font-face {
+    font-family: "Cubano";
+    src: url("./fonts/Cubano.eot"); /* IE9*/
+    src: url("./fonts/Cubano.eot.iefix") format("embedded-opentype"), /* IE6-IE8 */
+    url("./fonts/Cubano.woff2") format("woff2"), /* chrome firefox */
+    url("./fonts/Cubano.woff") format("woff"), /* chrome firefox */
+    url("./fonts/Cubano.ttf") format("truetype"), /* chrome firefox opera Safari, Android, iOS 4.2+*/
+    url("./fonts/Cubano.svg") format("svg"); /* iOS 4.1- */
+}
