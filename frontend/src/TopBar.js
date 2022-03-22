@@ -1,16 +1,16 @@
 import React from "react";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Box from "@material-ui/core/Box";
-import Typography from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
-import GetAppIcon from "@material-ui/icons/GetApp";
-import SearchIcon from "@material-ui/icons/Search";
-import ScatterPlotIcon from "@material-ui/icons/ScatterPlot";
-import InfoIcon from "@material-ui/icons/Info";
-import MailOutlineIcon from "@material-ui/icons/MailOutline";
-import { makeStyles } from "@material-ui/core/styles";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import GetAppIcon from "@mui/icons-material/GetApp";
+import SearchIcon from "@mui/icons-material/Search";
+import ScatterPlotIcon from "@mui/icons-material/ScatterPlot";
+import InfoIcon from "@mui/icons-material/Info";
+import MailOutlineIcon from "@mui/icons-material/MailOutline";
+import { makeStyles } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { NavLink } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({

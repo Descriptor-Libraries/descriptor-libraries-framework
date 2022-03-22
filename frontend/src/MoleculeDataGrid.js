@@ -1,6 +1,6 @@
 import React from "react";
-import Typography from "@material-ui/core/Typography";
-import { DataGrid } from "@material-ui/data-grid";
+import Typography from "@mui/material/Typography";
+import { DataGrid } from "@mui/x-data-grid";
 import dft_descriptors from "./dft_descriptors.js";
 import xtb_descriptors from "./xtb_descriptors.js";
 

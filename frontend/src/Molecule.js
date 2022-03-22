@@ -1,10 +1,10 @@
 import React from "react";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import Typography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/core/styles";
-import ButtonGroup from "@material-ui/core/ButtonGroup";
-import Button from "@material-ui/core/Button";
-import Grid from "@material-ui/core/Grid";
+import CircularProgress from "@mui/material/CircularProgress";
+import Typography from "@mui/material/Typography";
+import { makeStyles } from "@mui/material/styles";
+import ButtonGroup from "@mui/material/ButtonGroup";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
 import { useParams, useHistory, useLocation } from "react-router-dom";
 
 import PubChemInfo from "./PubChem.js";
