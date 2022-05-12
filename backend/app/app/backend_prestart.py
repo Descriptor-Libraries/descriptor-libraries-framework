@@ -33,5 +33,6 @@ def init() -> None:
 
 def main() -> None:
     logger.info("Initializing service")
-    init()
+    db = SessionLocal()
+    db.execute("SELECT 1")
     logger.info("Service finished initializing")
