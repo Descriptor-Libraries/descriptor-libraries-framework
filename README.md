@@ -21,9 +21,6 @@ Images which I have working are marked in <span style="color:green">green</span>
 
 2. `pr3`: Contains dumped data.
 
-### Database
-1. This database was created using a database dump file and supplemented with PCA and UMAP data provided in CSV format. This docker compose file assumes that a database with relevant data already exists and is mounted on a volume called `kraken-postgres`.
-
 ### Running containers
 1. All containers can be built using
 
@@ -55,3 +52,54 @@ docker exect -it CONTAINER_ID /bin/bash
 ```
 
 To start an interactive bash terminal in the running container.
+
+### Database
+1. This database was created using a database dump file and supplemented with PCA and UMAP data provided in CSV format. This docker compose file assumes that a database with relevant data already exists and is mounted on a volume called `kraken-postgres`.
+
+#### Importing from CSV
+The approach I've taken is to use pandas to create a csv which has `smiles` and the data I want to import into the database. 
+
+Then, I log into the database and create a new temporary table. For example, for the `umap` data,
+
+```
+CREATE TABLE temporary
+(smiles VARCHAR PRIMARY KEY,
+umap1 NUMERIC,
+umap2 NUMERIC,
+umap POINT
+);
+```
+
+Then, to read in the data from a CSV
+
+```
+\copy temporary(smiles, umap1, umap2)
+FROM '\PATH\TO\CSV'
+DELIMITER ','
+CSV HEADER;
+```
+
+To create the point type
+
+```
+UPDATE new_data
+SET umap = point(umap1, umap2);
+```
+
+Add column to molecule table
+
+```
+ALTER TABLE molecule
+ADD COLUMN umap point;
+```
+
+Set column equal to `umap` from temporary table.
+
+```
+UPDATE molecule
+SET umap = nd.map
+FROM temporary nd
+WHERE nd.smiles = molecule.smiles;
+```
+
+
