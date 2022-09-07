@@ -22,6 +22,8 @@ services:
       dockerfile: backend.dockerfile
     ports:
       - "80:8080"
+    volumes:
+      - "./backend/app:/app"
     environment:
       POSTGRES_SERVER: database
       POSTGRES_USER: postgres
