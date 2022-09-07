@@ -6,11 +6,11 @@ This web app is made up of several Docker containers which work together through
 
 Images which I have working are marked in <span style="color:green">green</span>, while images which I have not been able to build are marked in <span style="color:red">red.</span> Changes are marked in **bold**.
 
-1.: red_circle: nginx :red_circle: : This is the front end of the app. I cannot build this currently because of memory limitations.
+1. :red_circle: nginx :red_circle: : This is the front end of the app. I cannot build this currently because of memory limitations.
 
-2. <span style="color:green">database</span>: This contains the database connection. **I changed the base image for this image.** It as originally built from a file which was in `backend/database.dockerfile`, with a postgres base image. RDKit was then built and installed. I switched to using a postgres-rdkit base image so that rdkit does not have to be built and installed.
+2. :green_circle: database :green_circle: : This contains the database connection. **I changed the base image for this image.** It as originally built from a file which was in `backend/database.dockerfile`, with a postgres base image. RDKit was then built and installed. I switched to using a postgres-rdkit base image so that rdkit does not have to be built and installed.
 
-3. <span style="color:green">backend</span>: This is the container which crates the REST API. Uses sqlalchemy, pydantic, and fast api. **I switched to a miniconda base image for this (from fastapi base image).** Allows to more easily install and update Python packages.
+3. :green_circle: backend :green_circle: This is the container which crates the REST API. Uses sqlalchemy, pydantic, and fast api. **I switched to a miniconda base image for this (from fastapi base image).** Allows to more easily install and update Python packages.
 
 4. <span style>cdk-depict</span>: I think something with molecule rendering. I think this is working.
 
