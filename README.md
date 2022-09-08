@@ -4,7 +4,7 @@ This web app is made up of several Docker containers which work together through
 
 ## Docker Containers
 
-Images which I have working are marked in <span style="color:green">green</span>, while images which I have not been able to build are marked in <span style="color:red">red.</span> Changes are marked in **bold**.
+Images which I have working are marked with a green circle :green_circle:, while images which I have not been able to build are marked with a red circle :red_circle". Changes are marked in **bold**.
 
 1. :red_circle: nginx :red_circle: : This is the front end of the app. I cannot build this currently because of memory limitations.
 
@@ -17,11 +17,13 @@ Images which I have working are marked in <span style="color:green">green</span>
 ## More about Docker Set-Up
 
 ### Volumes
-I have set up two volumes to run with these docker containers. These are accessible locally.
+I have set up three volumes to run with these docker containers. The first two are accessible locally on my set-up, but are not included in the remote repository. The third volume mounts the Python code so it can be developed while the containers are run. This will likely be removed in production.
 
 1. `kraken-postgres`: Contains database. This database has been updated to contain `umap` information.
 
-2. `pr3`: Contains dumped data (file the database was constructed from)
+2. `pr3`: Contains dumped data (file the database was constructed from using `pg_restore`)
+
+3. backend volume for Python code.
 
 ### Running containers
 1. All containers can be built using
@@ -38,6 +40,12 @@ To run and connect all of the containers, use:
 docker-compose up
 ```
 
+To stop the containers, use:
+
+```
+docker-compose down
+```
+
 ## Working with Postgres Database
 Once the database docker container is running, you can connect to the database from outside of the container using `psql`, if installed.
 
@@ -49,7 +57,7 @@ Connecting to the database from outside of the Docker container will require ent
 Alternatively, the database docker container can be entered, and a password will not be required to work with the database. Use `docker ps` to get the container ID of the database container, then you can do
 
 ```
-docker exect -it CONTAINER_ID /bin/bash
+docker exec -it CONTAINER_ID /bin/bash
 ```
 
 To start an interactive bash terminal in the running container.
@@ -104,7 +112,7 @@ WHERE nd.smiles = molecule.smiles;
 ```
 
 ### MolSSI Changes to the Database
-I have added the `umap` information to the database using the [POINT](https://www.postgresql.org/docs/current/datatype-geometric.html) data type. This will allow us to search and filter by distance.
+I have added the `umap` information to the database using the [POINT](https://www.postgresql.org/docs/current/datatype-geometric.html) data type. The point data type is for storing two dimensional data. This will allow us to search and filter by umap distance.
 
 ### MolSSI Changes to Code
 
