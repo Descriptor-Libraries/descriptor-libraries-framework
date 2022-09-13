@@ -1,4 +1,4 @@
-import sys
+
 from typing import Dict, List, Union
 
 from app import schemas
@@ -11,6 +11,11 @@ from sqlalchemy import exc, text
 from sqlalchemy.orm import Session
 
 router = APIRouter()
+
+#@router.get("/molecules", response_model=List[schemas.Molecule])
+#def get_molecules(db: Session = Depends(deps.get_db)):
+
+#    return "Working"
 
 
 @router.get("/{molecule_id}", response_model=schemas.Molecule)
@@ -34,62 +39,52 @@ def get_a_single_molecule(molecule_id: int, db: Session = Depends(deps.get_db)):
     return response
 
 
-@router.put("/search", response_model=List[schemas.Molecule])
+@router.get("/search/", response_model=List[schemas.MoleculeSimple])
 def search_molecules(
-    db: Session = Depends(deps.get_db),
     substructure: str = "",
     skip: int = 0,
     limit: int = 100,
-    with_dft: bool = True,
-    with_xtb: bool = True,
-    with_ml: bool = False,
+    db: Session = Depends(deps.get_db),
 ):
-    fields = ["dft_data", "xtb_data", "ml_data"]
-    bools = [with_dft, with_xtb, with_ml]
-    filters = []
-    for field, include in zip(fields, bools):
-        if include:
-            filters.append(f"{field} is not null")
-    if filters:
-        filters = " or ".join(filters)
-    else:
-        filters = ""
-
-    limit = limit if limit < 100 else 100
     mol = Chem.MolFromSmiles(substructure)
     if mol is None:
-        raise HTTPException(status_code=400, detault="Invalid Smiles Substructure")
+        raise HTTPException(status_code=400, detail="Invalid Smiles Substructure")
     substructure = Chem.MolToSmiles(mol)
     if substructure is None:
-        raise HTTPException(status_code=400, default="Invalid Smiles Substructure!")
+        raise HTTPException(status_code=400, detail="Invalid Smiles Substructure!")
 
+    # The original query is not doing a substructure search at all. It is doing string 
+    # comparisons between the substructure and the molecule smiles string.
+    # added WHERE mol@>:substructure. Leaving order by results in a
+    # very slow query, as mentioned in this blog 
+    # https://depth-first.com/articles/2021/08/11/the-rdkit-postgres-ordered-substructure-search-problem/
+    # Adopting their solution works  (set enable_sort=off)
+    # However, this isn't the (only) problem. 
+    # returning the data is very slow.
     sql = text(
         """
+        SET LOCAL enable_sort=off;
         with m as 
             ( select molecule_id,
                      smiles,
-                     molecular_weight, 
-                     dft_data, 
-                     xtb_data,
-                     xtb_ni_data, 
-                     ml_data 
+                     molecular_weight
              from    molecule 
-             order by 
-                    smiles <-> :substructure 
+             where mol@>:substructure
+             order by smiles <-> :substructure 
              offset :offset 
              fetch next :limit rows only ) 
         select m.*,
                array_agg(conformer.conformer_id) as "conformers_id"
         from   m
         left join conformer on (conformer.molecule_id = m.molecule_id)
-        group by (m.molecule_id, smiles, molecular_weight,
-                  dft_data, xtb_data, xtb_ni_data, ml_data);
+        group by (m.molecule_id, smiles, molecular_weight);
         """
     )
     try:
         results = db.execute(
-            sql, dict(substructure=substructure, offset=skip, limit=limit)
-        ).fetchall()
+             sql, dict(substructure=substructure, offset=skip, limit=limit)
+         ).fetchall()
     except exc.DataError:
         raise HTTPException(status_code=400, detail="Invalid Smiles Substructure!")
-    return [schemas.Molecule(**res) for res in results]
+
+    return results

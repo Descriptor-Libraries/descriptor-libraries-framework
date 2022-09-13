@@ -12,3 +12,7 @@ class Molecule(BaseModel):
     xtb_data: Optional[Dict]
     xtb_ni_data: Optional[Dict]
     ml_data: Optional[Dict]
+
+class MoleculeSimple(BaseModel):
+    molecule_id: int
+    smiles: str

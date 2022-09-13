@@ -23,7 +23,7 @@ I have set up three volumes to run with these docker containers. The first two a
 
 2. `pr3`: Contains dumped data (file the database was constructed from using `pg_restore`)
 
-3. backend volume for Python code.
+3. backend volume for Python code to allow development while container is running.
 
 ### Running containers
 1. All containers can be built using
