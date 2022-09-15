@@ -61,23 +61,20 @@ def search_molecules(
     # Adopting their solution works  (set enable_sort=off)
     # However, this isn't the (only) problem. 
     # returning the data is very slow.
+
+    # Create mol from smiles in db - select mol_from_smiles('smiles')
+    # currently does a substructure search then orders by molecular fingerprint.
+    # i wonder if there is a way to order only close neighbors based on maybe...
+    # molecular weight.
+    
     sql = text(
         """
         SET LOCAL enable_sort=off;
-        with m as 
-            ( select molecule_id,
-                     smiles,
-                     molecular_weight
-             from    molecule 
-             where mol@>:substructure
-             order by smiles <-> :substructure 
-             offset :offset 
-             fetch next :limit rows only ) 
-        select m.*,
-               array_agg(conformer.conformer_id) as "conformers_id"
-        from   m
-        left join conformer on (conformer.molecule_id = m.molecule_id)
-        group by (m.molecule_id, smiles, molecular_weight);
+        select molecule_id, smiles, molecular_weight from molecule 
+        where mol@>:substructure
+        order by morganbv <%> morganbv_fp(mol_from_smiles(:substructure)) 
+        offset :offset 
+        limit :limit
         """
     )
     try:
