@@ -111,8 +111,31 @@ FROM temporary nd
 WHERE nd.smiles = molecule.smiles;
 ```
 
+### Other notes
+
+Creating molecular fingerprints in table from mol object:
+
+Add a column for fingerprints
+
+```sql
+ALTER TABLE_NAME
+ADD COLUMN fingerprint bfp;
+```
+
+Add fingerprints
+
+```sql
+UPDATE TABLE_NAME
+SET fingerprint = featmorganbv_fp(MOL_COLUMN_NAME)
+```
+
 ### MolSSI Changes to the Database
-I have added the `umap` information to the database using the [POINT](https://www.postgresql.org/docs/current/datatype-geometric.html) data type. The point data type is for storing two dimensional data. This will allow us to search and filter by umap distance.
+- I have added the `umap` information to the database using the [POINT](https://www.postgresql.org/docs/current/datatype-geometric.html) data type. The point data type is for storing two dimensional data. This will allow us to search and filter by umap distance.
+
+- I have added morgan fingerprints to the molecules table and added an index on this column.
 
 ### MolSSI Changes to Code
+- I have changed the search API to actually do a search function and return results in order based on molecular fingerprint similarity. This RDKit substructure query + sorting was very slow. [Searching online](https://depth-first.com/articles/2021/08/11/the-rdkit-postgres-ordered-substructure-search-problem/), I found a workaround which I have applied.
+
+- I simplified the data delivered by the search endpoint to only necessary data, making the endpoint 10 times faster.
 
