@@ -12,7 +12,9 @@ Images which I have working are marked with a green circle :green_circle:, while
 
 3. :green_circle: backend :green_circle: This is the container which crates the REST API. Uses sqlalchemy, pydantic, and fast api. **I switched to a miniconda base image for this (from fastapi base image).** Allows to more easily install and update Python packages.
 
-4. <span style>cdk-depict</span>: I think something with molecule rendering. I think this is working.
+4. :green_circle: cdk-depict :green_circle:: I think something with molecule rendering. I think this is working.
+
+5. :green_circle: frontend :green_circle: : I added this container. It uses miniconda as a base image and installs nodejs and yarn. Mounts frontend directory as a volume so I can work on developing the front end.
 
 ## More about Docker Set-Up
 
@@ -24,6 +26,8 @@ I have set up three volumes to run with these docker containers. The first two a
 2. `pr3`: Contains dumped data (file the database was constructed from using `pg_restore`)
 
 3. backend volume for Python code to allow development while container is running.
+
+4. frontend volume for react code to allow development while container is running.
 
 ### Running containers
 1. All containers can be built using
@@ -139,10 +143,11 @@ WHERE molecule_column@>'substructure_string'
 ### MolSSI Changes to the Database
 - I have added the `umap` information to the database using the [POINT](https://www.postgresql.org/docs/current/datatype-geometric.html) data type. The point data type is for storing two dimensional data. This will allow us to search and filter by umap distance.
 
-- I have added morgan fingerprints to the molecules table and added an index on this column.
+- I have added morgan fingerprints to the molecules table and added an index on this column to allow searching.
 
 ### MolSSI Changes to Code
 - I have changed the search API to actually do a search function and return results in order based on molecular fingerprint similarity. This RDKit substructure query + sorting was very slow. [Searching online](https://depth-first.com/articles/2021/08/11/the-rdkit-postgres-ordered-substructure-search-problem/), I found a workaround which I have applied.
 
 - I simplified the data delivered by the search endpoint to only necessary data, making the endpoint 10 times faster.
 
+- I'm starting development on a new front end using React.
