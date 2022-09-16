@@ -16,6 +16,8 @@ import Container from '@mui/material/Container';
 import Link from '@mui/material/Link';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
+import MyPlot from "./Graph.js";
+
 function Copyright() {
   return (
     <Typography variant="body2" color="text.secondary" align="center">
@@ -68,7 +70,9 @@ export default function Album() {
               Something short and leading about the collection below—its contents,
               the creator, etc. Make it short and sweet, but not too short so folks
               don&apos;t simply skip over it entirely!
+              
             </Typography>
+            <MyPlot></MyPlot>
             <Stack
               sx={{ pt: 4 }}
               direction="row"
