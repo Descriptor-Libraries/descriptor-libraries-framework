@@ -1,11 +1,10 @@
 
-from typing import Dict, List, Union
+from typing import List
 
 from app import schemas
 from app.api import deps
 from app.db.session import models
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
 from rdkit import Chem
 from sqlalchemy import exc, text
 from sqlalchemy.orm import Session
