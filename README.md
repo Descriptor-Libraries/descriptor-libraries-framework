@@ -126,7 +126,14 @@ Add fingerprints
 
 ```sql
 UPDATE TABLE_NAME
-SET fingerprint = featmorganbv_fp(MOL_COLUMN_NAME)
+SET morganbv = morganbv_fp(MOL_COLUMN_NAME)
+```
+
+Substructure search
+
+```sql
+SELECT * FROM table_name
+WHERE molecule_column@>'substructure_string'
 ```
 
 ### MolSSI Changes to the Database

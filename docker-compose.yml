@@ -1,5 +1,16 @@
 version: "3.3"
 services:
+
+  frontend:
+    image: 'phosphines-frontend:latest'
+    volumes:
+      - "./frontend:/app"
+    build:
+      context: .
+      dockerfile: frontend.dockerfile
+    ports:
+      - "80:3000"
+    entrypoint: npm start
   
   database:
     image: 'mcs07/postgres-rdkit'
@@ -21,7 +32,7 @@ services:
       context: ./backend
       dockerfile: backend.dockerfile
     ports:
-      - "80:8080"
+      - "81:8080"
     volumes:
       - "./backend/app:/app"
     environment:
