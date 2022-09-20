@@ -69,13 +69,13 @@ services:
       - web
     labels:
       - "traefik.enable=true"
+      - "traefik.http.routers.cdk-depict.rule=Host(`localhost`) && PathPrefix(`/depict`) || Host(`147.182.187.35`) && PathPrefix(`/depict`)"
+
 
   frontend:
     image: 'phosphines-frontend:latest'
     volumes:
       - "./frontend:/app"
-    ports:
-      - "3000:3000"
     build:
       context: .
       dockerfile: frontend.dockerfile
