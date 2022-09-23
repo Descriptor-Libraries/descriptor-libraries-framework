@@ -1,5 +1,5 @@
 
-from typing import List
+from typing import List, Optional
 
 from app import schemas
 from app.api import deps
@@ -15,6 +15,29 @@ router = APIRouter()
 #def get_molecules(db: Session = Depends(deps.get_db)):
 
 #    return "Working"
+
+@router.get("/molecules/umap", response_model=List[schemas.MoleculeSimple])
+def get_molecule_umap(limit: int = 3000, category: Optional[str] = None, db: Session = Depends(deps.get_db)):
+
+    query = """
+        SELECT molecule_id, smiles, umap[0] AS umap1, umap[1] AS umap2, pat FROM molecule
+        """
+
+    if category:
+        query += """WHERE pat = :category
+        """
+
+    query += """ORDER BY molecule_id 
+        FETCH FIRST :limit ROWS ONLY;"""
+
+    sql = text(query)
+    
+    results = db.execute(
+        sql, {"limit": limit, "category": category}
+        ).fetchall()
+
+    return results
+
 
 
 @router.get("/{molecule_id}", response_model=schemas.Molecule)
@@ -63,19 +86,20 @@ def search_molecules(
 
     # Create mol from smiles in db - select mol_from_smiles('smiles')
     # currently does a substructure search then orders by molecular fingerprint.
-    # i wonder if there is a way to order only close neighbors based on maybe...
-    # molecular weight.
+    # Timing - without setting enable_sort = off about 34 seconds for 100 molecules
+    # with enable_sort off, 0.039 seconds
     
     sql = text(
         """
         SET LOCAL enable_sort=off;
-        select molecule_id, smiles, molecular_weight from molecule 
+        select molecule_id, smiles, molecular_weight, umap[0] as umap1, umap[1] as umap2 from molecule 
         where mol@>:substructure
         order by morganbv <%> morganbv_fp(mol_from_smiles(:substructure)) 
         offset :offset 
         limit :limit
         """
     )
+
     try:
         results = db.execute(
              sql, dict(substructure=substructure, offset=skip, limit=limit)

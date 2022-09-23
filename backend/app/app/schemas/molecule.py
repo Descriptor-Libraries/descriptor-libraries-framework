@@ -15,4 +15,7 @@ class Molecule(BaseModel):
 
 class MoleculeSimple(BaseModel):
     molecule_id: int
+    umap1: Optional[float]
+    umap2: Optional[float]
+    pat: Optional[str]
     smiles: str
