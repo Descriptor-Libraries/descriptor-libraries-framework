@@ -36,3 +36,9 @@
     transform: rotate(360deg);
   }
 }
+
+#molecule {
+  height: 200px;
+  width: 200px;
+  border-style: ridge;
+}

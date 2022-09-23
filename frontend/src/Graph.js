@@ -1,6 +1,11 @@
 import React from 'react';
 import Plot from 'react-plotly.js';
 
+function fetchSVG(element) {
+  fetch(`depict/box/svg?smi=${element.points[0].text}&w=50&h=50`).then(response => response.text() ).then( body => document.getElementById("molecule").innerHTML=body);
+}
+
+
 class MyPlot extends React.Component {
 
   // Constructor
@@ -15,17 +20,19 @@ class MyPlot extends React.Component {
   }
 
   componentDidMount() {
-    fetch('/api/v1/molecule/molecules/umap?limit=500&category=pcn')
+    fetch('/api/v1/molecule/molecules/umap?limit=100&category=pcn')
       .then(response => response.json())
-      .then(items => this.setState({ pcn: items })
+      .then(items => this.setState({ 
+        pcn: items
+      })
       );
 
-    fetch('/api/v1/molecule/molecules/umap?limit=500&category=pc3')
+    fetch('/api/v1/molecule/molecules/umap?limit=100&category=pc3')
       .then(response => response.json())
       .then(items => this.setState({ pc3: items })
       );
 
-    fetch('/api/v1/molecule/molecules/umap?limit=500&category=po3')
+    fetch('/api/v1/molecule/molecules/umap?limit=100&category=po3')
       .then(response => response.json())
       .then(items => this.setState({ po3: items })
       );
@@ -33,12 +40,13 @@ class MyPlot extends React.Component {
 
   render() {
 
-    let myPlot = <Plot
+    let myPlot = <div id=""> <Plot onHover={ (el) => fetchSVG(el) }
     data={[
       {
         x: this.state.pcn.map( row => { return row.umap1 }),
         y: this.state.pcn.map( row => { return row.umap2 }),
-        text: this.state.pcn.map( row => { return row.smiles }),
+        text: this.state.po3.map( row => { return row.smiles }),
+        // hovertemplate: "( %{x}, %{y} )",
         type: 'scatter',
         mode: 'markers',
         marker: {color: 'red'},
@@ -48,7 +56,8 @@ class MyPlot extends React.Component {
       {
         x: this.state.pc3.map( row => { return row.umap1 }),
         y: this.state.pc3.map( row => { return row.umap2 }),
-        //text: this.state.pc3.map( row => { return fetch(`/depict/bow/svg?smi=${row.smiles}&w=80&h=50&abbr=on&hdisp=bridgehead&showtitle=false&zoom=1.6&annotate=none`) } ),
+        text: this.state.po3.map( row => { return row.smiles }),
+        // hovertemplate: "( %{x}, %{y} )",
         type: 'scatter',
         mode: 'markers',
         marker: {color: 'blue'},
@@ -59,6 +68,7 @@ class MyPlot extends React.Component {
         x: this.state.po3.map( row => { return row.umap1 }),
         y: this.state.po3.map( row => { return row.umap2 }),
         text: this.state.po3.map( row => { return row.smiles }),
+        // hovertemplate: "( %{x}, %{y} )",
         type: 'scatter',
         mode: 'markers',
         marker: {color: 'orange'},
@@ -91,7 +101,9 @@ class MyPlot extends React.Component {
     
     } }
   />
-
+  <div id="molecule"></div>
+  <div id="molecule-name"></div>
+</div>
   
     return (
       myPlot
