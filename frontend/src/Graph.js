@@ -1,10 +1,40 @@
 import React from 'react';
 import Plot from 'react-plotly.js';
 
-function fetchSVG(element) {
-  fetch(`depict/box/svg?smi=${element.points[0].text}&w=50&h=50`).then(response => response.text() ).then( body => document.getElementById("molecule").innerHTML=body);
+
+function showSVGWindow(svg, event) {
+
+  console.log(event)
+
+  // remove in case existing
+  if (document.getElementById("molecule")) {
+    document.getElementById("molecule").remove()
+  }
+
+  let xaxis = event.points[0].xaxis;
+  let yaxis = event.points[0].yaxis;
+
+  let mol = document.createElement("g")
+  mol.setAttribute("id", "molecule")
+  
+  let plotly_container = document.getElementsByClassName("plotly")
+  mol.innerHTML = svg;
+  
+  plotly_container[0].appendChild(mol);
+  mol.style.position = "absolute";
+  mol.style.left = `${xaxis.l2p(event.points[0].x) + xaxis._offset}px`;
+  mol.style.top = `${yaxis.l2p(event.points[0].y) + yaxis._offset }px`;
+
 }
 
+function showSVG(event) {
+  fetch(`depict/cow/svg?smi=${event.points[0].text}&w=40&h=40`).then(response => 
+    response.text() ).then( body => showSVGWindow(body, event) );
+}
+
+function hideSVG(event) {
+  document.getElementById("molecule").remove()
+}
 
 class MyPlot extends React.Component {
 
@@ -20,19 +50,19 @@ class MyPlot extends React.Component {
   }
 
   componentDidMount() {
-    fetch('/api/v1/molecule/molecules/umap?limit=100&category=pcn')
+    fetch('/api/v1/molecule/molecules/umap?limit=200&category=pcn')
       .then(response => response.json())
       .then(items => this.setState({ 
         pcn: items
       })
       );
 
-    fetch('/api/v1/molecule/molecules/umap?limit=100&category=pc3')
+    fetch('/api/v1/molecule/molecules/umap?limit=200&category=pc3')
       .then(response => response.json())
       .then(items => this.setState({ pc3: items })
       );
 
-    fetch('/api/v1/molecule/molecules/umap?limit=100&category=po3')
+    fetch('/api/v1/molecule/molecules/umap?limit=200&category=po3')
       .then(response => response.json())
       .then(items => this.setState({ po3: items })
       );
@@ -40,13 +70,15 @@ class MyPlot extends React.Component {
 
   render() {
 
-    let myPlot = <div id=""> <Plot onHover={ (el) => fetchSVG(el) }
+    
+    let myPlot = <div id=""> <Plot onHover={ (event) => showSVG(event) } onUnhover={ (event)=> hideSVG(event) }
     data={[
       {
         x: this.state.pcn.map( row => { return row.umap1 }),
         y: this.state.pcn.map( row => { return row.umap2 }),
-        text: this.state.po3.map( row => { return row.smiles }),
-        // hovertemplate: "( %{x}, %{y} )",
+        text: this.state.po3.map( row => { return encodeURIComponent(row.smiles) }),
+        hovertemplate: "( %{x}, %{y} )",
+        hovermode: "closest",
         type: 'scatter',
         mode: 'markers',
         marker: {color: 'red'},
@@ -56,8 +88,9 @@ class MyPlot extends React.Component {
       {
         x: this.state.pc3.map( row => { return row.umap1 }),
         y: this.state.pc3.map( row => { return row.umap2 }),
-        text: this.state.po3.map( row => { return row.smiles }),
-        // hovertemplate: "( %{x}, %{y} )",
+        text: this.state.po3.map( row => { return encodeURIComponent(row.smiles) }),
+        hovertemplate: "( %{x}, %{y} )",
+        hovermode: "closest",
         type: 'scatter',
         mode: 'markers',
         marker: {color: 'blue'},
@@ -67,8 +100,9 @@ class MyPlot extends React.Component {
       {
         x: this.state.po3.map( row => { return row.umap1 }),
         y: this.state.po3.map( row => { return row.umap2 }),
-        text: this.state.po3.map( row => { return row.smiles }),
-        // hovertemplate: "( %{x}, %{y} )",
+        text: this.state.po3.map( row => { return encodeURIComponent(row.smiles) }),
+        hovertemplate: "( %{x}, %{y} )",
+        hovermode: "closest",
         type: 'scatter',
         mode: 'markers',
         marker: {color: 'orange'},
@@ -101,8 +135,6 @@ class MyPlot extends React.Component {
     
     } }
   />
-  <div id="molecule"></div>
-  <div id="molecule-name"></div>
 </div>
   
     return (
