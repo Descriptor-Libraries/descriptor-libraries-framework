@@ -64,13 +64,12 @@ services:
       - "traefik.http.services.backend.loadbalancer.server.port=8080"
 
   cdk-depict:
-    image: 'simolecule/cdkdepict:1.3'
+    image: 'simolecule/cdkdepict:latest'
     networks:
       - web
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.cdk-depict.rule=Host(`localhost`) && PathPrefix(`/depict`) || Host(`147.182.187.35`) && PathPrefix(`/depict`)"
-
 
   frontend:
     image: 'phosphines-frontend:latest'
