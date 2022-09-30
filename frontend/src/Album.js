@@ -56,7 +56,7 @@ export default function Album() {
             pb: 6,
           }}
         >
-          <Container maxWidth="sm">
+          <Container maxWidth="lg">
             <Typography
               component="h1"
               variant="h2"
@@ -72,7 +72,14 @@ export default function Album() {
               don&apos;t simply skip over it entirely!
               
             </Typography>
-            <MyPlot></MyPlot>
+
+            <Container maxWidth="100%">
+              <MyPlot
+              align="center"
+              ></MyPlot>
+
+            </Container>
+            
             <Stack
               sx={{ pt: 4 }}
               direction="row"

@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  height: 100vh;
 }
 
 .App-logo {
@@ -38,7 +39,7 @@
 }
 
 #molecule {
-  height: 200px;
-  width: 200px;
   border-style: ridge;
+  position: relative;
+  background-color: #ffffff;
 }

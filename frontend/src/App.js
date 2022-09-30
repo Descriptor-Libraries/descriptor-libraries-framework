@@ -1,8 +1,6 @@
-import logo from './logo.svg';
 import './App.css';
 
-import MyPlot from "./Graph.js";
-import ResponsiveAppBar from './Navbar';
+import ResponsiveAppBar from './common/Navbar';
 
 function App() {
   return (
@@ -10,7 +8,6 @@ function App() {
       <header className="kraken-webapp">
       </header>
       <ResponsiveAppBar />
-      <MyPlot />
     </div>
   );
 }
