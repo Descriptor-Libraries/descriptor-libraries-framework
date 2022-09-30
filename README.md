@@ -1,12 +1,13 @@
 # Phosphines WebApp
 
-This web app is made up of several Docker containers which work together through Docker Compose.
+This web app is made up of several Docker containers which work together through Docker Compose. 
+The docker containers connect to a database which contains molecule + conformer information.
 
 ## Docker Containers
 
-Images which I have working are marked with a green circle :green_circle:, while images which I have not been able to build are marked with a red circle :red_circle". Changes are marked in **bold**.
+Docker immages which I have working are marked with a green circle :green_circle:, while images which I have not been able to build are marked with a red circle :red_circle". Changes are marked in **bold**.
 
-1. :red_circle: nginx :red_circle: : This is the front end of the app. I cannot build this currently because of memory limitations.
+1. :red_circle: nginx :red_circle: : This is the front end of the app. I cannot build this currently because of memory limitations. I have abandoned nginx for the reverse proxy in favor of [traefik](https://traefik.io/), which is commonly used for reverse proxy with docker containers.
 
 2. :green_circle: database :green_circle: : This contains the database connection. **I changed the base image for this image.** It as originally built from a file which was in `backend/database.dockerfile`, with a postgres base image. RDKit was then built and installed. I switched to using a postgres-rdkit base image so that rdkit does not have to be built and installed.
 
@@ -19,7 +20,7 @@ Images which I have working are marked with a green circle :green_circle:, while
 ## More about Docker Set-Up
 
 ### Volumes
-I have set up three volumes to run with these docker containers. The first two are accessible locally on my set-up, but are not included in the remote repository. The third volume mounts the Python code so it can be developed while the containers are run. This will likely be removed in production.
+I have set up three volumes to run with these docker containers. The first two are accessible locally on my set-up, but are not included in the remote repository. The third and fourth volumes mount the Python and React code so they can be developed while the containers are run. These will likely be removed in production.
 
 1. `kraken-postgres`: Contains database. This database has been updated to contain `umap` information.
 
@@ -28,6 +29,10 @@ I have set up three volumes to run with these docker containers. The first two a
 3. backend volume for Python code to allow development while container is running.
 
 4. frontend volume for react code to allow development while container is running.
+
+### Networking / Reverse Proxy
+
+I switched the reverse proxy from nginx to traefik.
 
 ### Running containers
 1. All containers can be built using
@@ -110,7 +115,7 @@ Set column equal to `umap` from temporary table.
 
 ```
 UPDATE molecule
-SET umap = nd.map
+SET umap = nd.umap
 FROM temporary nd
 WHERE nd.smiles = molecule.smiles;
 ```
@@ -150,4 +155,16 @@ WHERE molecule_column@>'substructure_string'
 
 - I simplified the data delivered by the search endpoint to only necessary data, making the endpoint 10 times faster.
 
+- Added a React development container (`frontend.dockerfile`).
+
 - I'm starting development on a new front end using React.
+
+### To Do:
+
+- Add ability to select molecule and retrieve neighbors based on molecular fingerprint or umap distance.
+
+- Clean up backend code (it is very messy).
+
+- Incorporate Razi submodule for SQLAlchemy + RDKit database cartridge.
+
+- Evaluate database structure.
