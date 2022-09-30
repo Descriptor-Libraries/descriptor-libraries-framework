@@ -4,8 +4,6 @@ import Plot from 'react-plotly.js';
 
 function showSVGWindow(svg, event) {
 
-  console.log(event)
-
   // remove in case existing
   if (document.getElementById("molecule")) {
     document.getElementById("molecule").remove()
@@ -22,8 +20,8 @@ function showSVGWindow(svg, event) {
   
   plotly_container[0].appendChild(mol);
   mol.style.position = "absolute";
-  mol.style.left = `${xaxis.l2p(event.points[0].x) + xaxis._offset}px`;
-  mol.style.top = `${yaxis.l2p(event.points[0].y) + yaxis._offset }px`;
+  mol.style.left = `${xaxis.l2p(event.points[0].x) + xaxis._offset - 100}px`;
+  mol.style.top = `${yaxis.l2p(event.points[0].y) + yaxis._offset - 100 }px`;
 
 }
 
@@ -33,7 +31,10 @@ function showSVG(event) {
 }
 
 function hideSVG(event) {
-  document.getElementById("molecule").remove()
+  if (document.getElementById("molecule")) {
+    document.getElementById("molecule").remove()
+  }
+
 }
 
 class MyPlot extends React.Component {
@@ -71,7 +72,10 @@ class MyPlot extends React.Component {
   render() {
 
     
-    let myPlot = <div id=""> <Plot onHover={ (event) => showSVG(event) } onUnhover={ (event)=> hideSVG(event) }
+    let myPlot = <div id="plotly-container" style={{'width': '90%', 'height': '75%', 'margin': 'auto' }}> <Plot onHover={ (event) => showSVG(event) } 
+    onUnhover={ (event)=> hideSVG(event) } 
+    style={{'width': '100%', 'height': '100%' }}
+    useResizeHandler={true}
     data={[
       {
         x: this.state.pcn.map( row => { return row.umap1 }),
@@ -110,9 +114,10 @@ class MyPlot extends React.Component {
       },
     ]}
     layout={ { 
-      width: '100%', 
-      height: '75%', 
       title: this.props.title,
+      autosize: true,
+      useResizeHandler: true,
+      style: {width: '100%', height: '100%'},
       xaxis: {
         title: {
           text: 'umap1',
