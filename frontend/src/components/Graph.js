@@ -9,19 +9,19 @@ function showSVGWindow(svg, event) {
     document.getElementById("molecule").remove()
   }
 
-  let xaxis = event.points[0].xaxis;
-  let yaxis = event.points[0].yaxis;
-
   let mol = document.createElement("g")
   mol.setAttribute("id", "molecule")
   
   let plotly_container = document.getElementsByClassName("plotly")
   mol.innerHTML = svg;
   
+  let xpos = event.event.clientX - 160;
+  let ypos = event.event.clientY - 160;
+
   plotly_container[0].appendChild(mol);
   mol.style.position = "absolute";
-  mol.style.left = `${xaxis.l2p(event.points[0].x) + xaxis._offset - 100}px`;
-  mol.style.top = `${yaxis.l2p(event.points[0].y) + yaxis._offset - 100 }px`;
+  mol.style.left = `${xpos}px`;
+  mol.style.top = `${ypos}px`;
 
 }
 
@@ -72,7 +72,7 @@ class MyPlot extends React.Component {
   render() {
 
     
-    let myPlot = <div id="plotly-container" style={{'width': '90%', 'height': '75%', 'margin': 'auto' }}> <Plot onHover={ (event) => showSVG(event) } 
+    let myPlot = <div id="plotly-container" style={{'width': '60%', 'height': '85%', 'margin': 'auto' }}> <Plot onHover={ (event) => showSVG(event) } 
     onUnhover={ (event)=> hideSVG(event) } 
     style={{'width': '100%', 'height': '100%' }}
     useResizeHandler={true}
@@ -80,24 +80,32 @@ class MyPlot extends React.Component {
       {
         x: this.state.pcn.map( row => { return row.umap1 }),
         y: this.state.pcn.map( row => { return row.umap2 }),
-        text: this.state.po3.map( row => { return encodeURIComponent(row.smiles) }),
+        text: this.state.pcn.map( row => { return encodeURIComponent(row.smiles) }),
         hovertemplate: "( %{x}, %{y} )",
         hovermode: "closest",
         type: 'scatter',
         mode: 'markers',
-        marker: {color: 'red'},
+        marker: {color: 'blue', size: 12,
+          symbol: 'hexagon',
+          line: {
+            width: 2,
+            color: 'DarkSlateGrey'}},
         name: 'PCN'
       },
       
       {
         x: this.state.pc3.map( row => { return row.umap1 }),
         y: this.state.pc3.map( row => { return row.umap2 }),
-        text: this.state.po3.map( row => { return encodeURIComponent(row.smiles) }),
+        text: this.state.pc3.map( row => { return encodeURIComponent(row.smiles) }),
         hovertemplate: "( %{x}, %{y} )",
         hovermode: "closest",
         type: 'scatter',
         mode: 'markers',
-        marker: {color: 'blue'},
+        marker: {color: 'SlateGrey', size: 12 ,
+        symbol: 'triangle-down', 
+          line: {
+            width: 2,
+            color: 'DarkSlateGrey'}},
         name: 'PC3'
       },
 
@@ -109,7 +117,10 @@ class MyPlot extends React.Component {
         hovermode: "closest",
         type: 'scatter',
         mode: 'markers',
-        marker: {color: 'orange'},
+        marker: {color: 'red', size: 12 , 
+          line: {
+            width: 2,
+            color: 'DarkSlateGrey'}},
         name: 'PO3'
       },
     ]}
