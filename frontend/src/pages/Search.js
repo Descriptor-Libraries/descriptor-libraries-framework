@@ -26,9 +26,7 @@ class Search extends React.Component {
       searchString: 'PC=C',
       skip: 0,
       limit: 9,
-      searchSVG: '',
       results: [],
-      svgs: [],
       valid_smiles: true,
     };
   };
@@ -38,17 +36,16 @@ class Search extends React.Component {
   }
 
   dynamicGrid() {
-
     if (this.state.valid_smiles) {
     return (
     <Container>
       <Grid container spacing={2} sx= {{ mt: 3 }}>
       {
-      this.state.svgs.map((result) => (
+      this.state.results.map((result) => (
         <Grid item xs={12} md={4}>
           <Item>
-            <img src={`data:image/svg+xml;utf8,${encodeURIComponent(result)}`} />
-          </Item>
+            <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(result['svg'])}`} />
+          </Item> 
         </Grid>
       ))
       }
@@ -82,12 +79,10 @@ class Search extends React.Component {
       })
     .then( (items) => {
 
-      items.map((item) => { item['svg'] ='' })
-
-      console.log(items)
+      //items.map(item =>  item['svg'] ='');
 
       this.setState({
-        items: items,
+        results: items,
         svgs: [],
       })
 
@@ -98,13 +93,8 @@ class Search extends React.Component {
           .then( response => response.text() )
           .then( (text) => {
             item['svg'] = text;
-            let joined = this.state.svgs.concat(text)
-            this.setState({
-              svgs: joined,
-            })
-          } 
-          
-        
+            this.setState({});
+          }
           )
         })
 
@@ -115,7 +105,7 @@ class Search extends React.Component {
   }
 
   _handleKeyDown(event) {
-    if (event.key == "Enter") {
+    if (event.key === "Enter") {
       this.substructureSearch(this.state.searchString);
     }
   }
