@@ -3,7 +3,10 @@ import { styled } from '@mui/material/styles';
 import { TextField, Typography } from "@mui/material";
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
+import CircularProgress from '@mui/material/CircularProgress';
+
 
 import Button from '@mui/material/Button';
 
@@ -28,6 +31,7 @@ class Search extends React.Component {
       limit: 9,
       results: [],
       valid_smiles: true,
+      loading: true,
     };
   };
 
@@ -36,6 +40,13 @@ class Search extends React.Component {
   }
 
   dynamicGrid() {
+    if ( this.state.loading ) {
+      return (<Container sx={{display: 'flex', justifyContent: 'center', my: 3}}>
+        <Box sx={{ display: 'flex' }}>
+          <CircularProgress sx={{ color: "#ed1c24" }} />
+        </Box>
+      </Container>);
+    }
     if (this.state.valid_smiles) {
     return (
     <Container>
@@ -62,6 +73,7 @@ class Search extends React.Component {
 
   substructureSearch(substructure) {
     let encoded = encodeURIComponent(substructure)
+    this.setState({loading: true})
     fetch(`/api/v1/molecule/search/?substructure=${encoded}&skip=${this.state.skip}&limit=${this.state.limit}`)
     .then( (response) => {
       if (!response.ok) {
@@ -93,7 +105,7 @@ class Search extends React.Component {
           .then( response => response.text() )
           .then( (text) => {
             item['svg'] = text;
-            this.setState({});
+            this.setState({loading: false});
           }
           )
         })
