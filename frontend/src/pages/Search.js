@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { styled } from '@mui/material/styles';
 import { TextField, Typography } from "@mui/material";
 import Paper from '@mui/material/Paper';
@@ -15,8 +15,6 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-
-
 class Search extends React.Component {
 
   // Constructor
@@ -25,8 +23,10 @@ class Search extends React.Component {
 
     this.state = {
       defaultSearch: 'PC=C',
+      searchString: 'PC=C',
       skip: 0,
-      limit: 12,
+      limit: 9,
+      searchSVG: '',
       results: [],
       svgs: [],
       valid_smiles: true,
@@ -67,7 +67,6 @@ class Search extends React.Component {
     let encoded = encodeURIComponent(substructure)
     fetch(`/api/v1/molecule/search/?substructure=${encoded}&skip=${this.state.skip}&limit=${this.state.limit}`)
     .then( (response) => {
-      console.log(substructure)
       if (!response.ok) {
         this.setState({
           valid_smiles: false,
@@ -83,6 +82,10 @@ class Search extends React.Component {
       })
     .then( (items) => {
 
+      items.map((item) => { item['svg'] ='' })
+
+      console.log(items)
+
       this.setState({
         items: items,
         svgs: [],
@@ -94,14 +97,27 @@ class Search extends React.Component {
           fetch(`/depict/cow/svg?smi=${encoded}&sma=${encoded_sub}&zoom=1.25&w=50&h=50`)
           .then( response => response.text() )
           .then( (text) => {
+            item['svg'] = text;
             let joined = this.state.svgs.concat(text)
             this.setState({
               svgs: joined,
             })
-          } )
-        });
+          } 
+          
+        
+          )
+        })
+
+
+        ;
     } 
    )   
+  }
+
+  _handleKeyDown(event) {
+    if (event.key == "Enter") {
+      this.substructureSearch(this.state.searchString);
+    }
   }
 
   render () {
@@ -112,7 +128,13 @@ class Search extends React.Component {
                 label="Enter a SMILES String to Search" 
                 variant="outlined"
                  defaultValue= {this.state.defaultSearch} 
-                 onChange = { (event) => this.substructureSearch(event.target.value) }  />
+                 onChange = { (event) => this.setState({searchString: event.target.value }) }
+                 onKeyDown = { (e) => this._handleKeyDown(e) }
+                 InputProps={{endAdornment: <Button onClick={ () => { this.substructureSearch(this.state.searchString )} } 
+                >
+                  Search
+                  </Button>}}
+                  />
       
       { this.dynamicGrid() }
   </Container>
