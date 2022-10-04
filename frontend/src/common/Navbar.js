@@ -24,6 +24,7 @@ import {
 } from 'react-router-dom'
 
 import KrakenBadge from './Kraken';
+import OriginalKraken from './OriginalKraken';
 
 const pages ={
               'Home': <Home />, 
@@ -49,7 +50,7 @@ const ResponsiveAppBar = () => {
       <AppBar position="static" style={{backgroundColor: "#ed1c24"}} sx={{mb: 2}} >
         <Container maxWidth="xl">
           <Toolbar disableGutters>
-            <KrakenBadge sx={{ display: { xs: 'none', md: 'flex' }, mr: 1, fontSize: '60px' }} />
+            <OriginalKraken sx={{ display: { xs: 'none', md: 'flex' }, mr: 1, fontSize: '60px' }} />
             <Typography
               variant="h6"
               noWrap
@@ -104,7 +105,7 @@ const ResponsiveAppBar = () => {
                 ))}
               </Menu>
             </Box>
-            <KrakenBadge sx={{ display: { xs: 'flex', md: 'none' }, mr: 1, fontSize: '60px' }} />
+            <OriginalKraken sx={{ display: { xs: 'flex', md: 'none' }, mr: 1, fontSize: '60px' }} />
             <Typography
               variant="h5"
               noWrap
