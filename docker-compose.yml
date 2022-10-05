@@ -74,7 +74,7 @@ services:
   frontend:
     image: 'phosphines-frontend:latest'
     volumes:
-      - "./frontend:/app"
+      - "./frontend/src:/app/src"
     build:
       context: .
       dockerfile: frontend.dockerfile
