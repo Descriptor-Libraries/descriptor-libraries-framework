@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { TextField, Typography } from "@mui/material";
 import Paper from '@mui/material/Paper';
@@ -25,7 +25,7 @@ async function substructureSearch(substructure, limit=48, skip=0) {
     console.log(`/api/v1/molecule/search/?substructure=${encoded}&skip=${skip}&limit=${limit}`)
 
     if (!response.ok) {
-        throw 'invalid smiles'
+        throw new Error('invalid smiles')
     }
 
     else {
@@ -69,7 +69,6 @@ function dynamicGrid( svgs ) {
         }
         
     </Grid>
-        <Button variant="contained" style={{backgroundColor: "#ed1c24"}} sx={{ my: 3 }}>Load More</Button>
     </Container>
     )
 }
@@ -86,6 +85,17 @@ export default function SearchHook () {
     const [ svg_results, setSVGResults ] = useState([])
     const [ searchPage, setSearchPage ] = useState(0);
     const [ isLoading, setIsLoading ] = useState(true);
+
+    // loadmore
+    function loadMore() {
+        setSkip(skip => skip + interval);
+        setSearchPage( searchPage => searchPage + 1);
+    }
+
+    function newSearch() {
+        setSkip(0);
+        setSearchPage(0);
+    }
 
     // 
     function loadImages() {
@@ -106,16 +116,32 @@ export default function SearchHook () {
             setIsLoading(false);
         } )
         .then( (items )=> {
+            console.log(searchPage)
+            if (searchPage == 0) {
             setSVGResults(items[1]);
             setResults(items[0]);
+            }
+
+            else {
+                console.log("Else")
+                setSVGResults(svg_results.concat(items[1]));
+                setResults(results.concat(items[0]) )
+                console.log(results.concat(items[0]))
+            }
+
             setIsLoading(false);
+
           })
 
     }
 
-    // initial load of data and what happens when search
-    // string changes
-    useEffect( () => { loadImages() }, [] );
+    // initial load of data 
+    useEffect( ( ) => { 
+        loadImages() }, 
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [ searchPage ] 
+    );
 
     function _handleKeyDown(event) {
         if (event.key === "Enter") {
@@ -132,7 +158,7 @@ export default function SearchHook () {
                   defaultValue= {searchString} 
                   onChange = { event => setSearch( event.target.value ) }
                   onKeyDown = { (e) => _handleKeyDown(e) }
-                  InputProps={{endAdornment: <Button onClick={ () => { loadImages() } } 
+                  InputProps={{endAdornment: <Button onClick={ () => { newSearch() } } 
                   >
                     Search
                     </Button>}}
@@ -142,7 +168,10 @@ export default function SearchHook () {
             <Box sx={{ display: 'flex' }}>
              { isLoading && <CircularProgress sx={{ color: "#ed1c24" }} /> }
              { !isLoading && !validSmiles  && <Typography>Invalid Smiles String</Typography> }
-             { !isLoading && validSmiles && Object.keys(svg_results).length && <Container> { dynamicGrid(svg_results) } </Container> } 
+             { !isLoading && validSmiles && Object.keys(svg_results).length && <Container> 
+                { dynamicGrid(svg_results) } 
+                <Button variant="contained" style={{backgroundColor: "#ed1c24"}} sx={{ my: 3 }} onClick={ () => loadMore() }>Load More</Button> 
+                </Container>  } 
             </Box>
         </Container>
 
