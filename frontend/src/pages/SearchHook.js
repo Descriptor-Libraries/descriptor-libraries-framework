@@ -85,23 +85,27 @@ export default function SearchHook () {
     const [ searchPage, setSearchPage ] = useState(1);
     const [ isLoading, setIsLoading ] = useState(true);
     const [ searchToggle, setSearchToggle ] = useState(true);
+    const [ isLoadingMore, setIsLoadingMore ] = useState(false);
     
     // loadmore
     function loadMore() {
         setSkip(skip => skip + interval);
         setSearchPage( searchPage => searchPage + 1);
+        setIsLoadingMore(true);
     }
 
     function newSearch() {
         setSkip(0);
         setSearchPage(1);
+        setSVGResults([]);
+        setResults([]);
         // Just need to toggle this to make sure it toggles
         // so that effect will be triggered
+        setIsLoading(true);
         setSearchToggle(!searchToggle);
     }
  
     function loadImages() {
-        setIsLoading(true);
 
         const fetchData = async () => {
             const molecule_data = await substructureSearch(searchString, interval, skip);
@@ -112,12 +116,13 @@ export default function SearchHook () {
 
         fetchData()
         .catch( (error) => { 
-            console.log(error)
             setValidSmiles(false);
-            setResults([]); 
+            setResults([]);
+            setSVGResults([])
+            setIsLoading(false)
+            setIsLoadingMore(false) 
         } )
         .then( (items )=> {
-            console.log(searchPage)
             if (searchPage == 1) {
             setSVGResults(items[1]);
             setResults(items[0]);
@@ -126,12 +131,12 @@ export default function SearchHook () {
             else {
                 setSVGResults(svg_results.concat(items[1]));
                 setResults(results.concat(items[0]) )
-                console.log(results.concat(items[0]))
             }
 
+            setIsLoading(false);
+            setIsLoadingMore(false);
 
           })
-          .finally( setIsLoading(false) )
 
     }
 
@@ -170,8 +175,8 @@ export default function SearchHook () {
              { !isLoading && !validSmiles  && <Typography>Invalid Smiles String</Typography> }
              { !isLoading && validSmiles && Object.keys(svg_results).length && 
              <Container> 
-                { dynamicGrid(svg_results)  } 
-                <Button variant="contained" style={{backgroundColor: "#ed1c24"}} sx={{ my: 3 }} onClick={ () => loadMore() }>Load More</Button> 
+                { dynamicGrid(svg_results)  }
+                { isLoadingMore ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <Button variant="contained" style={{backgroundColor: "#ed1c24"}} sx={{ my: 3 }} onClick={ () => loadMore() }>Load More</Button> }
             </Container>  } 
             </Box>
         </Container>
