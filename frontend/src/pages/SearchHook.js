@@ -62,7 +62,7 @@ function dynamicGrid( svgs ) {
         <Grid item xs={12} md={4}>
             <Item>
             <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(result.svg)}`} />
-            <Typography>{ result.smiles }</Typography>
+            <Typography sx={{ wordBreak: "break-word" }}>{ result.smiles }</Typography>
             </Item> 
         </Grid>
         ))
@@ -84,7 +84,8 @@ export default function SearchHook () {
     const [ svg_results, setSVGResults ] = useState([])
     const [ searchPage, setSearchPage ] = useState(1);
     const [ isLoading, setIsLoading ] = useState(true);
-
+    const [ searchToggle, setSearchToggle ] = useState(true);
+    
     // loadmore
     function loadMore() {
         setSkip(skip => skip + interval);
@@ -94,9 +95,11 @@ export default function SearchHook () {
     function newSearch() {
         setSkip(0);
         setSearchPage(1);
+        // Just need to toggle this to make sure it toggles
+        // so that effect will be triggered
+        setSearchToggle(!searchToggle);
     }
-
-    // 
+ 
     function loadImages() {
         setIsLoading(true);
 
@@ -137,7 +140,7 @@ export default function SearchHook () {
         loadImages() }, 
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [ searchPage ] 
+        [ searchPage, searchToggle ] 
     );
 
     function _handleKeyDown(event) {
