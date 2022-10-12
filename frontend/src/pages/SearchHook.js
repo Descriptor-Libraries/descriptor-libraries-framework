@@ -75,15 +75,14 @@ function dynamicGrid( svgs ) {
 
 export default function SearchHook () {
 
-    const interval = 21
+    const interval = 15;
 
     const [ searchString, setSearch ] = useState('PC=C');
     const [ skip, setSkip ] = useState(0);
-    const [ limit, setLimit ] = useState(interval);
     const [ results, setResults ] = useState([]);
     const [ validSmiles, setValidSmiles ] = useState(true);
     const [ svg_results, setSVGResults ] = useState([])
-    const [ searchPage, setSearchPage ] = useState(0);
+    const [ searchPage, setSearchPage ] = useState(1);
     const [ isLoading, setIsLoading ] = useState(true);
 
     // loadmore
@@ -94,7 +93,7 @@ export default function SearchHook () {
 
     function newSearch() {
         setSkip(0);
-        setSearchPage(0);
+        setSearchPage(1);
     }
 
     // 
@@ -102,7 +101,7 @@ export default function SearchHook () {
         setIsLoading(true);
 
         const fetchData = async () => {
-            const molecule_data = await substructureSearch(searchString, limit, skip);
+            const molecule_data = await substructureSearch(searchString, interval, skip);
             const svg_data = await retrieveAllSVGs(molecule_data, searchString);
 
             return [ molecule_data, svg_data ]
@@ -113,25 +112,23 @@ export default function SearchHook () {
             console.log(error)
             setValidSmiles(false);
             setResults([]); 
-            setIsLoading(false);
         } )
         .then( (items )=> {
             console.log(searchPage)
-            if (searchPage == 0) {
+            if (searchPage == 1) {
             setSVGResults(items[1]);
             setResults(items[0]);
             }
 
             else {
-                console.log("Else")
                 setSVGResults(svg_results.concat(items[1]));
                 setResults(results.concat(items[0]) )
                 console.log(results.concat(items[0]))
             }
 
-            setIsLoading(false);
 
           })
+          .finally( setIsLoading(false) )
 
     }
 
@@ -168,10 +165,11 @@ export default function SearchHook () {
             <Box sx={{ display: 'flex' }}>
              { isLoading && <CircularProgress sx={{ color: "#ed1c24" }} /> }
              { !isLoading && !validSmiles  && <Typography>Invalid Smiles String</Typography> }
-             { !isLoading && validSmiles && Object.keys(svg_results).length && <Container> 
-                { dynamicGrid(svg_results) } 
+             { !isLoading && validSmiles && Object.keys(svg_results).length && 
+             <Container> 
+                { dynamicGrid(svg_results)  } 
                 <Button variant="contained" style={{backgroundColor: "#ed1c24"}} sx={{ my: 3 }} onClick={ () => loadMore() }>Load More</Button> 
-                </Container>  } 
+            </Container>  } 
             </Box>
         </Container>
 
