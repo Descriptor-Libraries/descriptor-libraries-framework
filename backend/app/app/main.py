@@ -8,6 +8,7 @@ import core.config
 app = FastAPI(
     title=core.config.settings.PROJECT_NAME,
     openapi_url="/api/openapi.json",
+    docs_url="/api/docs",
     redoc=None
 )
 

@@ -60,7 +60,7 @@ services:
       - db
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`localhost`) && PathPrefix(`/api`, `/docs`) || Host(`147.182.187.35`) && PathPrefix(`/api`, `/docs`)"
+      - "traefik.http.routers.backend.rule=Host(`localhost`) && PathPrefix(`/api`) || Host(`147.182.187.35`) && PathPrefix(`/api`)"
       - "traefik.http.services.backend.loadbalancer.server.port=8080"
 
   cdk-depict:
