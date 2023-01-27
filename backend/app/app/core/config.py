@@ -5,7 +5,6 @@ from typing import Any, Optional, Dict
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = 'Phosphines'
-    API_V1_STR: str = '/api/v1'
 
     POSTGRES_SERVER: str
     POSTGRES_USER: str
