@@ -28,7 +28,7 @@ class Search extends React.Component {
       defaultSearch: 'PC=C',
       searchString: 'PC=C',
       skip: 0,
-      limit: 9,
+      limit: 50,
       results: [],
       valid_smiles: true,
       loading: true,
@@ -91,11 +91,10 @@ class Search extends React.Component {
       })
     .then( (items) => {
 
-      //items.map(item =>  item['svg'] ='');
+      items.map(item =>  item['svg'] ='');
 
       this.setState({
         results: items,
-        svgs: [],
       })
 
         items.map( (item) => {
@@ -108,10 +107,7 @@ class Search extends React.Component {
             this.setState({loading: false});
           }
           )
-        })
-
-
-        ;
+        });
     } 
    )   
   }

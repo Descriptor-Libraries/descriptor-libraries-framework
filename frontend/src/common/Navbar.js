@@ -13,8 +13,8 @@ import MenuItem from '@mui/material/MenuItem';
 import Home from '../pages/Home'
 import About from '../pages/About'
 import Contact from '../pages/Contact'
-import Search from '../pages/Search'
 import Download from '../pages/Download'
+import Search  from '../pages/SearchHook';
 
 import {
   BrowserRouter as Router, 
@@ -23,7 +23,6 @@ import {
   Link
 } from 'react-router-dom'
 
-import KrakenBadge from './Kraken';
 import OriginalKraken from './OriginalKraken';
 
 const pages ={

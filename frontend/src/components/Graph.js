@@ -51,19 +51,19 @@ class MyPlot extends React.Component {
   }
 
   componentDidMount() {
-    fetch('/api/v1/molecule/molecules/umap?limit=200&category=pcn')
+    fetch('/api/v1/molecule/molecules/umap?category=pcn')
       .then(response => response.json())
       .then(items => this.setState({ 
         pcn: items
       })
       );
 
-    fetch('/api/v1/molecule/molecules/umap?limit=200&category=pc3')
+    fetch('/api/v1/molecule/molecules/umap?category=pc3')
       .then(response => response.json())
       .then(items => this.setState({ pc3: items })
       );
 
-    fetch('/api/v1/molecule/molecules/umap?limit=200&category=po3')
+    fetch('/api/v1/molecule/molecules/umap?category=po3')
       .then(response => response.json())
       .then(items => this.setState({ po3: items })
       );
@@ -106,7 +106,7 @@ class MyPlot extends React.Component {
           line: {
             width: 2,
             color: 'DarkSlateGrey'}},
-        name: 'PC3'
+        name: 'PC<sub>3</sub>'
       },
 
       {
@@ -121,7 +121,7 @@ class MyPlot extends React.Component {
           line: {
             width: 2,
             color: 'DarkSlateGrey'}},
-        name: 'PO3'
+        name: 'PO<sub>3</sub>'
       },
     ]}
     layout={ { 

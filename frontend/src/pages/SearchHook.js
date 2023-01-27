@@ -115,7 +115,8 @@ export default function SearchHook () {
         }
 
         fetchData()
-        .catch( (error) => { 
+        .catch( (error) => {
+            console.log(error) 
             setValidSmiles(false);
             setResults([]);
             setSVGResults([])
@@ -173,11 +174,12 @@ export default function SearchHook () {
             <Box sx={{ display: 'flex' }}>
              { isLoading && <CircularProgress sx={{ color: "#ed1c24" }} /> }
              { !isLoading && !validSmiles  && <Typography>Invalid Smiles String</Typography> }
-             { !isLoading && validSmiles && Object.keys(svg_results).length && 
+             { !isLoading && validSmiles && Object.keys(svg_results).length > 0 && 
              <Container> 
                 { dynamicGrid(svg_results)  }
                 { isLoadingMore ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <Button variant="contained" style={{backgroundColor: "#ed1c24"}} sx={{ my: 3 }} onClick={ () => loadMore() }>Load More</Button> }
-            </Container>  } 
+            </Container>  }
+            { !isLoading && validSmiles && Object.keys(svg_results).length==0 && <Typography>No results found for SMILES string.</Typography> } 
             </Box>
         </Container>
 
