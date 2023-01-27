@@ -20,9 +20,7 @@ const Item = styled(Paper)(({ theme }) => ({
 async function substructureSearch(substructure, limit=48, skip=0) {
     let encoded = encodeURIComponent(substructure);
 
-    const response =  await fetch(`/api/v1/molecule/search/?substructure=${encoded}&skip=${skip}&limit=${limit}`)
-
-    console.log(`/api/v1/molecule/search/?substructure=${encoded}&skip=${skip}&limit=${limit}`)
+    const response =  await fetch(`/api/molecule/search/?substructure=${encoded}&skip=${skip}&limit=${limit}`)
 
     if (!response.ok) {
         throw new Error('invalid smiles')

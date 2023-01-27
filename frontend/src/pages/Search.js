@@ -74,7 +74,7 @@ class Search extends React.Component {
   substructureSearch(substructure) {
     let encoded = encodeURIComponent(substructure)
     this.setState({loading: true})
-    fetch(`/api/v1/molecule/search/?substructure=${encoded}&skip=${this.state.skip}&limit=${this.state.limit}`)
+    fetch(`/api/molecule/search/?substructure=${encoded}&skip=${this.state.skip}&limit=${this.state.limit}`)
     .then( (response) => {
       if (!response.ok) {
         this.setState({
