@@ -11,9 +11,12 @@ app = FastAPI(
     redoc=None
 )
 
-# versioned API endpoints
-app.include_router(api.v1.api.router, prefix="/api/v1")
-app.include_router(api.v2.api.router, prefix="/api/v2")
-
 # default API endpoints
-app.include_router(api.v2.api.router, prefix="/api")
+app.include_router(api.v2.api.router, prefix="/api", tags=["current"])
+
+# versioned API endpoints
+app.include_router(api.v2.api.router, prefix="/api/v2", tags=["v2"])
+app.include_router(api.v1.api.router, prefix="/api/v1", tags=["v1"])
+
+
+
