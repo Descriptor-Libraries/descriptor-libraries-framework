@@ -36,12 +36,12 @@ def get_molecule_umap(
 
     # Case 1: no category and no ml (default)
     if not category and not show_ml:
-        query += """WHERE dft_data IS NOT NULL
+        query += """WHERE dft_data IS NOT NULL OR xtb_data IS NOT NULL
         """
 
     # Case 2: category and no ml
     if category and not show_ml:
-        query += """WHERE pat = :category AND dft_data IS NOT NULL
+        query += """WHERE pat = :category AND (dft_data IS NOT NULL OR xtb_data IS NOT NULL)
         """
         query_parameters["category"] = category
 
