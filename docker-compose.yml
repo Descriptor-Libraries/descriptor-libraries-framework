@@ -52,7 +52,7 @@ services:
     environment:
       POSTGRES_SERVER: database
       POSTGRES_USER: postgres
-      POSTGRES_PASSWD: 'password'
+      POSTGRES_PASSWD: '8erYeah!'
       POSTGRES_DB: postgres
     entrypoint: bash prestart.sh
     networks:
