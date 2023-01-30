@@ -47,26 +47,39 @@ class MyPlot extends React.Component {
       pcn: [],
       pc3: [],
       po3: [],
+      pn3: [],
+      phal: [],
     };
   }
 
   componentDidMount() {
-    fetch('/api/molecule/molecules/umap?category=pcn')
+    fetch('/api/molecules/umap?category=pcn')
       .then(response => response.json())
       .then(items => this.setState({ 
         pcn: items
       })
       );
 
-    fetch('/api/molecule/molecules/umap?category=pc3')
+    fetch('/api/molecules/umap?category=pc3')
       .then(response => response.json())
       .then(items => this.setState({ pc3: items })
       );
 
-    fetch('/api/molecule/molecules/umap?category=po3')
+    fetch('/api/molecules/umap?category=po3')
       .then(response => response.json())
       .then(items => this.setState({ po3: items })
       );
+
+      fetch('/api/molecules/umap?category=phal')
+      .then(response => response.json())
+      .then(items => this.setState({ phal: items })
+      );
+
+      fetch('/api/molecules/umap?category=pn3')
+      .then(response => response.json())
+      .then(items => this.setState({ pn3: items })
+      );
+
   }
 
   render() {
@@ -77,22 +90,7 @@ class MyPlot extends React.Component {
     style={{'width': '100%', 'height': '100%' }}
     useResizeHandler={true}
     data={[
-      {
-        x: this.state.pcn.map( row => { return row.umap1 }),
-        y: this.state.pcn.map( row => { return row.umap2 }),
-        text: this.state.pcn.map( row => { return encodeURIComponent(row.smiles) }),
-        hovertemplate: "( %{x}, %{y} )",
-        hovermode: "closest",
-        type: 'scatter',
-        mode: 'markers',
-        marker: {color: 'blue', size: 12,
-          symbol: 'hexagon',
-          line: {
-            width: 2,
-            color: 'DarkSlateGrey'}},
-        name: 'PCN'
-      },
-      
+
       {
         x: this.state.pc3.map( row => { return row.umap1 }),
         y: this.state.pc3.map( row => { return row.umap2 }),
@@ -106,8 +104,25 @@ class MyPlot extends React.Component {
           line: {
             width: 2,
             color: 'DarkSlateGrey'}},
-        name: 'PC<sub>3</sub>'
+        name: 'P[C]<sub>3</sub>'
       },
+
+      {
+        x: this.state.pn3.map( row => { return row.umap1 }),
+        y: this.state.pn3.map( row => { return row.umap2 }),
+        text: this.state.pn3.map( row => { return encodeURIComponent(row.smiles) }),
+        hovertemplate: "( %{x}, %{y} )",
+        hovermode: "closest",
+        type: 'scatter',
+        mode: 'markers',
+        marker: {color: 'blue', size: 12,
+          symbol: 'circle',
+          line: {
+            width: 2,
+            color: 'DarkSlateGrey'}},
+        name: 'P[N]<sub>3</sub>'
+      },
+
 
       {
         x: this.state.po3.map( row => { return row.umap1 }),
@@ -118,11 +133,47 @@ class MyPlot extends React.Component {
         type: 'scatter',
         mode: 'markers',
         marker: {color: 'red', size: 12 , 
+        symbol: "triangle-up",
           line: {
             width: 2,
             color: 'DarkSlateGrey'}},
-        name: 'PO<sub>3</sub>'
+        name: 'P[O]<sub>3</sub>'
       },
+
+
+      {
+        x: this.state.pcn.map( row => { return row.umap1 }),
+        y: this.state.pcn.map( row => { return row.umap2 }),
+        text: this.state.pcn.map( row => { return encodeURIComponent(row.smiles) }),
+        hovertemplate: "( %{x}, %{y} )",
+        hovermode: "closest",
+        type: 'scatter',
+        mode: 'markers',
+        marker: {color: 'DarkBlue', size: 12,
+          symbol: 'hexagon',
+          line: {
+            width: 2,
+            color: 'DarkSlateGrey'}},
+        name: 'P[C]<sub>n</sub>[N]<sub>m</sub>'
+      },
+
+      
+      {
+        x: this.state.phal.map( row => { return row.umap1 }),
+        y: this.state.phal.map( row => { return row.umap2 }),
+        text: this.state.phal.map( row => { return encodeURIComponent(row.smiles) }),
+        hovertemplate: "( %{x}, %{y} )",
+        hovermode: "closest",
+        type: 'scatter',
+        mode: 'markers',
+        marker: {color: 'LimeGreen', size: 12,
+          symbol: 'hexagon2',
+          line: {
+            width: 2,
+            color: 'DarkSlateGrey'}},
+        name: 'PF<sub>n</sub>[R]<sub>m</sub>'
+      },
+      
     ]}
     layout={ { 
       title: this.props.title,
