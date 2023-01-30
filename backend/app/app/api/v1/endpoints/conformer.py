@@ -12,6 +12,7 @@ from app import schemas, utils
 
 router = APIRouter()
 
+
 def get_conformer_and_format(conformer_id, format, db):
     if not format in ['xyz', 'sdf', 'pdb', 'mol']:
         return 'Not implemented yet'
@@ -62,7 +63,7 @@ def get_other_conformers_id(
     sql = text((
         "select conformer_id from conformer "
         "where molecule_id = ("
-        "select molecule_id from conformer where conformer_id = :conformer_id"
+        "select molecule_id from conformer where conformer_id = :conformer_id" # modified slightly from true v1
         ");"
     ))
     results = db.execute(sql, conformer_id=conformer_id).fetchall()

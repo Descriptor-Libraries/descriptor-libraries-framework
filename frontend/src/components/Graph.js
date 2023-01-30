@@ -51,19 +51,19 @@ class MyPlot extends React.Component {
   }
 
   componentDidMount() {
-    fetch('/api/v1/molecule/molecules/umap?category=pcn')
+    fetch('/api/molecule/molecules/umap?category=pcn')
       .then(response => response.json())
       .then(items => this.setState({ 
         pcn: items
       })
       );
 
-    fetch('/api/v1/molecule/molecules/umap?category=pc3')
+    fetch('/api/molecule/molecules/umap?category=pc3')
       .then(response => response.json())
       .then(items => this.setState({ pc3: items })
       );
 
-    fetch('/api/v1/molecule/molecules/umap?category=po3')
+    fetch('/api/molecule/molecules/umap?category=po3')
       .then(response => response.json())
       .then(items => this.setState({ po3: items })
       );
