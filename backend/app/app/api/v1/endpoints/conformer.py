@@ -63,8 +63,8 @@ def get_other_conformers_id(
     sql = text((
         "select conformer_id from conformer "
         "where molecule_id = ("
-        f"select molecule_id from conformer where conformer_id = {conformer_id}"
+        "select molecule_id from conformer where conformer_id = :conformer_id" # modified slightly from true v1
         ");"
     ))
-    results = db.execute(sql).fetchall()
+    results = db.execute(sql, conformer_id=conformer_id).fetchall()
     return [r['conformer_id'] for r in results]
