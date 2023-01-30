@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Any
 
 from app import schemas
 from app.api import deps
@@ -18,25 +18,49 @@ router = APIRouter()
 
 @router.get("/molecules/umap", response_model=List[schemas.MoleculeSimple])
 def get_molecule_umap(
-    limit: int = 3000,
+    limit: int = 1000,
     category: Optional[str] = None,
+    show_ml: bool = False,
     db: Session = Depends(deps.get_db),
 ):
+
+    query_parameters: dict[str, Any] = {"limit": limit}
 
     query = """
         SELECT molecule_id, smiles, umap[0] AS umap1, umap[1] AS umap2, pat FROM molecule
         """
 
-    if category:
+    # Need to build the query based on the inputs
+    # the cleanest way to do this is to consider the
+    # possible cases separately.
+
+    # Case 1: no category and no ml (default)
+    if not category and not show_ml:
+        query += """WHERE dft_data IS NOT NULL
+        """
+
+    # Case 2: category and no ml
+    if category and not show_ml:
+        query += """WHERE pat = :category AND dft_data IS NOT NULL
+        """
+        query_parameters["category"] = category
+
+    # Case 3: category and ml
+    if category and show_ml:
         query += """WHERE pat = :category
         """
+        query_parameters["category"] = category
+
+    # Case 4: no category and ml
+    # no additional arugments needed
 
     query += """ORDER BY molecule_id 
         FETCH FIRST :limit ROWS ONLY;"""
 
     sql = text(query)
+    stmt = sql.bindparams(**query_parameters)
 
-    results = db.execute(sql, {"limit": limit, "category": category}).fetchall()
+    results = db.execute(stmt).fetchall()
 
     return results
 
