@@ -16,7 +16,7 @@ router = APIRouter()
 #    return "Working"
 
 
-@router.get("/molecules/umap", response_model=List[schemas.MoleculeSimple])
+@router.get("/umap", response_model=List[schemas.MoleculeSimple])
 def get_molecule_umap(
     limit: int = 1000,
     category: Optional[str] = None,
