@@ -168,3 +168,36 @@ def search_molecules(
 
     return results
 
+@router.get("/pca_space/{smiles}", response_model=List[schemas.MoleculeUmap])
+def search_molecules(
+    smiles: str = "",
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(deps.get_db),
+):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        raise HTTPException(status_code=400, detail="Invalid Smiles")
+    smiles = Chem.MolToSmiles(mol)
+    if smiles is None:
+        raise HTTPException(status_code=400, detail="Invalid Smiles!")
+
+    sql = text(
+        """
+        SELECT smiles, pca.pca,
+        SQRT(POWER((pca.pca[1] - p1.pca[1]),2)+POWER((pca.pca[2] - p1.pca[2]),2)+POWER((pca.pca[3] - p1.pca[3]),2)+POWER((pca.pca[4] - p1.pca[4]),2)) as dist
+        FROM pca, (SELECT pca FROM pca WHERE smiles='N#Cc1ccc(OP(Oc2ccccc2)Oc2ccccc2)cc1') as p1
+        ORDER BY dist
+        offset :offset 
+        limit :limit
+        """
+    )
+
+    try:
+        results = db.execute(
+            sql, dict(smiles=smiles, offset=skip, limit=limit)
+        ).fetchall()
+    except exc.DataError:
+        raise HTTPException(status_code=400, detail="Invalid Smiles!")
+
+    return results
