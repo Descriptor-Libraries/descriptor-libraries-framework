@@ -133,3 +133,38 @@ def search_molecules(
         raise HTTPException(status_code=400, detail="Invalid Smiles Substructure!")
 
     return results
+
+@router.get("/umap_space/{smiles}", response_model=List[schemas.MoleculeUmap])
+def search_molecules(
+    smiles: str = "",
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(deps.get_db),
+):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        raise HTTPException(status_code=400, detail="Invalid Smiles")
+    smiles = Chem.MolToSmiles(mol)
+    if smiles is None:
+        raise HTTPException(status_code=400, detail="Invalid Smiles!")
+
+    sql = text(
+        """
+        SELECT smiles, umap, 
+        (umap <-> (SELECT umap FROM new_data WHERE smiles=:smiles)) as dist
+        FROM new_data 
+        ORDER BY dist
+        offset :offset 
+        limit :limit
+        """
+    )
+
+    try:
+        results = db.execute(
+            sql, dict(smiles=smiles, offset=skip, limit=limit)
+        ).fetchall()
+    except exc.DataError:
+        raise HTTPException(status_code=400, detail="Invalid Smiles!")
+
+    return results
+
