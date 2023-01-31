@@ -19,3 +19,7 @@ class MoleculeSimple(BaseModel):
     umap2: Optional[float]
     pat: Optional[str]
     smiles: str
+
+class MoleculeUmap(BaseModel):
+    smiles: str
+    dist: Optional[float]
