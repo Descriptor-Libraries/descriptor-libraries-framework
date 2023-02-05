@@ -1,6 +1,10 @@
 Developer Guide
 ===============
 
-#.  Overview of project structure
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :titlesonly:
 
-#. Setting up your development environment
+   environment
+   architecture_overview

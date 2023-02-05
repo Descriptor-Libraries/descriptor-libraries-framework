@@ -14,7 +14,7 @@ These are the docs for the kraken website.
     .. grid-item-card:: API Reference
       :margin: 0 3 0 0
       
-      Most projects will also need an API reference.
+      Documentation for the REST API.
 
       .. button-link:: ./api/index.html
          :color: primary
@@ -25,7 +25,7 @@ These are the docs for the kraken website.
     .. grid-item-card::  Developer Guide
       :margin: 0 3 0 0
       
-      How to contribute to molssi_doc_theme
+      How to set up your development environment to contribute to kraken.
 
       .. button-link:: ./developer_guide/index.html
          :color: primary
@@ -39,7 +39,4 @@ These are the docs for the kraken website.
    :hidden:
    :titlesonly:
 
-   getting_started/index
-   user_guide/index
-   api/index
    developer_guide/index

@@ -101,9 +101,9 @@ html_theme_options = {
 	"twitter_url": "https://twitter.com/MolSSI_NSF",
 
 	"logo": {
-      "image_light": "molssi_main_logo.png",
-      "image_dark": "molssi_main_logo_inverted_white.png",
-      "text": "Docs Theme",
+      "image_light": "kraken_red.svg",
+      "image_dark": "kraken_red.svg",
+      "text": "kraken",
       "molssi_light": "molssi_main_logo.png",
       "molssi_dark": "molssi_main_logo_inverted_white.png",
     },
@@ -114,6 +114,7 @@ html_theme_options = {
   ],
 
 	"secondary_sidebar_items": ["page-toc", "sourcelink"],
+    "footer_items": [ "molssi_footer" ],
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
