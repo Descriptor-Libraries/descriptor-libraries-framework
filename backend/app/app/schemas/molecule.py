@@ -14,12 +14,14 @@ class Molecule(BaseModel):
     ml_data: Optional[Dict]
 
 class MoleculeSimple(BaseModel):
-    molecule_id: int
+    # Making molecule_id optional for now
+    molecule_id: Optional[int]
     umap1: Optional[float]
     umap2: Optional[float]
+    pca1: Optional[float]
+    pca2: Optional[float]
+    pca3: Optional[float]
+    pca4: Optional[float]
     pat: Optional[str]
-    smiles: str
-
-class MoleculeUmap(BaseModel):
-    smiles: str
     dist: Optional[float]
+    smiles: str
