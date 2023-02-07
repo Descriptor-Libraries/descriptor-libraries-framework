@@ -4,34 +4,34 @@
    contain the root `toctree` directive.
 
 
-kraken
+kraken Documentation
 =========================================================
 
 These are the docs for the kraken website.
 
 .. grid:: 1 1 2 2
 
-    .. grid-item-card:: API Reference
-      :margin: 0 3 0 0
-      
-      Documentation for the REST API.
-
-      .. button-link:: ./api/index.html
-         :color: primary
-         :expand:
-
-         To the API Reference.
-
     .. grid-item-card::  Developer Guide
       :margin: 0 3 0 0
       
-      How to set up your development environment to contribute to kraken.
+      Learn about kraken's architecture and how to set up your development environment.
 
       .. button-link:: ./developer_guide/index.html
          :color: primary
          :expand:
 
-         To the Developer Guide
+         To the Developer Guide.
+    
+    .. grid-item-card:: API Reference
+      :margin: 0 3 0 0
+      
+      Documentation for the REST API.
+
+      .. button-link:: /api/docs
+         :color: primary
+         :expand:
+
+         To the API Reference.
 
 
 .. toctree::
@@ -39,4 +39,5 @@ These are the docs for the kraken website.
    :hidden:
    :titlesonly:
 
+   self
    developer_guide/index

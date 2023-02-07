@@ -1,3 +1,7 @@
+#!/bin/bash
+
+make clean
+make html
 
 nohup inotifywait -m -r . --exclude _build/ --event create,modify | while read changed; do echo $changed; make html>/dev/null; done &
 

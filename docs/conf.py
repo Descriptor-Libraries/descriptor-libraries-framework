@@ -97,7 +97,7 @@ html_favicon = "_static/molssi_square.png"
 # documentation.
 #
 html_theme_options = {
-	"github_url": "https://github.com/jchen0506/molssi_doc_theme",
+	"github_url": "https://github.com/janash/kraken-starting",
 	"twitter_url": "https://twitter.com/MolSSI_NSF",
 
 	"logo": {
@@ -106,11 +106,14 @@ html_theme_options = {
       "text": "kraken",
       "molssi_light": "molssi_main_logo.png",
       "molssi_dark": "molssi_main_logo_inverted_white.png",
+      "link": "/"
     },
 	"show_toc_level": 2,
 	"header_links_before_dropdown": 4,
 	"external_links": [
-      {"name": "MolSSI", "url": "https://molssi.org"}
+      {"name": "API Reference", "url": "/api/docs"},
+      {"name": "MolSSI", "url": "https://molssi.org"},
+      
   ],
 
 	"secondary_sidebar_items": ["page-toc", "sourcelink"],
