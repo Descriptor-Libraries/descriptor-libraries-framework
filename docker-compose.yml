@@ -5,6 +5,7 @@ services:
     # The official v2 Traefik docker image
     image: traefik:v2.8
     # Enables the web UI and tells Traefik to listen to docker
+    container_name: reverse_proxy
     command: 
       - --api.insecure=true 
       - --api.dashboard=true
@@ -44,6 +45,7 @@ services:
 
   backend:
     image: 'phosphines-backend:latest'
+    container_name: backend
     build:
       context: ./backend
       dockerfile: backend.dockerfile
@@ -52,7 +54,7 @@ services:
     environment:
       POSTGRES_SERVER: database
       POSTGRES_USER: postgres
-      POSTGRES_PASSWD: '8erYeah!'
+      POSTGRES_PASSWD: $POSTGRES_PWD
       POSTGRES_DB: postgres
     entrypoint: bash prestart.sh
     networks:
@@ -65,6 +67,7 @@ services:
 
   cdk-depict:
     image: 'simolecule/cdkdepict:latest'
+    container_name: cdk_depict
     networks:
       - web
     labels:
@@ -73,6 +76,7 @@ services:
 
   frontend:
     image: 'phosphines-frontend:latest'
+    container_name: frontend
     volumes:
       - "./frontend/src:/app/src"
     build:
@@ -85,6 +89,23 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`localhost`) || Host(`147.182.187.35`)"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+
+  documentation:
+    image: "phosphines-docs:latest"
+    container_name: documentation
+    build:
+      context: ./docs
+      dockerfile: docs.dockerfile
+    entrypoint: bash start.sh
+    volumes:
+      - "./docs:/docs"
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.documentation.rule=Host(`localhost`) && PathPrefix(`/docs`) || Host(`147.182.187.35`) && PathPrefix(`/docs`)"
+      - "traefik.http.services.documentation.loadbalancer.server.port=5000"
+    
 
 networks:
   web:
