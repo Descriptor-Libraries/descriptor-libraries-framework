@@ -135,6 +135,15 @@ const ResponsiveAppBar = () => {
                   </Button>
                 </Link>
               ))}
+
+              <Link to="/docs/" id="documentation" className="NavbarLink" reloadDocument >
+                  <Button
+                  key="documentation"
+                  sx={{ my: 2, color: 'white', display: 'block' }}>
+                  Documentation
+                </Button>
+              </Link>
+
             </Box>
           </Toolbar>
         </Container>
