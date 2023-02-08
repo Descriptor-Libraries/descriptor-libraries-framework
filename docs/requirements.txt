@@ -1,0 +1,7 @@
+starlette
+uvicorn[standard]
+sphinx
+sphinx-autobuild
+sphinx-design
+sphinx-copybutton 
+pydata-sphinx-theme 

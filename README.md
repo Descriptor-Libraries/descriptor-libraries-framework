@@ -168,3 +168,21 @@ WHERE molecule_column@>'substructure_string'
 - Incorporate Razi submodule for SQLAlchemy + RDKit database cartridge.
 
 - Evaluate database structure.
+
+
+### Installation
+
+1. [Install Docker](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04)
+   1. If you are on WSL, you will not be able to do: `sudo systemctl status docker`. You can skip this step.
+2. [Install Docker Compose](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-20-04)
+   1. On this step `sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose` it points to a specific `docker-compose` version (`1.29.2`). However, you should refer to the releases on the Docker Compose GitHub page and install the most recent.
+3. Create volumes
+   1. `docker volume create kraken-postgres`
+   2. `docker volume create pr3`
+4. Create Database.
+   1. Download a dump of the database.
+      1. `wget https://www.dropbox.com/s/63bktngq70rg5rn/kraken_20221107.sql?dl=0`
+   2. Start the database container
+      1. `docker-compose run database`
+5. Leave the terminal open and running. Open a new terminal.
+   1. `sudo apt install postgresql-client-common`
