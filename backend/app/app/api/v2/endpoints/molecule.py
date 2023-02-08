@@ -170,8 +170,8 @@ def search_molecules(
 
 @router.get("smiles/pca_neighbors/", response_model=List[schemas.MoleculeSimple])
 def search_molecules(
-    smiles: str = "",
-    pca_components: Optional[str]=None,
+    smiles: str,
+    pca_components: Optional[str]="1,2,3,4",
     skip: int = 1,
     limit: int = 100,
     db: Session = Depends(deps.get_db),
@@ -185,47 +185,36 @@ def search_molecules(
     
     query = """"""
 
-    if not pca_components:
-        query ="""
-            SELECT smiles, pca.pca[1] as pca1, pca.pca[2] as pca2, pca.pca[3] as pca3, pca.pca[4] as pca4,
-            SQRT(POWER((pca.pca[1] - p1.pca[1]),2)+POWER((pca.pca[2] - p1.pca[2]),2)+POWER((pca.pca[3] - p1.pca[3]),2)+POWER((pca.pca[4] - p1.pca[4]),2)) as dist
-            FROM pca, (SELECT pca FROM pca WHERE smiles=:smiles) as p1
-            ORDER BY dist
-            OFFSET :offset 
-            LIMIT :limit
-            """
-    else:
-        pca_components_list = [int(i) for i in pca_components.split(",")]
-        pca_components_list.sort()
+    pca_components_list = [int(i) for i in pca_components.split(",")]
+    pca_components_list.sort()
 
-        # Check to see if the pca components requested are valid
-        if pca_components_list[-1] > 4 or len(pca_components_list) > 4:
-            raise HTTPException(status_code=400, detail="Invalid PCA components, there are only 4 available")
+    # Check to see if the pca components requested are valid
+    if pca_components_list[-1] > 4 or len(pca_components_list) > 4:
+        raise HTTPException(status_code=400, detail="Invalid PCA components, there are only 4 available")
         
-        #TODO: CHECK TO MAKE SURE THE SAME NUMBER IS NOT ENTERED TWICE ("1,1"), ("2,1,1") 
-        
-        query += """SELECT smiles,
+    query += """SELECT smiles,"""
+
+    # Look into creating a distance function on SQL to just pass in the parameters
+
+    # Adding on all the PCA columns requested
+    for i in pca_components_list:
+        query += f"""pca.pca[{i}] as pca{i},"""
+    
+    # Adding on the distance calculation using only PCA columns requested
+    for i in pca_components_list:
+        if i == pca_components_list[0]:
+            query += f"""SQRT(POWER((pca.pca[{i}] - p1.pca[{i}]),2)+"""
+        elif i != pca_components_list[-1]:
+            query += f"""POWER((pca.pca[{i}] - p1.pca[{i}]),2)+"""
+        else:
+            query += f"""POWER((pca.pca[{i}] - p1.pca[{i}]),2)) as dist"""
+
+    query += """
+        FROM pca, (SELECT pca FROM pca WHERE smiles=:smiles) as p1
+        ORDER BY dist
+        OFFSET :offset 
+        LIMIT :limit
         """
-
-        # Adding on all the PCA columns requested
-        for i in pca_components_list:
-            query += f"""pca.pca[{i}] as pca{i},"""
-        
-        # Adding on the distance calculation using only PCA columns requested
-        for i in pca_components_list:
-            if i == pca_components_list[0]:
-                query += f"""SQRT(POWER((pca.pca[{i}] - p1.pca[{i}]),2)+"""
-            elif i != pca_components_list[-1]:
-                query += f"""POWER((pca.pca[{i}] - p1.pca[{i}]),2)+"""
-            else:
-                query += f"""POWER((pca.pca[{i}] - p1.pca[{i}]),2)) as dist"""
-
-        query += """
-            FROM pca, (SELECT pca FROM pca WHERE smiles=:smiles) as p1
-            ORDER BY dist
-            OFFSET :offset 
-            LIMIT :limit
-            """
 
     sql = text(query)
 
