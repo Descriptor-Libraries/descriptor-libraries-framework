@@ -1,3 +1,8 @@
+---- Set column pca in table pca to an array of all 4 pca component columns ----
+ALTER TABLE pca ADD COLUMN pca float[];
+UPDATE pca
+SET pca = ARRAY[pca1, pca2, pca3, pca4];
+
 ---- Query to add molecule_id to umap table ----
 
 ALTER TABLE new_data
@@ -26,3 +31,11 @@ WHERE t1.smiles = t2.smiles;
 -- check to make sure everything was transfered over
 select molecule_id, smiles from pca
 WHERE molecule_id IS NULL;
+
+---- Query to drop unnescesary columns from umap and pca tables ----
+
+ALTER TABLE umap
+DROP COLUMN umap1, DROP COLUMN umap2;
+
+ALTER TABLE pca
+DROP COLUMN pca1, DROP COLUMN pca2, DROP COLUMN pca3, DROP COLUMN pca4;
