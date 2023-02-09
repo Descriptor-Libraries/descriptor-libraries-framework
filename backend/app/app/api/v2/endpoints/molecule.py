@@ -150,9 +150,9 @@ def search_molecules(
 
     sql = text(
         """
-        SELECT smiles, umap, 
-        (umap <-> (SELECT umap FROM new_data WHERE smiles=:smiles)) as dist
-        FROM new_data 
+        SELECT smiles, umap[0] AS umap1, umap[1] AS umap2 , molecule_id,
+        (umap <-> (SELECT umap FROM umap WHERE smiles=:smiles)) as dist
+        FROM umap
         ORDER BY dist
         OFFSET :offset 
         LIMIT :limit
@@ -192,7 +192,7 @@ def search_molecules(
     if pca_components_list[-1] > 4 or len(pca_components_list) > 4:
         raise HTTPException(status_code=400, detail="Invalid PCA components, there are only 4 available")
         
-    query += """SELECT smiles,"""
+    query += """SELECT smiles, molecule_id,"""
 
     # Look into creating a distance function on SQL to just pass in the parameters
 

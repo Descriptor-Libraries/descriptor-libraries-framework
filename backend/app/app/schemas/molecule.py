@@ -14,8 +14,7 @@ class Molecule(BaseModel):
     ml_data: Optional[Dict]
 
 class MoleculeSimple(BaseModel):
-    # Making molecule_id optional for now
-    molecule_id: Optional[int]
+    molecule_id: int
     umap1: Optional[float]
     umap2: Optional[float]
     pca1: Optional[float]
