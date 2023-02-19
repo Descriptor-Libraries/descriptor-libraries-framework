@@ -150,7 +150,7 @@ def search_umap_neighbors(
 
     sql = text(
         """
-        SELECT smiles, umap[0] AS umap1, umap[1] AS umap2 , molecule_id,
+        SELECT smiles, ARRAY[umap[0], umap[1]] AS components, molecule_id, 'umap' as type,
         (umap <-> (SELECT umap FROM umap WHERE smiles=:smiles)) as dist
         FROM umap
         ORDER BY dist
@@ -171,7 +171,7 @@ def search_umap_neighbors(
 @router.get("smiles/pca_neighbors/", response_model=List[schemas.MoleculeSimple])
 def search_pca_neighbors(
     smiles: str,
-    pca_components: Optional[str]="1,2,3,4",
+    components: Optional[str]="1,2,3,4",
     skip: int = 1,
     limit: int = 100,
     db: Session = Depends(deps.get_db),
@@ -185,31 +185,39 @@ def search_pca_neighbors(
     
     query = """"""
 
-    pca_components_list = [int(i) for i in pca_components.split(",")]
-    pca_components_list.sort()
+    # Need check to see if the components are all integers
+    pca_components_list = []
+    for i in components.split(","):
+        if isinstance(int(i), int):
+            pca_components_list.append(int(i))
+        else:
+            raise HTTPException(status_code=400, detail="Components must be a string of integers seperated by commas")
 
     # Check to see if the pca components requested are valid
+    # TODO: This will need to be generalized, since other schemas may have more or less pcas not a maximum of 4...
+    pca_components_list.sort()
     if pca_components_list[-1] > 4 or len(pca_components_list) > 4:
         raise HTTPException(status_code=400, detail="Invalid PCA components, there are only 4 available")
         
-    query += """SELECT smiles, molecule_id,"""
+    query += """SELECT smiles, molecule_id, 'pca' as type, ARRAY["""
 
     # Look into creating a distance function on SQL to just pass in the parameters
 
     # Adding on all the PCA columns requested
     for i in pca_components_list:
-        query += f"""pca.pca[{i}] as pca{i},"""
-    
+        if i != pca_components_list[-1]:
+            query += f"""pca.pca[{i}],"""
+        else:
+            query += f"""pca.pca[{i}]] as components,"""
+
     # Adding on the distance calculation using only PCA columns requested
     for i in pca_components_list:
-        if i == pca_components_list[0]:
-            query += f"""SQRT(POWER((pca.pca[{i}] - p1.pca[{i}]),2)+"""
-        elif i != pca_components_list[-1]:
-            query += f"""POWER((pca.pca[{i}] - p1.pca[{i}]),2)+"""
+        if i != pca_components_list[-1]:
+            query += f"""+POWER((pca.pca[{i}] - p1.pca[{i}]),2)+"""
         else:
-            query += f"""POWER((pca.pca[{i}] - p1.pca[{i}]),2)) as dist"""
+            query += f"""SQRT(POWER((pca.pca[{i}] - p1.pca[{i}]),2)"""
 
-    query += """
+    query += """) as dist
         FROM pca, (SELECT pca FROM pca WHERE smiles=:smiles) as p1
         ORDER BY dist
         OFFSET :offset 
@@ -280,17 +288,15 @@ def search_neighbors(
                 query += f"""pca.pca[{i}],"""
             else:
                 query += f"""pca.pca[{i}]] as components,"""
-    
+
         # Adding on the distance calculation using only PCA columns requested
         for i in pca_components_list:
-            if i == pca_components_list[0]:
-                query += f"""SQRT(POWER((pca.pca[{i}] - p1.pca[{i}]),2)+"""
-            elif i != pca_components_list[-1]:
-                query += f"""POWER((pca.pca[{i}] - p1.pca[{i}]),2)+"""
+            if i != pca_components_list[-1]:
+                query += f"""+POWER((pca.pca[{i}] - p1.pca[{i}]),2)+"""
             else:
-                query += f"""POWER((pca.pca[{i}] - p1.pca[{i}]),2)) as dist"""
+                query += f"""SQRT(POWER((pca.pca[{i}] - p1.pca[{i}]),2)"""
 
-        query += """
+        query += """) as dist
             FROM pca, (SELECT pca FROM pca WHERE smiles=:smiles) as p1
             ORDER BY dist
             OFFSET :offset 
