@@ -226,3 +226,84 @@ def search_pca_neighbors(
         raise HTTPException(status_code=400, detail="Invalid Smiles!")
 
     return results
+
+@router.get("/{smiles}/neighbors/{type}/", response_model=List[schemas.MoleculeSimple])
+def search_neighbors(
+    type: str,
+    smiles: str,
+    components: Optional[str]="1,2,3,4",
+    skip: int = 1,
+    limit: int = 100,
+    db: Session = Depends(deps.get_db),
+):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        raise HTTPException(status_code=400, detail="Invalid Smiles")
+    smiles = Chem.MolToSmiles(mol)
+    if smiles is None:
+        raise HTTPException(status_code=400, detail="Invalid Smiles!")
+    
+    query = """"""
+
+    if type == "umap":
+        query = """
+        SELECT smiles, ARRAY[umap[0], umap[1]] AS components, molecule_id, 'umap' as type,
+        (umap <-> (SELECT umap FROM umap WHERE smiles=:smiles)) as dist
+        FROM umap
+        ORDER BY dist
+        OFFSET :offset 
+        LIMIT :limit
+        """
+
+    if type == "pca":
+        # Need check to see if the components are all integers
+        pca_components_list = []
+        for i in components.split(","):
+            if isinstance(int(i), int):
+                pca_components_list.append(int(i))
+            else:
+                raise HTTPException(status_code=400, detail="Components must be a string of integers seperated by commas")
+
+        # Check to see if the pca components requested are valid
+        # TODO: This will need to be generalized, since other schemas may have more or less pcas not a maximum of 4...
+        pca_components_list.sort()
+        if pca_components_list[-1] > 4 or len(pca_components_list) > 4:
+            raise HTTPException(status_code=400, detail="Invalid PCA components, there are only 4 available")
+            
+        query += """SELECT smiles, molecule_id, 'pca' as type, ARRAY["""
+
+        # Look into creating a distance function on SQL to just pass in the parameters
+
+        # Adding on all the PCA columns requested
+        for i in pca_components_list:
+            if i != pca_components_list[-1]:
+                query += f"""pca.pca[{i}],"""
+            else:
+                query += f"""pca.pca[{i}]] as components,"""
+    
+        # Adding on the distance calculation using only PCA columns requested
+        for i in pca_components_list:
+            if i == pca_components_list[0]:
+                query += f"""SQRT(POWER((pca.pca[{i}] - p1.pca[{i}]),2)+"""
+            elif i != pca_components_list[-1]:
+                query += f"""POWER((pca.pca[{i}] - p1.pca[{i}]),2)+"""
+            else:
+                query += f"""POWER((pca.pca[{i}] - p1.pca[{i}]),2)) as dist"""
+
+        query += """
+            FROM pca, (SELECT pca FROM pca WHERE smiles=:smiles) as p1
+            ORDER BY dist
+            OFFSET :offset 
+            LIMIT :limit
+            """
+
+    sql = text(query)
+
+    try:
+        results = db.execute(
+            sql, dict(smiles=smiles, offset=skip, limit=limit)
+        ).fetchall()
+    except exc.DataError:
+        raise HTTPException(status_code=400, detail="Invalid Smiles!")
+
+    return results
