@@ -164,7 +164,7 @@ def search_umap_neighbors(
             sql, dict(smiles=smiles, offset=skip, limit=limit)
         ).fetchall()
     except exc.DataError:
-        raise HTTPException(status_code=400, detail="Invalid Smiles!")
+        raise HTTPException(status_code=400, detail="No molecule with the smile string provided was found!")
 
     return results
 
@@ -231,7 +231,7 @@ def search_pca_neighbors(
             sql, dict(smiles=smiles, offset=skip, limit=limit)
         ).fetchall()
     except exc.DataError:
-        raise HTTPException(status_code=400, detail="Invalid Smiles!")
+        raise HTTPException(status_code=400, detail="No molecule with the smile string provided was found!")
 
     return results
 
@@ -310,6 +310,6 @@ def search_neighbors(
             sql, dict(smiles=smiles, offset=skip, limit=limit)
         ).fetchall()
     except exc.DataError:
-        raise HTTPException(status_code=400, detail="Invalid Smiles!")
+        raise HTTPException(status_code=400, detail="No molecule with the smile string provided was found!")
 
     return results
