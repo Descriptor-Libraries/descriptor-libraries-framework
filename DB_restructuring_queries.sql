@@ -16,8 +16,8 @@ FROM molecule t2
 WHERE t1.smiles = t2.smiles;
 
 -- check to make sure everything was transfered over
-select molecule_id, smiles from umap
-WHERE molecule_id IS NULL;
+-- select molecule_id, smiles from umap
+-- WHERE molecule_id IS NULL;
 
 ---- Query to add molecule_id to pca table ----
 
@@ -29,8 +29,8 @@ FROM molecule t2
 WHERE t1.smiles = t2.smiles;
 
 -- check to make sure everything was transfered over
-select molecule_id, smiles from pca
-WHERE molecule_id IS NULL;
+-- select molecule_id, smiles from pca
+-- WHERE molecule_id IS NULL;
 
 ---- Query to drop unnescesary columns from umap and pca tables ----
 
@@ -53,3 +53,43 @@ BEGIN
   RETURN sqrt(sum);
 END;
 $$ LANGUAGE plpgsql;
+
+---- Create new dft_data table and add only non-null dft_data into it ----
+
+CREATE TABLE dft_data AS
+SELECT molecule_id, smiles, dft_data
+FROM molecule
+WHERE dft_data IS NOT NULL;
+
+-- check to make sure everything was transfered over
+-- SELECT * FROM dft_data
+
+---- Create new xtb_data table and add only non-null xtb_data into it ----
+
+CREATE TABLE xtb_data AS
+SELECT molecule_id, smiles, xtb_data
+FROM molecule
+WHERE xtb_data IS NOT NULL;
+
+-- check to make sure everything was transfered over
+-- SELECT * FROM xtb_data
+
+---- Create new ml_data table and add only non-null ml_data into it ----
+
+CREATE TABLE ml_data AS
+SELECT molecule_id, smiles, ml_data
+FROM molecule
+WHERE ml_data IS NOT NULL;
+
+-- check to make sure everything was transfered over
+-- SELECT * FROM ml_data
+
+---- Create new xtb_ni_data table and add only non-null xtb_ni_data into it ----
+
+CREATE TABLE xtb_ni_data AS
+SELECT molecule_id, smiles, xtb_ni_data
+FROM molecule
+WHERE xtb_ni_data IS NOT NULL;
+
+-- check to make sure everything was transfered over
+-- SELECT * FROM xtb_ni_data
