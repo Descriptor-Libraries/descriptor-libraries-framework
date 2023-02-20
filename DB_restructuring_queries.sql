@@ -39,3 +39,17 @@ DROP COLUMN umap1, DROP COLUMN umap2;
 
 ALTER TABLE pca
 DROP COLUMN pca1, DROP COLUMN pca2, DROP COLUMN pca3, DROP COLUMN pca4;
+
+---- Creates distance function to calculate the distance between 2 arrays of floats ----
+CREATE OR REPLACE FUNCTION distance(a float[], b float[])
+RETURNS float AS $$
+DECLARE
+  n int := array_upper(a, 1);
+  sum float := 0;
+BEGIN
+  FOR i IN 1..n LOOP
+    sum := sum + (a[i] - b[i])^2;
+  END LOOP;
+  RETURN sqrt(sum);
+END;
+$$ LANGUAGE plpgsql;
