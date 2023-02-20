@@ -1,3 +1,4 @@
+from re import sub
 from typing import List, Optional, Any
 
 from app import schemas
@@ -14,7 +15,26 @@ router = APIRouter()
 # def get_molecules(db: Session = Depends(deps.get_db)):
 
 #    return "Working"
+def valid_smiles(smiles):
+    """
+    Check to see if smile string is valid to represent a molecule.
 
+    Converts the smile string to an rdkit molecule to see if it is valid, then turns it back into a smile string to return an rdkit standardized
+    smiles.
+
+    :param smiles: Smile string.
+    :raises HTTPException: When an rdkit molecule cannot be created from the smile string.
+    :raises HTTPException: When a smile string cannot be created from an rdkit molecule.
+    :returns smiles: Smile string from rdkit.
+    """
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        raise HTTPException(status_code=400, detail="Invalid Smiles")
+    smiles = Chem.MolToSmiles(mol)
+    if smiles is None:
+        raise HTTPException(status_code=400, detail="Invalid Smiles!")
+    
+    return smiles
 
 @router.get("/umap", response_model=List[schemas.MoleculeSimple])
 def get_molecule_umap(
@@ -93,12 +113,8 @@ def search_molecules(
     limit: int = 100,
     db: Session = Depends(deps.get_db),
 ):
-    mol = Chem.MolFromSmiles(substructure)
-    if mol is None:
-        raise HTTPException(status_code=400, detail="Invalid Smiles Substructure")
-    substructure = Chem.MolToSmiles(mol)
-    if substructure is None:
-        raise HTTPException(status_code=400, detail="Invalid Smiles Substructure!")
+    # Check if the substructure provided is valid
+    substructure = valid_smiles(substructure)
 
     # The original query is not doing a substructure search at all. It is doing string
     # comparisons between the substructure and the molecule smiles string.
@@ -141,12 +157,8 @@ def search_umap_neighbors(
     limit: int = 100,
     db: Session = Depends(deps.get_db),
 ):
-    mol = Chem.MolFromSmiles(smiles)
-    if mol is None:
-        raise HTTPException(status_code=400, detail="Invalid Smiles")
-    smiles = Chem.MolToSmiles(mol)
-    if smiles is None:
-        raise HTTPException(status_code=400, detail="Invalid Smiles!")
+    # Check if the smiles provided is valid
+    smiles = valid_smiles(smiles)
 
     sql = text(
         """
@@ -176,12 +188,8 @@ def search_pca_neighbors(
     limit: int = 100,
     db: Session = Depends(deps.get_db),
 ):
-    mol = Chem.MolFromSmiles(smiles)
-    if mol is None:
-        raise HTTPException(status_code=400, detail="Invalid Smiles")
-    smiles = Chem.MolToSmiles(mol)
-    if smiles is None:
-        raise HTTPException(status_code=400, detail="Invalid Smiles!")
+    # Check if the smiles provided is valid
+    smiles = valid_smiles(smiles)
     
     query = """"""
 
@@ -244,12 +252,8 @@ def search_neighbors(
     limit: int = 100,
     db: Session = Depends(deps.get_db),
 ):
-    mol = Chem.MolFromSmiles(smiles)
-    if mol is None:
-        raise HTTPException(status_code=400, detail="Invalid Smiles")
-    smiles = Chem.MolToSmiles(mol)
-    if smiles is None:
-        raise HTTPException(status_code=400, detail="Invalid Smiles!")
+    # Check if the smiles provided is valid
+    smiles = valid_smiles(smiles)
     
     query = """"""
 
