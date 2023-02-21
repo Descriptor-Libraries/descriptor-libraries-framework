@@ -1,6 +1,14 @@
 import React from 'react';
 import Plot from 'react-plotly.js';
 
+const datasetsMap = new Map([
+  ['showPCN', '/api/molecules/umap?category=pcn'],
+  ['showPC3', '/api/molecules/umap?category=pc3'],
+  ['showPO3', '/api/molecules/umap?category=po3'],
+  ['showPN3', '/api/molecules/umap?category=pn3'],
+  ['showPHAL', '/api/molecules/umap?category=phal'],
+]);
+
 
 function showSVGWindow(svg, event) {
 
@@ -42,59 +50,84 @@ class MyPlot extends React.Component {
   // Constructor
   constructor(props) {
     super(props);
-
-    this.state = {
-      pcn: [],
-      pc3: [],
-      po3: [],
-      pn3: [],
-      phal: [],
-    };
+  
+    const datasets = {};
+    for (const [key, url] of datasetsMap) {
+      const datasetKey = key.replace(/^show/, '').toLowerCase();
+      datasets[datasetKey] = [];
+    }
+  
+    this.state = { datasets };
   }
+  
 
   componentDidMount() {
-    fetch('/api/molecules/umap?category=pcn')
-      .then(response => response.json())
-      .then(items => this.setState({ 
-        pcn: items
+    console.log("load data")
+
+    this.loadData()
+     
+  }
+
+  componentDidUpdate(prevProps) {
+    const { checkboxState } = this.props;
+
+    if (Object.keys(checkboxState).some((key) => checkboxState[key] !== prevProps.checkboxState[key])) {
+      this.loadData();
+    }
+  }
+
+  loadData() {
+    const { checkboxState } = this.props;
+    const datasetsToLoad = [];
+
+    for (const [key, url] of datasetsMap) {
+      if (checkboxState[key]) {
+        datasetsToLoad.push(fetch(url).then((response) => response.json()));
+      }
+    }
+
+    console.log(datasetsToLoad)
+
+    Promise.all(datasetsToLoad)
+      .then(datasets => {
+        this.setState({
+          datasets: {
+            pcn: checkboxState.showPCN ? datasets.shift() : [],
+            pc3: checkboxState.showPC3 ? datasets.shift() : [],
+            po3: checkboxState.showPO3 ? datasets.shift() : [],
+            pn3: checkboxState.showPN3 ? datasets.shift() : [],
+            phal: checkboxState.showPHAL ? datasets.shift() : [],
+          }
+        });
+        console.log('datasets')
+        console.log(this.datasets)
       })
-      );
+      .catch(error => console.error('Error loading data:', error));
+  }
 
-    fetch('/api/molecules/umap?category=pc3')
-      .then(response => response.json())
-      .then(items => this.setState({ pc3: items })
-      );
 
-    fetch('/api/molecules/umap?category=po3')
-      .then(response => response.json())
-      .then(items => this.setState({ po3: items })
-      );
+  
 
-      fetch('/api/molecules/umap?category=phal')
-      .then(response => response.json())
-      .then(items => this.setState({ phal: items })
-      );
-
-      fetch('/api/molecules/umap?category=pn3')
-      .then(response => response.json())
-      .then(items => this.setState({ pn3: items })
-      );
-
+  printMessage() {
+    if (this.props.showPC3) {
+      console.log('showPC3 is true');
+    } else {
+      console.log('showPC3 is false');
+    }
   }
 
   render() {
 
-    
+    console.log('render is running')
     let myPlot = <div id="plotly-container" style={{'width': '60%', 'height': '85%', 'margin': 'auto' }}> <Plot onHover={ (event) => showSVG(event) } 
     onUnhover={ (event)=> hideSVG(event) } 
     style={{'width': '100%', 'height': '100%' }}
     useResizeHandler={true}
     data={[
-
-      {
-        x: this.state.pc3.map( row => { return row.umap1 }),
-        y: this.state.pc3.map( row => { return row.umap2 }),
-        text: this.state.pc3.map( row => { return encodeURIComponent(row.smiles) }),
+       {
+        x: this.state.datasets.pc3.map( row => { return row.umap1 }),
+        y: this.state.datasets.pc3.map( row => { return row.umap2 }),
+        text: this.state.datasets.pc3.map( row => { return encodeURIComponent(row.smiles) }),
         hovertemplate: "( %{x}, %{y} )",
         hovermode: "closest",
         type: 'scatter',
@@ -108,9 +141,9 @@ class MyPlot extends React.Component {
       },
 
       {
-        x: this.state.pn3.map( row => { return row.umap1 }),
-        y: this.state.pn3.map( row => { return row.umap2 }),
-        text: this.state.pn3.map( row => { return encodeURIComponent(row.smiles) }),
+        x: this.state.datasets.pn3.map( row => { return row.umap1 }),
+        y: this.state.datasets.pn3.map( row => { return row.umap2 }),
+        text: this.state.datasets.pn3.map( row => { return encodeURIComponent(row.smiles) }),
         hovertemplate: "( %{x}, %{y} )",
         hovermode: "closest",
         type: 'scatter',
@@ -125,9 +158,9 @@ class MyPlot extends React.Component {
 
 
       {
-        x: this.state.po3.map( row => { return row.umap1 }),
-        y: this.state.po3.map( row => { return row.umap2 }),
-        text: this.state.po3.map( row => { return encodeURIComponent(row.smiles) }),
+        x: this.state.datasets.po3.map( row => { return row.umap1 }),
+        y: this.state.datasets.po3.map( row => { return row.umap2 }),
+        text: this.state.datasets.po3.map( row => { return encodeURIComponent(row.smiles) }),
         hovertemplate: "( %{x}, %{y} )",
         hovermode: "closest",
         type: 'scatter',
@@ -142,9 +175,9 @@ class MyPlot extends React.Component {
 
 
       {
-        x: this.state.pcn.map( row => { return row.umap1 }),
-        y: this.state.pcn.map( row => { return row.umap2 }),
-        text: this.state.pcn.map( row => { return encodeURIComponent(row.smiles) }),
+        x: this.state.datasets.pcn.map( row => { return row.umap1 }),
+        y: this.state.datasets.pcn.map( row => { return row.umap2 }),
+        text: this.state.datasets.pcn.map( row => { return encodeURIComponent(row.smiles) }),
         hovertemplate: "( %{x}, %{y} )",
         hovermode: "closest",
         type: 'scatter',
@@ -159,9 +192,9 @@ class MyPlot extends React.Component {
 
       
       {
-        x: this.state.phal.map( row => { return row.umap1 }),
-        y: this.state.phal.map( row => { return row.umap2 }),
-        text: this.state.phal.map( row => { return encodeURIComponent(row.smiles) }),
+        x: this.state.datasets.phal.map( row => { return row.umap1 }),
+        y: this.state.datasets.phal.map( row => { return row.umap2 }),
+        text: this.state.datasets.phal.map( row => { return encodeURIComponent(row.smiles) }),
         hovertemplate: "( %{x}, %{y} )",
         hovermode: "closest",
         type: 'scatter',
