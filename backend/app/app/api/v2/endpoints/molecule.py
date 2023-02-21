@@ -150,7 +150,7 @@ def search_molecules(
 
     return results
 
-@router.get("/smiles/umap_neighbors/", response_model=List[schemas.MoleculeSimple])
+@router.get("/smiles/umap_neighbors/", response_model=List[schemas.MoleculeNeighbors])
 def search_umap_neighbors(
     smiles: str,
     skip: int = 1,
@@ -180,7 +180,7 @@ def search_umap_neighbors(
 
     return results
 
-@router.get("smiles/pca_neighbors/", response_model=List[schemas.MoleculeSimple])
+@router.get("smiles/pca_neighbors/", response_model=List[schemas.MoleculeNeighbors])
 def search_pca_neighbors(
     smiles: str,
     components: Optional[str]="1,2,3,4",
@@ -243,7 +243,7 @@ def search_pca_neighbors(
 
     return results
 
-@router.get("/{smiles}/neighbors/{type}/", response_model=List[schemas.MoleculeSimple])
+@router.get("/{smiles}/neighbors/{type}/", response_model=List[schemas.MoleculeNeighbors])
 def search_neighbors(
     type: str,
     smiles: str,

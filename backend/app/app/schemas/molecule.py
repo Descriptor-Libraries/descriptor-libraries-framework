@@ -14,8 +14,17 @@ class Molecule(BaseModel):
     ml_data: Optional[Dict]
 
 class MoleculeSimple(BaseModel):
+    molecule_id: int
+    umap1: Optional[float]
+    umap2: Optional[float]
+    pat: Optional[str]
+    smiles: str
+
+class MoleculeNeighbors(BaseModel):
     type: Optional[str]
     molecule_id: int
     dist: Optional[float]
     smiles: str
     components: List[float]
+
+
