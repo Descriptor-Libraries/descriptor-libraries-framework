@@ -1,3 +1,4 @@
+from multiprocessing.sharedctypes import Value
 from re import sub
 from typing import List, Optional, Any
 
@@ -207,10 +208,10 @@ def search_pca_neighbors(
     # Need check to see if the components are all integers
     pca_components_list = []
     for i in components.split(","):
-        if i.isdigit():
+        try:
             pca_components_list.append(int(i))
-        else:
-            raise HTTPException(status_code=400, detail="Components must be a string of integers seperated by commas")
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Components must be a string of integers separated by commas")
 
     # Check to see if the pca components requested are valid
     # TODO: This will need to be generalized, since other schemas may have more or less pcas not a maximum of 4...
@@ -282,10 +283,10 @@ def search_neighbors(
         # Need check to see if the components are all integers
         pca_components_list = []
         for i in components.split(","):
-            if i.isdigit():
+            try:
                 pca_components_list.append(int(i))
-            else:
-                raise HTTPException(status_code=400, detail="Components must be a string of integers seperated by commas")
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Components must be a string of integers separated by commas")
 
         # Check to see if the pca components requested are valid
         # TODO: This will need to be generalized, since other schemas may have more or less pcas not a maximum of 4...
