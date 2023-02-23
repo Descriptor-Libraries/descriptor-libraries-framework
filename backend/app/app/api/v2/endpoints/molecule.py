@@ -192,7 +192,7 @@ def search_umap_neighbors(
 
     return results
 
-@router.get("smiles/pca_neighbors/", response_model=List[schemas.MoleculeNeighbors])
+@router.get("/smiles/pca_neighbors/", response_model=List[schemas.MoleculeNeighbors])
 def search_pca_neighbors(
     smiles: str,
     components: Optional[str]="1,2,3,4",
