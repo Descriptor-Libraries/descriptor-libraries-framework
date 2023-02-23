@@ -16,16 +16,27 @@ router = APIRouter()
 
 #    return "Working"
 def valid_smiles(smiles):
-    """
-    Check to see if smile string is valid to represent a molecule.
+    """Check to see if a smile string is valid to represent a molecule.
 
     Converts the smile string to an rdkit molecule to see if it is valid, then turns it back into a smile string to return an rdkit standardized
     smiles.
 
-    :param smiles: Smile string.
-    :raises HTTPException: When an rdkit molecule cannot be created from the smile string.
-    :raises HTTPException: When a smile string cannot be created from an rdkit molecule.
-    :returns smiles: Smile string from rdkit.
+    Parameters
+    ----------
+    smiles : str
+             Smile string.
+    
+    Returns
+    -------
+    smiles : str
+             A smile string generated from an rdkit  molecule.
+
+    Raises
+    ------
+    HTTPException 
+        When an rdkit molecule cannot be created from the smile string.
+    HTTPException
+        When a smile string cannot be created from an rdkit molecule.
     """
     mol = Chem.MolFromSmiles(smiles)
     if mol is None:
