@@ -196,7 +196,7 @@ def search_pca_neighbors(
     # Need check to see if the components are all integers
     pca_components_list = []
     for i in components.split(","):
-        if isinstance(int(i), int):
+        if i.isdigit():
             pca_components_list.append(int(i))
         else:
             raise HTTPException(status_code=400, detail="Components must be a string of integers seperated by commas")
@@ -271,7 +271,7 @@ def search_neighbors(
         # Need check to see if the components are all integers
         pca_components_list = []
         for i in components.split(","):
-            if isinstance(int(i), int):
+            if i.isdigit():
                 pca_components_list.append(int(i))
             else:
                 raise HTTPException(status_code=400, detail="Components must be a string of integers seperated by commas")
