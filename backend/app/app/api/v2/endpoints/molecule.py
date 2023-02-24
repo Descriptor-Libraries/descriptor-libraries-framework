@@ -218,27 +218,18 @@ def search_pca_neighbors(
     pca_components_list.sort()
     if pca_components_list[-1] > 4 or len(pca_components_list) > 4:
         raise HTTPException(status_code=400, detail="Invalid PCA components, there are only 4 available")
-        
-    query += """SELECT smiles, molecule_id, 'pca' as type, ARRAY["""
 
-    # Look into creating a distance function on SQL to just pass in the parameters
-
-    # Adding on all the PCA columns requested
-    for i in pca_components_list:
-        if i != pca_components_list[-1]:
-            query += f"""pca.pca[{i}],"""
-        else:
-            query += f"""pca.pca[{i}]] as components,"""
-
-    # Adding on the distance calculation using only PCA columns requested
-    for i in pca_components_list:
-        if i != pca_components_list[-1]:
-            query += f"""+POWER((pca.pca[{i}] - p1.pca[{i}]),2)+"""
-        else:
-            query += f"""SQRT(POWER((pca.pca[{i}] - p1.pca[{i}]),2)"""
-
-    query += """) as dist
-        FROM pca, (SELECT pca FROM pca WHERE smiles=:smiles) as p1
+    # Creates list of strings of indexing the cube using the `->` operator, ex. ["p2->1", "p2->2", ...]
+    cube_indexing = ["p2->" + str(i) for i in pca_components_list]
+    # Creates the string array from the indexing strings. ex. "ARRAY[p2->1, p2->2]"
+    array_substitute_one = f'ARRAY[{", ".join(i for i in cube_indexing)}]'
+    # Creates the string array for indexing the cube using cube_subset. ex "ARRAY[1, 2, 3, 4]"
+    array_substitute_two = f'ARRAY[{", ".join(str(i) for i in pca_components_list)}]'
+    
+    query = f"""
+        SELECT smiles, molecule_id, {array_substitute_one} as components, 'pca' as type,
+        cube_subset(p1.pca, {array_substitute_two}) <-> p2 as dist
+        FROM pca, (SELECT pca FROM pca WHERE smiles=:smiles) as p1, cube_subset(pca.pca, {array_substitute_two}) as p2
         ORDER BY dist
         OFFSET :offset 
         LIMIT :limit
@@ -252,6 +243,8 @@ def search_pca_neighbors(
         ).fetchall()
     except exc.DataError:
         raise HTTPException(status_code=400, detail="No molecule with the smile string provided was found!")
+    
+    print(results)
 
     return results
 
@@ -294,26 +287,17 @@ def search_neighbors(
         if pca_components_list[-1] > 4 or len(pca_components_list) > 4:
             raise HTTPException(status_code=400, detail="Invalid PCA components, there are only 4 available")
             
-        query += """SELECT smiles, molecule_id, 'pca' as type, ARRAY["""
-
-        # Look into creating a distance function on SQL to just pass in the parameters
-
-        # Adding on all the PCA columns requested
-        for i in pca_components_list:
-            if i != pca_components_list[-1]:
-                query += f"""pca.pca[{i}],"""
-            else:
-                query += f"""pca.pca[{i}]] as components,"""
-
-        # Adding on the distance calculation using only PCA columns requested
-        for i in pca_components_list:
-            if i != pca_components_list[-1]:
-                query += f"""+POWER((pca.pca[{i}] - p1.pca[{i}]),2)+"""
-            else:
-                query += f"""SQRT(POWER((pca.pca[{i}] - p1.pca[{i}]),2)"""
-
-        query += """) as dist
-            FROM pca, (SELECT pca FROM pca WHERE smiles=:smiles) as p1
+        # Creates list of strings of indexing the cube using the `->` operator, ex. ["p2->1", "p2->2", ...]
+        cube_indexing = ["p2->" + str(i) for i in pca_components_list]
+        # Creates the string array from the indexing strings. ex. "ARRAY[p2->1, p2->2]"
+        array_substitute_one = f'ARRAY[{", ".join(i for i in cube_indexing)}]'
+        # Creates the string array for indexing the cube using cube_subset. ex "ARRAY[1, 2, 3, 4]"
+        array_substitute_two = f'ARRAY[{", ".join(str(i) for i in pca_components_list)}]'
+            
+        query = f"""
+            SELECT smiles, molecule_id, {array_substitute_one} as components, 'pca' as type,
+            cube_subset(p1.pca, {array_substitute_two}) <-> p2 as dist
+            FROM pca, (SELECT pca FROM pca WHERE smiles=:smiles) as p1, cube_subset(pca.pca, {array_substitute_two}) as p2
             ORDER BY dist
             OFFSET :offset 
             LIMIT :limit

@@ -25,6 +25,6 @@ class MoleculeNeighbors(BaseModel):
     molecule_id: int
     dist: Optional[float]
     smiles: str
-    components: List[float]
+    components: list[float]
 
 

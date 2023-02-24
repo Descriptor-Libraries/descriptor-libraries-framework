@@ -1,7 +1,10 @@
----- Set column pca in table pca to an array of all 4 pca component columns ----
-ALTER TABLE pca ADD COLUMN pca float[];
+---- Add cube extension to DB ----
+create extension cube;
+
+---- Set column pca in table pca to a cube of all 4 pca component columns ----
+ALTER TABLE pca ADD COLUMN pca cube;
 UPDATE pca
-SET pca = ARRAY[pca1, pca2, pca3, pca4];
+SET pca = cube(ARRAY[pca1, pca2, pca3, pca4]);
 
 ---- Query to add molecule_id to umap table ----
 
