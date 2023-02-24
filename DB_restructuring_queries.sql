@@ -96,3 +96,11 @@ WHERE xtb_ni_data IS NOT NULL;
 
 -- check to make sure everything was transfered over
 -- SELECT * FROM xtb_ni_data
+
+--- Drop all unnecessary columns from molecule table ----
+ALTER TABLE molecule
+DROP COLUMN dft_data, 
+DROP COLUMN xtb_data, 
+DROP COLUMN ml_data, 
+DROP COLUMN xtb_ni_data, 
+DROP COLUMN umap;
