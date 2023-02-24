@@ -162,20 +162,18 @@ def search_molecules(
 
     return results
 
-@router.get("/smiles/umap_neighbors/", response_model=List[schemas.MoleculeNeighbors])
+@router.get("/molecule_id/umap_neighbors/", response_model=List[schemas.MoleculeNeighbors])
 def search_umap_neighbors(
-    smiles: str,
+    molecule_id: int,
     skip: int = 1,
     limit: int = 100,
     db: Session = Depends(deps.get_db),
 ):
-    # Check if the smiles provided is valid
-    smiles = valid_smiles(smiles)
 
     sql = text(
         """
         SELECT smiles, ARRAY[umap[0], umap[1]] AS components, molecule_id, 'umap' as type,
-        (umap <-> (SELECT umap FROM umap WHERE smiles=:smiles)) as dist
+        (umap <-> (SELECT umap FROM umap WHERE molecule_id=:molecule_id)) as dist
         FROM umap
         ORDER BY dist
         OFFSET :offset 
@@ -185,23 +183,21 @@ def search_umap_neighbors(
 
     try:
         results = db.execute(
-            sql, dict(smiles=smiles, offset=skip, limit=limit)
+            sql, dict(molecule_id=molecule_id, offset=skip, limit=limit)
         ).fetchall()
     except exc.DataError:
         raise HTTPException(status_code=400, detail="No molecule with the smile string provided was found!")
 
     return results
 
-@router.get("/smiles/pca_neighbors/", response_model=List[schemas.MoleculeNeighbors])
+@router.get("/molecule_id/pca_neighbors/", response_model=List[schemas.MoleculeNeighbors])
 def search_pca_neighbors(
-    smiles: str,
+    molecule_id: int,
     components: Optional[str]="1,2,3,4",
     skip: int = 1,
     limit: int = 100,
     db: Session = Depends(deps.get_db),
 ):
-    # Check if the smiles provided is valid
-    smiles = valid_smiles(smiles)
     
     query = """"""
 
@@ -229,7 +225,7 @@ def search_pca_neighbors(
     query = f"""
         SELECT smiles, molecule_id, {array_substitute_one} as components, 'pca' as type,
         cube_subset(p1.pca, {array_substitute_two}) <-> p2 as dist
-        FROM pca, (SELECT pca FROM pca WHERE smiles=:smiles) as p1, cube_subset(pca.pca, {array_substitute_two}) as p2
+        FROM pca, (SELECT pca FROM pca WHERE molecule_id=:molecule_id) as p1, cube_subset(pca.pca, {array_substitute_two}) as p2
         ORDER BY dist
         OFFSET :offset 
         LIMIT :limit
@@ -239,33 +235,29 @@ def search_pca_neighbors(
 
     try:
         results = db.execute(
-            sql, dict(smiles=smiles, offset=skip, limit=limit)
+            sql, dict(molecule_id=molecule_id, offset=skip, limit=limit)
         ).fetchall()
     except exc.DataError:
-        raise HTTPException(status_code=400, detail="No molecule with the smile string provided was found!")
+        raise HTTPException(status_code=400, detail="No molecule with the id provided was found!")
     
-    print(results)
-
     return results
 
-@router.get("/{smiles}/neighbors/{type}/", response_model=List[schemas.MoleculeNeighbors])
+@router.get("/{molecule_id}/neighbors/{type}/", response_model=List[schemas.MoleculeNeighbors])
 def search_neighbors(
     type: str,
-    smiles: str,
+    molecule_id: int,
     components: Optional[str]="1,2,3,4",
     skip: int = 1,
     limit: int = 100,
     db: Session = Depends(deps.get_db),
 ):
-    # Check if the smiles provided is valid
-    smiles = valid_smiles(smiles)
     
     query = """"""
 
     if type == "umap":
         query = """
         SELECT smiles, ARRAY[umap[0], umap[1]] AS components, molecule_id, 'umap' as type,
-        (umap <-> (SELECT umap FROM umap WHERE smiles=:smiles)) as dist
+        (umap <-> (SELECT umap FROM umap WHERE molecule_id=:molecule_id)) as dist
         FROM umap
         ORDER BY dist
         OFFSET :offset 
@@ -297,7 +289,7 @@ def search_neighbors(
         query = f"""
             SELECT smiles, molecule_id, {array_substitute_one} as components, 'pca' as type,
             cube_subset(p1.pca, {array_substitute_two}) <-> p2 as dist
-            FROM pca, (SELECT pca FROM pca WHERE smiles=:smiles) as p1, cube_subset(pca.pca, {array_substitute_two}) as p2
+            FROM pca, (SELECT pca FROM pca WHERE molecule_id=:molecule_id) as p1, cube_subset(pca.pca, {array_substitute_two}) as p2
             ORDER BY dist
             OFFSET :offset 
             LIMIT :limit
@@ -307,9 +299,9 @@ def search_neighbors(
 
     try:
         results = db.execute(
-            sql, dict(smiles=smiles, offset=skip, limit=limit)
+            sql, dict(molecule_id=molecule_id, offset=skip, limit=limit)
         ).fetchall()
     except exc.DataError:
-        raise HTTPException(status_code=400, detail="No molecule with the smile string provided was found!")
+        raise HTTPException(status_code=400, detail="No molecule with the id provided was found!")
 
     return results
