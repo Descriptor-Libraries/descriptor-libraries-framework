@@ -216,7 +216,7 @@ def search_pca_neighbors(
         raise HTTPException(status_code=400, detail="Invalid PCA components, there are only 4 available")
 
     # Creates list of strings of indexing the cube using the `->` operator, ex. ["p2->1", "p2->2", ...]
-    cube_indexing = ["p2->" + str(i) for i in pca_components_list]
+    cube_indexing = ["p2->" + str(i) for i in range(1, len(pca_components_list)+1)]
     # Creates the string array from the indexing strings. ex. "ARRAY[p2->1, p2->2]"
     array_substitute_one = f'ARRAY[{", ".join(i for i in cube_indexing)}]'
     # Creates the string array for indexing the cube using cube_subset. ex "ARRAY[1, 2, 3, 4]"
@@ -280,7 +280,7 @@ def search_neighbors(
             raise HTTPException(status_code=400, detail="Invalid PCA components, there are only 4 available")
             
         # Creates list of strings of indexing the cube using the `->` operator, ex. ["p2->1", "p2->2", ...]
-        cube_indexing = ["p2->" + str(i) for i in pca_components_list]
+        cube_indexing = ["p2->" + str(i) for i in range(1, len(pca_components_list)+1)]
         # Creates the string array from the indexing strings. ex. "ARRAY[p2->1, p2->2]"
         array_substitute_one = f'ARRAY[{", ".join(i for i in cube_indexing)}]'
         # Creates the string array for indexing the cube using cube_subset. ex "ARRAY[1, 2, 3, 4]"
