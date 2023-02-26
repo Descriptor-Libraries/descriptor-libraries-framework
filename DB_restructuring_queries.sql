@@ -1,106 +1,32 @@
 ---- Add cube extension to DB ----
-create extension cube;
+CREATE EXTENSION IF NOT EXISTS cube;
 
----- Set column pca in table pca to a cube of all 4 pca component columns ----
-ALTER TABLE pca ADD COLUMN pca cube;
-UPDATE pca
-SET pca = cube(ARRAY[pca1, pca2, pca3, pca4]);
+---- CREATE INDICES ON MOLECULE_ID ----
+CREATE INDEX IF NOT EXISTS idx_molecule_molecule_id ON molecule (molecule_id);
+CREATE INDEX IF NOT EXISTS idx_molecule_smiles ON molecule (smiles);
+CREATE INDEX IF NOT EXISTS idx_molecule_umap_knn ON molecule USING gist (umap);
+CREATE INDEX IF NOT EXISTS idx_molecule_pca ON molecule (pca);
+CREATE INDEX IF NOT EXISTS idx_molecule_pca_knn ON molecule USING gist (pca);
+CREATE INDEX IF NOT EXISTS idx_pca_smiles ON pca (smiles);
 
----- Query to add molecule_id to umap table ----
+---- Set column pca in table molecule to a cube of all 4 pca component columns ----
+ALTER TABLE molecule ADD COLUMN pca cube;
+UPDATE molecule
+SET pca = cube(ARRAY[pca.pca1, pca.pca2, pca.pca3, pca.pca4])
+FROM pca
+WHERE molecule.smiles = pca.smiles;
 
-ALTER TABLE new_data
-RENAME TO umap;
+---- Query to make umap into cube data type on molecule table ----
+ALTER TABLE molecule RENAME umap TO umap_point;
+ALTER TABLE molecule ADD COLUMN umap cube;
+UPDATE molecule
+SET umap = cube(ARRAY[umap_point[0], umap_point[1]])
+WHERE umap_point IS NOT NULL;
 
-ALTER TABLE umap ADD COLUMN molecule_id INT NOT NULL DEFAULT 0;
+--- Drop umap_point ---
+ALTER TABLE molecule DROP COLUMN umap_point;
 
-UPDATE umap t1
-SET molecule_id = t2.molecule_id
-FROM molecule t2
-WHERE t1.smiles = t2.smiles;
-
--- check to make sure everything was transfered over
--- select molecule_id, smiles from umap
--- WHERE molecule_id IS NULL;
-
----- Query to add molecule_id to pca table ----
-
-ALTER TABLE pca ADD COLUMN molecule_id INT NOT NULL DEFAULT 0;
-
-UPDATE pca t1
-SET molecule_id = t2.molecule_id
-FROM molecule t2
-WHERE t1.smiles = t2.smiles;
-
--- check to make sure everything was transfered over
--- select molecule_id, smiles from pca
--- WHERE molecule_id IS NULL;
-
----- Query to drop unnescesary columns from umap and pca tables ----
-
-ALTER TABLE umap
-DROP COLUMN umap1, DROP COLUMN umap2;
-
-ALTER TABLE pca
-DROP COLUMN pca1, DROP COLUMN pca2, DROP COLUMN pca3, DROP COLUMN pca4;
-
----- Creates distance function to calculate the distance between 2 arrays of floats ----
-CREATE OR REPLACE FUNCTION distance(a float[], b float[])
-RETURNS float AS $$
-DECLARE
-  n int := array_upper(a, 1);
-  sum float := 0;
-BEGIN
-  FOR i IN 1..n LOOP
-    sum := sum + (a[i] - b[i])^2;
-  END LOOP;
-  RETURN sqrt(sum);
-END;
-$$ LANGUAGE plpgsql;
-
----- Create new dft_data table and add only non-null dft_data into it ----
-
-CREATE TABLE dft_data AS
-SELECT molecule_id, smiles, dft_data
-FROM molecule
-WHERE dft_data IS NOT NULL;
-
--- check to make sure everything was transfered over
--- SELECT * FROM dft_data
-
----- Create new xtb_data table and add only non-null xtb_data into it ----
-
-CREATE TABLE xtb_data AS
-SELECT molecule_id, smiles, xtb_data
-FROM molecule
-WHERE xtb_data IS NOT NULL;
-
--- check to make sure everything was transfered over
--- SELECT * FROM xtb_data
-
----- Create new ml_data table and add only non-null ml_data into it ----
-
-CREATE TABLE ml_data AS
-SELECT molecule_id, smiles, ml_data
-FROM molecule
-WHERE ml_data IS NOT NULL;
-
--- check to make sure everything was transfered over
--- SELECT * FROM ml_data
-
----- Create new xtb_ni_data table and add only non-null xtb_ni_data into it ----
-
-CREATE TABLE xtb_ni_data AS
-SELECT molecule_id, smiles, xtb_ni_data
-FROM molecule
-WHERE xtb_ni_data IS NOT NULL;
-
--- check to make sure everything was transfered over
--- SELECT * FROM xtb_ni_data
-
---- Drop all unnecessary columns from molecule table ----
-ALTER TABLE molecule
-DROP COLUMN dft_data, 
-DROP COLUMN xtb_data, 
-DROP COLUMN ml_data, 
-DROP COLUMN xtb_ni_data, 
-DROP COLUMN umap;
+---- Drop unneccessary tables ----
+DROP TABLE new_data;
+DROP TABLE pca;
+DROP TABLE temporary;
