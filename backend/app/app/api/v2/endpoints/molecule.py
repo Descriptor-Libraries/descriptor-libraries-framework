@@ -21,7 +21,7 @@ def valid_smiles(smiles):
     Parameters
     ----------
     smiles : str
-        Smilea string.
+        Smiles string.
     
     Returns
     -------
@@ -210,14 +210,24 @@ def search_neighbors(
     array_substitute_two = f'ARRAY[{", ".join(str(i) for i in components_list)}]'
         
     query = f"""
-        SELECT smiles, molecule_id, {array_substitute_one} as components, '{type}' as type,
+    SELECT 
+        smiles, 
+        molecule_id, 
+        pat, 
+        {array_substitute_one} as components, 
+        '{type}' as type, 
         cube_subset(p1.{type}, {array_substitute_two}) <-> p2 as dist
-        FROM molecule, (SELECT {type} FROM molecule WHERE molecule_id=:molecule_id) as p1, 
+    FROM 
+        molecule, 
+        (SELECT {type} FROM molecule WHERE molecule_id=:molecule_id) as p1, 
         cube_subset(molecule.{type}, {array_substitute_two}) as p2
-        ORDER BY dist
-        OFFSET :offset 
-        LIMIT :limit
-        """
+    ORDER BY 
+        dist
+    OFFSET 
+        :offset 
+    LIMIT 
+        :limit
+    """
 
     sql = text(query)
 
