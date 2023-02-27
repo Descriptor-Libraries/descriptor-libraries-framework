@@ -12,10 +12,6 @@ from sqlalchemy.orm import Session
 
 router = APIRouter()
 
-# @router.get("/molecules", response_model=List[schemas.Molecule])
-# def get_molecules(db: Session = Depends(deps.get_db)):
-
-#    return "Working"
 def valid_smiles(smiles):
     """Check to see if a smile string is valid to represent a molecule.
 
@@ -25,12 +21,12 @@ def valid_smiles(smiles):
     Parameters
     ----------
     smiles : str
-             Smile string.
+        Smiles string.
     
     Returns
     -------
     smiles : str
-             A smile string generated from an rdkit  molecule.
+        A smiles string generated from an rdkit  molecule.
 
     Raises
     ------
@@ -59,7 +55,7 @@ def get_molecule_umap(
     query_parameters: dict[str, Any] = {"limit": limit}
 
     query = """
-        SELECT molecule_id, smiles, umap[0] AS umap1, umap[1] AS umap2, pat FROM molecule
+        SELECT molecule_id, smiles, umap->1 as umap1, umap->2 as umap2, pat FROM molecule
         """
 
     # Need to build the query based on the inputs
@@ -162,138 +158,76 @@ def search_molecules(
 
     return results
 
-@router.get("/molecule_id/umap_neighbors/", response_model=List[schemas.MoleculeNeighbors])
-def search_umap_neighbors(
+@router.get("/{molecule_id}/neighbors/", response_model=List[schemas.MoleculeNeighbors])
+def search_neighbors(
     molecule_id: int,
-    skip: int = 1,
-    limit: int = 100,
-    db: Session = Depends(deps.get_db),
-):
-
-    sql = text(
-        """
-        SELECT smiles, ARRAY[umap[0], umap[1]] AS components, molecule_id, 'umap' as type,
-        (umap <-> (SELECT umap FROM umap WHERE molecule_id=:molecule_id)) as dist
-        FROM umap
-        ORDER BY dist
-        OFFSET :offset 
-        LIMIT :limit
-        """
-    )
-
-    try:
-        results = db.execute(
-            sql, dict(molecule_id=molecule_id, offset=skip, limit=limit)
-        ).fetchall()
-    except exc.DataError:
-        raise HTTPException(status_code=400, detail="No molecule with the smile string provided was found!")
-
-    return results
-
-@router.get("/molecule_id/pca_neighbors/", response_model=List[schemas.MoleculeNeighbors])
-def search_pca_neighbors(
-    molecule_id: int,
-    components: Optional[str]="1,2,3,4",
+    type: str="pca",
+    components: Optional[str]=None,
     skip: int = 1,
     limit: int = 100,
     db: Session = Depends(deps.get_db),
 ):
     
-    query = """"""
+    type = type.lower()
+    
+    # Check for valid neighbor type.
+    if type not in  ["pca", "umap"]:
+        raise HTTPException(status_code=400, detail="Invalid neighbor type.")
 
-    # Need check to see if the components are all integers
-    pca_components_list = []
+    # Set defaults for components
+    if type == "pca" and components is None:
+        components =  "1,2,3,4"
+
+    # Set defaults for components
+    if type == "umap" and components is None:
+        components = "1,2"
+
+    # Check correct format
+    components_list = []
     for i in components.split(","):
         try:
-            pca_components_list.append(int(i))
+            components_list.append(int(i))
         except ValueError:
             raise HTTPException(status_code=400, detail="Components must be a string of integers separated by commas")
 
+    # Generalized - get max number of components for type by getting one record
+    query = text(f"SELECT cube_dim({type}) FROM molecule WHERE {type} IS NOT NULL LIMIT 1")
+
+    max_dims =  db.execute(query).fetchall()[0][0]
+
     # Check to see if the pca components requested are valid
-    # TODO: This will need to be generalized, since other schemas may have more or less pcas not a maximum of 4...
-    pca_components_list.sort()
-    if pca_components_list[-1] > 4 or len(pca_components_list) > 4:
-        raise HTTPException(status_code=400, detail="Invalid PCA components, there are only 4 available")
-
-    # Creates list of strings of indexing the cube using the `->` operator, ex. ["p2->1", "p2->2", ...]
-    cube_indexing = ["p2->" + str(i) for i in range(1, len(pca_components_list)+1)]
-    # Creates the string array from the indexing strings. ex. "ARRAY[p2->1, p2->2]"
-    array_substitute_one = f'ARRAY[{", ".join(i for i in cube_indexing)}]'
-    # Creates the string array for indexing the cube using cube_subset. ex "ARRAY[1, 2, 3, 4]"
-    array_substitute_two = f'ARRAY[{", ".join(str(i) for i in pca_components_list)}]'
-    
-    query = f"""
-        SELECT smiles, molecule_id, {array_substitute_one} as components, 'pca' as type,
-        cube_subset(p1.pca, {array_substitute_two}) <-> p2 as dist
-        FROM pca, (SELECT pca FROM pca WHERE molecule_id=:molecule_id) as p1, cube_subset(pca.pca, {array_substitute_two}) as p2
-        ORDER BY dist
-        OFFSET :offset 
-        LIMIT :limit
-        """
-
-    sql = text(query)
-
-    try:
-        results = db.execute(
-            sql, dict(molecule_id=molecule_id, offset=skip, limit=limit)
-        ).fetchall()
-    except exc.DataError:
-        raise HTTPException(status_code=400, detail="No molecule with the id provided was found!")
-    
-    return results
-
-@router.get("/{molecule_id}/neighbors/{type}/", response_model=List[schemas.MoleculeNeighbors])
-def search_neighbors(
-    type: str,
-    molecule_id: int,
-    components: Optional[str]="1,2,3,4",
-    skip: int = 1,
-    limit: int = 100,
-    db: Session = Depends(deps.get_db),
-):
+    components_list.sort()
+    if components_list[-1] > max_dims or len(components_list) > max_dims:
+        raise HTTPException(status_code=400, detail=f"Invalid components, there are only {max_dims} available")
     
     query = """"""
 
-    if type == "umap":
-        query = """
-        SELECT smiles, ARRAY[umap[0], umap[1]] AS components, molecule_id, 'umap' as type,
-        (umap <-> (SELECT umap FROM umap WHERE molecule_id=:molecule_id)) as dist
-        FROM umap
-        ORDER BY dist
-        OFFSET :offset 
-        LIMIT :limit
-        """
-
-    if type == "pca":
-        # Need check to see if the components are all integers
-        pca_components_list = []
-        for i in components.split(","):
-            try:
-                pca_components_list.append(int(i))
-            except ValueError:
-                raise HTTPException(status_code=400, detail="Components must be a string of integers separated by commas")
-
-        # Check to see if the pca components requested are valid
-        # TODO: This will need to be generalized, since other schemas may have more or less pcas not a maximum of 4...
-        pca_components_list.sort()
-        if pca_components_list[-1] > 4 or len(pca_components_list) > 4:
-            raise HTTPException(status_code=400, detail="Invalid PCA components, there are only 4 available")
-            
-        # Creates list of strings of indexing the cube using the `->` operator, ex. ["p2->1", "p2->2", ...]
-        cube_indexing = ["p2->" + str(i) for i in range(1, len(pca_components_list)+1)]
-        # Creates the string array from the indexing strings. ex. "ARRAY[p2->1, p2->2]"
-        array_substitute_one = f'ARRAY[{", ".join(i for i in cube_indexing)}]'
-        # Creates the string array for indexing the cube using cube_subset. ex "ARRAY[1, 2, 3, 4]"
-        array_substitute_two = f'ARRAY[{", ".join(str(i) for i in pca_components_list)}]'
-            
-        query = f"""
-            SELECT smiles, molecule_id, {array_substitute_one} as components, 'pca' as type,
-            cube_subset(p1.pca, {array_substitute_two}) <-> p2 as dist
-            FROM pca, (SELECT pca FROM pca WHERE molecule_id=:molecule_id) as p1, cube_subset(pca.pca, {array_substitute_two}) as p2
-            ORDER BY dist
-            OFFSET :offset 
-            LIMIT :limit
-            """
+    # Creates list of strings of indexing the cube using the `->` operator, ex. ["p2->1", "p2->2", ...]
+    cube_indexing = ["p2->" + str(i) for i in range(1, len(components_list)+1)]
+    # Creates the string array from the indexing strings. ex. "ARRAY[p2->1, p2->2]"
+    array_substitute_one = f'ARRAY[{", ".join(i for i in cube_indexing)}]'
+    # Creates the string array for indexing the cube using cube_subset. ex "ARRAY[1, 2, 3, 4]"
+    array_substitute_two = f'ARRAY[{", ".join(str(i) for i in components_list)}]'
+        
+    query = f"""
+    SELECT 
+        smiles, 
+        molecule_id, 
+        pat, 
+        {array_substitute_one} as components, 
+        '{type}' as type, 
+        cube_subset(p1.{type}, {array_substitute_two}) <-> p2 as dist
+    FROM 
+        molecule, 
+        (SELECT {type} FROM molecule WHERE molecule_id=:molecule_id) as p1, 
+        cube_subset(molecule.{type}, {array_substitute_two}) as p2
+    ORDER BY 
+        dist
+    OFFSET 
+        :offset 
+    LIMIT 
+        :limit
+    """
 
     sql = text(query)
 
