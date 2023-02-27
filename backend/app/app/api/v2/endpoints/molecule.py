@@ -1,3 +1,5 @@
+from multiprocessing.sharedctypes import Value
+from re import sub
 from typing import List, Optional, Any
 
 from app import schemas
@@ -10,11 +12,37 @@ from sqlalchemy.orm import Session
 
 router = APIRouter()
 
-# @router.get("/molecules", response_model=List[schemas.Molecule])
-# def get_molecules(db: Session = Depends(deps.get_db)):
+def valid_smiles(smiles):
+    """Check to see if a smile string is valid to represent a molecule.
 
-#    return "Working"
+    Converts the smile string to an rdkit molecule to see if it is valid, then turns it back into a smile string to return an rdkit standardized
+    smiles.
 
+    Parameters
+    ----------
+    smiles : str
+        Smiles string.
+    
+    Returns
+    -------
+    smiles : str
+        A smiles string generated from an rdkit  molecule.
+
+    Raises
+    ------
+    HTTPException 
+        When an rdkit molecule cannot be created from the smile string.
+    HTTPException
+        When a smile string cannot be created from an rdkit molecule.
+    """
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        raise HTTPException(status_code=400, detail="Invalid Smiles")
+    smiles = Chem.MolToSmiles(mol)
+    if smiles is None:
+        raise HTTPException(status_code=400, detail="Invalid Smiles!")
+    
+    return smiles
 
 @router.get("/umap", response_model=List[schemas.MoleculeSimple])
 def get_molecule_umap(
@@ -27,7 +55,7 @@ def get_molecule_umap(
     query_parameters: dict[str, Any] = {"limit": limit}
 
     query = """
-        SELECT molecule_id, smiles, umap[0] AS umap1, umap[1] AS umap2, pat FROM molecule
+        SELECT molecule_id, smiles, umap->1 as umap1, umap->2 as umap2, pat FROM molecule
         """
 
     # Need to build the query based on the inputs
@@ -93,12 +121,8 @@ def search_molecules(
     limit: int = 100,
     db: Session = Depends(deps.get_db),
 ):
-    mol = Chem.MolFromSmiles(substructure)
-    if mol is None:
-        raise HTTPException(status_code=400, detail="Invalid Smiles Substructure")
-    substructure = Chem.MolToSmiles(mol)
-    if substructure is None:
-        raise HTTPException(status_code=400, detail="Invalid Smiles Substructure!")
+    # Check if the substructure provided is valid
+    substructure = valid_smiles(substructure)
 
     # The original query is not doing a substructure search at all. It is doing string
     # comparisons between the substructure and the molecule smiles string.
@@ -131,5 +155,87 @@ def search_molecules(
         ).fetchall()
     except exc.DataError:
         raise HTTPException(status_code=400, detail="Invalid Smiles Substructure!")
+
+    return results
+
+@router.get("/{molecule_id}/neighbors/", response_model=List[schemas.MoleculeNeighbors])
+def search_neighbors(
+    molecule_id: int,
+    type: str="pca",
+    components: Optional[str]=None,
+    skip: int = 1,
+    limit: int = 100,
+    db: Session = Depends(deps.get_db),
+):
+    
+    type = type.lower()
+    
+    # Check for valid neighbor type.
+    if type not in  ["pca", "umap"]:
+        raise HTTPException(status_code=400, detail="Invalid neighbor type.")
+
+    # Set defaults for components
+    if type == "pca" and components is None:
+        components =  "1,2,3,4"
+
+    # Set defaults for components
+    if type == "umap" and components is None:
+        components = "1,2"
+
+    # Check correct format
+    components_list = []
+    for i in components.split(","):
+        try:
+            components_list.append(int(i))
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Components must be a string of integers separated by commas")
+
+    # Generalized - get max number of components for type by getting one record
+    query = text(f"SELECT cube_dim({type}) FROM molecule WHERE {type} IS NOT NULL LIMIT 1")
+
+    max_dims =  db.execute(query).fetchall()[0][0]
+
+    # Check to see if the pca components requested are valid
+    components_list.sort()
+    if components_list[-1] > max_dims or len(components_list) > max_dims:
+        raise HTTPException(status_code=400, detail=f"Invalid components, there are only {max_dims} available")
+    
+    query = """"""
+
+    # Creates list of strings of indexing the cube using the `->` operator, ex. ["p2->1", "p2->2", ...]
+    cube_indexing = ["p2->" + str(i) for i in range(1, len(components_list)+1)]
+    # Creates the string array from the indexing strings. ex. "ARRAY[p2->1, p2->2]"
+    array_substitute_one = f'ARRAY[{", ".join(i for i in cube_indexing)}]'
+    # Creates the string array for indexing the cube using cube_subset. ex "ARRAY[1, 2, 3, 4]"
+    array_substitute_two = f'ARRAY[{", ".join(str(i) for i in components_list)}]'
+        
+    query = f"""
+    SELECT 
+        smiles, 
+        molecule_id, 
+        pat, 
+        {array_substitute_one} as components, 
+        '{type}' as type, 
+        cube_subset(p1.{type}, {array_substitute_two}) <-> p2 as dist
+    FROM 
+        molecule, 
+        (SELECT {type} FROM molecule WHERE molecule_id=:molecule_id) as p1, 
+        cube_subset(molecule.{type}, {array_substitute_two}) as p2
+    ORDER BY 
+        dist
+    OFFSET 
+        :offset 
+    LIMIT 
+        :limit
+    """
+
+    sql = text(query)
+
+    try:
+        results = db.execute(
+            sql, dict(molecule_id=molecule_id, offset=skip, limit=limit)
+        ).fetchall()
+    except exc.DataError:
+        raise HTTPException(status_code=400, detail="No molecule with the id provided was found!")
 
     return results

@@ -19,3 +19,13 @@ class MoleculeSimple(BaseModel):
     umap2: Optional[float]
     pat: Optional[str]
     smiles: str
+
+class MoleculeNeighbors(BaseModel):
+    type: Optional[str]
+    molecule_id: int
+    pat: Optional[str]
+    dist: Optional[float]
+    smiles: str
+    components: list[float]
+
+
