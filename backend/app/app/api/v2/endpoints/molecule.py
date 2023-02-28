@@ -141,7 +141,7 @@ def search_molecules(
     sql = text(
         """
         SET LOCAL enable_sort=off;
-        select molecule_id, smiles, molecular_weight, umap[0] as umap1, umap[1] as umap2 from molecule 
+        select molecule_id, smiles, molecular_weight, umap->1 as umap1, umap->2 as umap2 from molecule 
         where mol@>:substructure
         order by morganbv <%> morganbv_fp(mol_from_smiles(:substructure)) 
         offset :offset 
