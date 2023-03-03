@@ -240,7 +240,7 @@ def search_neighbors(
     return results
 
 
-@router.get("/dimensions/", response_model=List[schemas.MoleculeComponents])
+@router.get("/dimensions", response_model=List[schemas.MoleculeComponents])
 def get_molecule_dimensions(
     type: str="pca",
     components: Optional[str]=None,
