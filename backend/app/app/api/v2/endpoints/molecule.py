@@ -291,7 +291,7 @@ def get_molecule_dimensions(
     where_clause = ""
 
     # Creates list of strings of indexing the cube using the `->` operator, ex. ["pca->1", "pca->2", ...]
-    cube_indexing = ["pca->" + str(i) for i in range(1, len(components_list)+1)]
+    cube_indexing = [f"{type}->" + str(i) for i in range(1, len(components_list)+1)]
     # Creates the string array from the indexing strings. ex. "ARRAY[pca->1, pca->2]"
     array_substitute_one = f'ARRAY[{", ".join(i for i in cube_indexing)}]'
 
