@@ -251,6 +251,9 @@ def get_molecule_dimensions(
 ):
     type = type.lower()
     
+    query = """"""
+    where_clause = ""
+
     # Check for valid neighbor type.
     if type not in  ["pca", "umap"]:
         raise HTTPException(status_code=400, detail="Invalid neighbor type.")
@@ -260,6 +263,9 @@ def get_molecule_dimensions(
         category = category.lower()
         if category not in ["pon", "pn3", "phal", "pcn", "po3", "pc3", "pco", "other", "psi"]:
             raise HTTPException(status_code=400, detail="Invalid category type.")
+        else: 
+            # Create where clause
+            where_clause = "WHERE pat = :category"
 
     # Set defaults for components
     if type == "pca" and components is None:
@@ -287,17 +293,10 @@ def get_molecule_dimensions(
     if components_list[-1] > max_dims or len(components_list) > max_dims:
         raise HTTPException(status_code=400, detail=f"Invalid components, there are only {max_dims} available")
     
-    query = """"""
-    where_clause = ""
-
     # Creates list of strings of indexing the cube using the `->` operator, ex. ["pca->1", "pca->2", ...]
     cube_indexing = [f"{type}->" + str(i) for i in range(1, len(components_list)+1)]
     # Creates the string array from the indexing strings. ex. "ARRAY[pca->1, pca->2]"
     array_substitute_one = f'ARRAY[{", ".join(i for i in cube_indexing)}]'
-
-    # Create where clause if category was passed in.
-    if category:
-        where_clause = "WHERE pat = :category"
         
     query = f"""
     SELECT 
