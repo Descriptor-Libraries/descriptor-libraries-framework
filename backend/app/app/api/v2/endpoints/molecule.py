@@ -92,7 +92,6 @@ def get_molecule_umap(
 
     return results
 
-
 @router.get("/{molecule_id}", response_model=schemas.Molecule)
 def get_a_single_molecule(molecule_id: int, db: Session = Depends(deps.get_db)):
     molecule = (
@@ -237,5 +236,91 @@ def search_neighbors(
         ).fetchall()
     except exc.DataError:
         raise HTTPException(status_code=400, detail="No molecule with the id provided was found!")
+
+    return results
+
+
+@router.get("/dimensions/", response_model=List[schemas.MoleculeComponents])
+def get_molecule_dimensions(
+    type: str="pca",
+    components: Optional[str]=None,
+    category: Optional[str]=None,
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(deps.get_db),
+):
+    type = type.lower()
+    
+    # Check for valid neighbor type.
+    if type not in  ["pca", "umap"]:
+        raise HTTPException(status_code=400, detail="Invalid neighbor type.")
+
+    # Check for valid category type if it was not None.
+    if category:
+        category = category.lower()
+        if category not in ["pon", "pn3", "phal", "pcn", "po3", "pc3", "pco", "other", "psi"]:
+            raise HTTPException(status_code=400, detail="Invalid category type.")
+
+    # Set defaults for components
+    if type == "pca" and components is None:
+        components =  "1,2,3,4"
+
+    # Set defaults for components
+    if type == "umap" and components is None:
+        components = "1,2"
+
+    # Check correct format
+    components_list = []
+    for i in components.split(","):
+        try:
+            components_list.append(int(i))
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Components must be a string of integers separated by commas.")
+
+    # Generalized - get max number of components for type by getting one record
+    query = text(f"SELECT cube_dim({type}) FROM molecule WHERE {type} IS NOT NULL LIMIT 1")
+
+    max_dims =  db.execute(query).fetchall()[0][0]
+
+    # Check to see if the pca components requested are valid
+    components_list.sort()
+    if components_list[-1] > max_dims or len(components_list) > max_dims:
+        raise HTTPException(status_code=400, detail=f"Invalid components, there are only {max_dims} available")
+    
+    query = """"""
+    where_clause = ""
+
+    # Creates list of strings of indexing the cube using the `->` operator, ex. ["pca->1", "pca->2", ...]
+    cube_indexing = ["pca->" + str(i) for i in range(1, len(components_list)+1)]
+    # Creates the string array from the indexing strings. ex. "ARRAY[pca->1, pca->2]"
+    array_substitute_one = f'ARRAY[{", ".join(i for i in cube_indexing)}]'
+
+    # Create where clause if category was passed in.
+    if category:
+        where_clause = "WHERE pat = :category"
+        
+    query = f"""
+    SELECT 
+        smiles, 
+        molecule_id,
+        pat, 
+        {array_substitute_one} as components, 
+        '{type}' as type
+    FROM 
+        molecule
+    {where_clause}
+    OFFSET 
+        :offset 
+    LIMIT 
+        :limit
+    """
+    sql = text(query)
+
+    try:
+        results = db.execute(
+            sql, dict(category=category, offset=skip, limit=limit)
+        ).fetchall()
+    except exc.DataError:
+        raise HTTPException(status_code=400, detail="No molecules with the parameters provided were found!")
 
     return results
