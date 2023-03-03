@@ -240,7 +240,7 @@ def search_neighbors(
     return results
 
 
-@router.get("/dimensions", response_model=List[schemas.MoleculeComponents])
+@router.get("/dimensions/", response_model=List[schemas.MoleculeComponents])
 def get_molecule_dimensions(
     type: str="pca",
     components: Optional[str]=None,
@@ -261,7 +261,12 @@ def get_molecule_dimensions(
     # Check for valid category type if it was not None.
     if category:
         category = category.lower()
-        if category not in ["pon", "pn3", "phal", "pcn", "po3", "pc3", "pco", "other", "psi"]:
+        
+        # Generalized - get different categories for category
+        query = text(f"SELECT ARRAY(SELECT DISTINCT pat from molecule)")
+        array_of_categories = db.execute(query).fetchall()[0][0]
+
+        if category not in array_of_categories:
             raise HTTPException(status_code=400, detail="Invalid category type.")
         else: 
             # Create where clause
