@@ -263,7 +263,7 @@ def get_molecule_dimensions(
         category = category.lower()
         
         # Generalized - get different categories for category
-        query = text(f"SELECT ARRAY(SELECT DISTINCT pat from molecule)")
+        query = text(f"SELECT ARRAY(SELECT DISTINCT LOWER(pat) from molecule)")
         array_of_categories = db.execute(query).fetchall()[0][0]
 
         if category not in array_of_categories:
