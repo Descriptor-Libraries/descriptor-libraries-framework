@@ -15,6 +15,7 @@ import About from '../pages/About'
 import Contact from '../pages/Contact'
 import Download from '../pages/Download'
 import Search  from '../pages/SearchHook';
+import NeighborSearch  from '../pages/Neighbors';
 
 import {
   BrowserRouter as Router, 
@@ -28,7 +29,8 @@ import OriginalKraken from './OriginalKraken';
 const pages ={
               'Home': <Home />, 
               'About': <About />, 
-              'Search': <Search />, 
+              'Search': <Search />,
+              'Neighbors': <NeighborSearch/>, 
               'Download': <Download />,
               'Contact': <Contact />
             };
