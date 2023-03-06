@@ -8,6 +8,7 @@ import Container from '@mui/material/Container';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import Button from '@mui/material/Button';
+import MenuItem from '@mui/material/MenuItem';
 
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -55,7 +56,7 @@ export default function NeighborSearchHook () {
     }
 
     function newSearch() {
-        setSkip(0);
+        setSkip(1);
         setSearchPage(1);
         setSVGResults([]);
         setResults([]);
@@ -117,7 +118,10 @@ export default function NeighborSearchHook () {
     return (
         <Container maxWidth="lg">
         <h2>Neighbor Search</h2>
-        <TextField id="search-outline" 
+        <TextField 
+                  style = {{width: 350}}
+                  sx={{ m: 0.5}}
+                  id="search-outline" 
                   label="Enter a Molecule ID to Search" 
                   variant="outlined"
                   defaultValue= {moleculeid} 
@@ -127,7 +131,25 @@ export default function NeighborSearchHook () {
                   >
                     Search
                     </Button>}}
-                    />
+        />
+        <TextField
+            sx={{ m: 0.5 }}
+            select
+            id="dimension-outline"
+            value={type}
+            onChange={event => setType(event.target.value)}
+        >
+            <MenuItem value={"pca"}>PCA</MenuItem>
+            <MenuItem value={"umap"}>UMAP</MenuItem>
+        </TextField>
+        <TextField
+                  sx={{ m: 0.5}} 
+                  id="component-outline" 
+                  label="Enter Components" 
+                  variant="outlined"
+                  defaultValue= {components} 
+                  onChange = { event => setComponents( event.target.value ) }
+        />
 
         <Container sx={{display: 'flex', justifyContent: 'center', my: 3}}>
             <Box sx={{ display: 'flex' }}>
