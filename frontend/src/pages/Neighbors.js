@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import Plot from 'react-plotly.js';
 import { styled } from '@mui/material/styles';
 import { TextField, Typography } from "@mui/material";
 import Paper from '@mui/material/Paper';
@@ -39,7 +40,7 @@ export default function NeighborSearchHook () {
     const [ moleculeid, setSearch ] = useState(1);
     const [ type, setType ] = useState("pca");
     const [ components, setComponents ] = useState("1,2,3,4");
-    const [ skip, setSkip ] = useState(1);
+    const [ skip, setSkip ] = useState(0);
     const [ results, setResults ] = useState([]);
     const [ validMolecule, setValidMolecule ] = useState(true);
     const [ svg_results, setSVGResults ] = useState([])
@@ -47,16 +48,131 @@ export default function NeighborSearchHook () {
     const [ isLoading, setIsLoading ] = useState(true);
     const [ searchToggle, setSearchToggle ] = useState(true);
     const [ isLoadingMore, setIsLoadingMore ] = useState(false);
+    const [ molData, setMolData] = useState([]);
+
+    // Plotting functions to show molecules on hover
+    function showSVGWindow(svg, event) {
+
+        // remove in case existing
+        if (document.getElementById("molecule")) {
+          document.getElementById("molecule").remove()
+        }
+      
+        let mol = document.createElement("g")
+        mol.setAttribute("id", "molecule")
+        
+        let plotly_container = document.getElementsByClassName("plotly")
+        mol.innerHTML = svg;
+        
+        let xpos = event.event.clientX - 160;
+        let ypos = event.event.clientY - 160;
+      
+        plotly_container[0].appendChild(mol);
+        mol.style.position = "absolute";
+        mol.style.left = `${xpos}px`;
+        mol.style.top = `${ypos}px`;
+      
+    }
+      
+    function showSVG(event) {
+    fetch(`depict/cow/svg?smi=${event.points[0].text}&w=40&h=40`).then(response => 
+        response.text() ).then( body => showSVGWindow(body, event) );
+    }
     
-    // loadmore
+    function hideSVG(event) {
+    if (document.getElementById("molecule")) {
+        document.getElementById("molecule").remove()
+    }
+    
+    }
+    // Returns the components entered as an array of strings
+    function getComponents(components){
+        return components.split(",");
+    }
+
+    function Graph(){
+        // Getting the components to label the axis.
+        let componentArray = getComponents(components);
+        // Shifting the data by 1, to avoid overwriting the target of the search
+        let neighbors = molData.slice(1);
+        let myPlot = <Plot onHover={ (event) => showSVG(event) } 
+        onUnhover={ (event)=> hideSVG(event) } 
+        style={{'width': '100%', 'height': '100%' }}
+        useResizeHandler={true}
+        data={[
+            // Creating the data series for the target of the search
+            {
+            x: [molData[0].components[0]],
+            y: [molData[0].components[1]],
+            text: [encodeURIComponent(molData[0].smiles)],
+            hovertemplate: "( %{x}, %{y})",
+            hovermode: "closest",
+            type: 'scatter',
+            mode: 'markers',
+            marker: {color: 'red', size: 12 , 
+                    symbol: "triangle-up",
+                    line: {
+                        width: 2,
+                        color: 'DarkSlateGrey'}},
+            name: 'Target'
+            },
+            // Creating the data series for the neighbors
+          {
+            x: neighbors.map( row => { return row.components[0] }),
+            y: neighbors.map( row => { return row.components[1] }),
+            text: neighbors.map( row => { return encodeURIComponent(row.smiles) }),
+            hovertemplate: "( %{x}, %{y})",
+            hovermode: "closest",
+            type: 'scatter',
+            mode: 'markers',
+            marker: {color: 'SlateGrey', size: 12 ,
+                    symbol: 'triangle-down', 
+                    line: {
+                        width: 2,
+                        color: 'DarkSlateGrey'}},
+            name: 'Neighbor'
+          }
+        ]}
+        layout={ { 
+          autosize: true,
+          useResizeHandler: true,
+          style: {width: '100%', height: '100%'},
+          xaxis: {
+            title: {
+              text: molData[0].type + componentArray[0],
+              font: {
+                size: 18,
+                color: '#7f7f7f'
+              }
+          }
+        },
+    
+        yaxis: {
+          title: {
+            text: molData[0].type + componentArray[1],
+            font: {
+              size: 18,
+              color: '#7f7f7f'
+            }
+        }
+      }
+        } }
+      />
+    return (
+        myPlot
+      );
+    }
+
+    // Loadmore neighbors
     function loadMore() {
         setSkip(skip => skip + interval);
         setSearchPage( searchPage => searchPage + 1);
         setIsLoadingMore(true);
     }
 
+    // Search new neighbors
     function newSearch() {
-        setSkip(1);
+        setSkip(0);
         setSearchPage(1);
         setSVGResults([]);
         setResults([]);
@@ -64,13 +180,14 @@ export default function NeighborSearchHook () {
         // so that effect will be triggered
         setIsLoading(true);
         setSearchToggle(!searchToggle);
+        setMolData([]);
     }
  
     function loadImages() {
 
         const fetchData = async () => {
-            const molecule_data = await NeighborSearch(moleculeid, type, components, interval, skip);
-            return [ molecule_data ]
+            const moleculeData = await NeighborSearch(moleculeid, type, components, interval, skip);
+            return moleculeData
         }
 
         fetchData()
@@ -84,18 +201,23 @@ export default function NeighborSearchHook () {
         } )
         .then( (items )=> {
             console.log(items);
-            if (searchPage == 1) {
-            setSVGResults(items[1]);
-            setResults(items[0]);
-            }
+            setMolData(items);
+            console.log(isLoading);
+            console.log(validMolecule);
 
-            else {
-                setSVGResults(svg_results.concat(items[1]));
-                setResults(results.concat(items[0]) )
-            }
+            // if (searchPage == 1) {
+            // setSVGResults(items[1]);
+            // setResults(items[0]);
+            // }
+
+            // else {
+            //     setSVGResults(svg_results.concat(items[1]));
+            //     setResults(results.concat(items[0]) )
+            // }
 
             setIsLoading(false);
             setIsLoadingMore(false);
+            setValidMolecule(true);
 
           })
 
@@ -153,12 +275,12 @@ export default function NeighborSearchHook () {
 
         <Container sx={{display: 'flex', justifyContent: 'center', my: 3}}>
             <Box sx={{ display: 'flex' }}>
-            { !isLoading && validMolecule && <Typography>No results found for SMILES string.</Typography> } 
+            { !isLoading && !validMolecule && <Typography>No results found for Molecule ID.</Typography> } 
+            </Box>
+            <Box sx={{ display: 'flex' }}>
+            { !isLoading && validMolecule && Object.keys(molData).length > 0 && <Typography>Results.</Typography> && <Container>{ Graph() }</Container> } 
             </Box>
         </Container>
-
-            
-
         </Container>
     )
 }
