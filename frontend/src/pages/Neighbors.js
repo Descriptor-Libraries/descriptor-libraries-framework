@@ -49,6 +49,7 @@ export default function NeighborSearchHook () {
     const [ searchToggle, setSearchToggle ] = useState(true);
     const [ isLoadingMore, setIsLoadingMore ] = useState(false);
     const [ molData, setMolData] = useState([]);
+    const [ componentArray, setComponentArray ] = useState([]);
 
     // Plotting functions to show molecules on hover
     function showSVGWindow(svg, event) {
@@ -85,14 +86,13 @@ export default function NeighborSearchHook () {
     }
     
     }
+    
     // Returns the components entered as an array of strings
     function getComponents(components){
         return components.split(",");
     }
 
     function Graph(){
-        // Getting the components to label the axis.
-        let componentArray = getComponents(components);
         // Shifting the data by 1, to avoid overwriting the target of the search
         let neighbors = molData.slice(1);
         let myPlot = <Plot onHover={ (event) => showSVG(event) } 
@@ -181,6 +181,7 @@ export default function NeighborSearchHook () {
         setIsLoading(true);
         setSearchToggle(!searchToggle);
         setMolData([]);
+        setComponentArray([]);
     }
  
     function loadImages() {
@@ -200,10 +201,7 @@ export default function NeighborSearchHook () {
             setIsLoadingMore(false) 
         } )
         .then( (items )=> {
-            console.log(items);
             setMolData(items);
-            console.log(isLoading);
-            console.log(validMolecule);
 
             // if (searchPage == 1) {
             // setSVGResults(items[1]);
@@ -218,6 +216,7 @@ export default function NeighborSearchHook () {
             setIsLoading(false);
             setIsLoadingMore(false);
             setValidMolecule(true);
+            setComponentArray(getComponents(components));
 
           })
 
