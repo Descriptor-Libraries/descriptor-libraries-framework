@@ -20,12 +20,13 @@ class MoleculeSimple(BaseModel):
     pat: Optional[str]
     smiles: str
 
-class MoleculeNeighbors(BaseModel):
+class MoleculeComponents(BaseModel):
     type: Optional[str]
     molecule_id: int
     pat: Optional[str]
-    dist: Optional[float]
     smiles: str
     components: list[float]
 
+class MoleculeNeighbors(MoleculeComponents):
+    dist: Optional[float]
 
