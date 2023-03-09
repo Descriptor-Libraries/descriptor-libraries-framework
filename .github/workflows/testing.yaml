@@ -1,0 +1,46 @@
+name: Testing
+
+on:
+  push:
+    branches: [ "update", "add-testing" ]
+  pull_request:
+    branches: [ "update" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+  # need checkout before using compose-action
+    - uses: actions/checkout@v3
+
+    - uses: conda-incubator/setup-miniconda@v2
+      with:
+        python-version: 3.11
+        environment-file: tests/testing.yaml
+        channels: conda-forge,defaults
+        activate-environment: test
+        auto-update-conda: false
+        auto-activate-base: false
+        show-channel-urls: true
+
+    - uses: isbang/compose-action@v1.4.1
+      with:
+        compose-file: "./docker-compose.test.yml"
+        #down-flags: "--volumes"
+        services: |
+          test_database
+          test_backend
+
+    - name: populate db
+      # conda setup requires this special shell
+      shell: bash -l {0}
+      run: |
+        sudo apt-get install -y postgresql
+        psql -U postgres -h localhost -f tests/db/test_db_small.sql
+    
+    - name: run tests
+      shell: bash -l {0}
+      run: pytest -v
