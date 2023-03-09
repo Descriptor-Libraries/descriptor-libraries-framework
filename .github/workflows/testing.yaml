@@ -33,6 +33,7 @@ jobs:
         services: |
           test_database
           test_backend
+          test_reverse-proxy
 
     - name: populate db
       # conda setup requires this special shell
