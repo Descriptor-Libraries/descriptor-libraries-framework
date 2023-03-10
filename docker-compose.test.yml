@@ -32,13 +32,18 @@ services:
     image: 'mcs07/postgres-rdkit'
     container_name: database_test
     shm_size: '4gb'
-    volumes:
-      - "./tests/db:/home/db"
     ports:
       - "5432:5432"
+    volumes:
+      - ./tests/db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "psql -U postgres -d postgres -c 'SELECT molecule_id FROM molecule LIMIT 1;' || exit 1"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
-      POSTGRES_DB: test
+      POSTGRES_DB: postgres
     networks:
       - db-test
 
@@ -57,13 +62,14 @@ services:
       POSTGRES_DB: postgres
     entrypoint: bash prestart.sh
     depends_on:
-      - test_database
+      test_database:
+        condition: service_healthy
     networks:
       - web-test
       - db-test
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`localhost`) && PathPrefix(`/api`) || Host(`147.182.187.35`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.backend.rule=Host(`localhost`) && PathPrefix(`/api`)"
       - "traefik.http.services.backend.loadbalancer.server.port=8080"
 
   test_cdk-depict:
@@ -73,7 +79,7 @@ services:
       - web-test
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.cdk-depict.rule=Host(`localhost`) && PathPrefix(`/depict`) || Host(`147.182.187.35`) && PathPrefix(`/depict`)"
+      - "traefik.http.routers.cdk-depict.rule=Host(`localhost`) && PathPrefix(`/depict`)"
 
   test_frontend:
     image: 'phosphines-frontend:latest'
@@ -88,7 +94,7 @@ services:
     entrypoint: npm start
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`localhost`) || Host(`147.182.187.35`)"
+      - "traefik.http.routers.frontend.rule=Host(`localhost`)"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
 
   test_documentation:
@@ -104,7 +110,7 @@ services:
       - web-test
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.documentation.rule=Host(`localhost`) && PathPrefix(`/docs`) || Host(`147.182.187.35`) && PathPrefix(`/docs`)"
+      - "traefik.http.routers.documentation.rule=Host(`localhost`) && PathPrefix(`/docs`)"
       - "traefik.http.services.documentation.loadbalancer.server.port=5000"
     
 
