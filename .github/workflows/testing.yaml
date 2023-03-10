@@ -34,14 +34,7 @@ jobs:
           test_database
           test_backend
           test_reverse-proxy
-
-    - name: populate db
-      # conda setup requires this special shell
-      shell: bash -l {0}
-      run: |
-        sudo apt-get install -y postgresql
-        psql -U postgres -h localhost -f tests/db/test_db_small.sql
-    
+          
     - name: run tests
       shell: bash -l {0}
       run: pytest -v
