@@ -85,7 +85,7 @@ class MyPlot extends React.Component {
   render() {
 
     
-    let myPlot = <div id="plotly-container" style={{'width': '60%', 'height': '85%', 'margin': 'auto' }}> <Plot onHover={ (event) => showSVG(event) } 
+    let myPlot = <div id="plotly-container" style={{'width': '60%', 'height': '70vh', 'margin': 'auto' }}> <Plot onHover={ (event) => showSVG(event) } 
     onUnhover={ (event)=> hideSVG(event) } 
     style={{'width': '100%', 'height': '100%' }}
     useResizeHandler={true}
