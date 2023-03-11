@@ -1,0 +1,18 @@
+
+a:hover {
+	color: #1A1A1A;
+}
+
+
+a {
+	color: #ed1c24;
+}
+
+.footer_logo {
+	max-height: 90px;
+    padding-top: 5px;
+}
+
+.content {
+    min-height: 75vh;
+}

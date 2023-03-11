@@ -16,6 +16,8 @@ import Contact from '../pages/Contact'
 import Download from '../pages/Download'
 import Search  from '../pages/SearchHook';
 
+import '../assets/custom.css'
+
 import {
   BrowserRouter as Router, 
   Routes,
@@ -149,13 +151,15 @@ const ResponsiveAppBar = () => {
         </Container>
       </AppBar>
       
-      <Routes>
-        <Route path='/' element={[pages['Home']]}></Route>
-        {Object.keys(pages).map((page) => (
-          <Route path={page} element={pages[page]} >
-          </Route>
-        )) }
-      </Routes>
+      <div class="content">
+        <Routes>
+          <Route path='/' element={[pages['Home']]}></Route>
+          {Object.keys(pages).map((page) => (
+            <Route path={page} element={pages[page]} >
+            </Route>
+          )) }
+        </Routes>
+      </div>
 
     </Router>
   );

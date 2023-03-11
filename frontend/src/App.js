@@ -1,6 +1,7 @@
 import './App.css';
 
 import ResponsiveAppBar from './common/Navbar';
+import Footer from './common/Footer'
 
 function App() {
   return (
@@ -8,6 +9,7 @@ function App() {
       <header className="kraken-webapp">
       </header>
       <ResponsiveAppBar />
+      <Footer />
     </div>
   );
 }
