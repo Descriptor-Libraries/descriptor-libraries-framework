@@ -106,6 +106,8 @@ html_theme_options = {
       "text": "kraken",
       "molssi_light": "molssi_main_logo.png",
       "molssi_dark": "molssi_main_logo_inverted_white.png",
+      "ccas_light": "CCAS_logo_light.png",
+      "ccas_dark": "CCAS_logo_dark.png",
       "link": "/"
     },
 	"show_toc_level": 2,

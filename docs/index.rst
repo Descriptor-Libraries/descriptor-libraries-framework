@@ -14,7 +14,7 @@ These are the docs for the kraken website.
     .. grid-item-card::  Developer Guide
       :margin: 0 3 0 0
       
-      Learn about kraken's architecture and how to set up your development environment.
+      Documentation for developers who want to contribute to the kraken app and website.
 
       .. button-link:: ./developer_guide/index.html
          :color: primary
