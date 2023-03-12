@@ -33,6 +33,45 @@ async function NeighborSearch(molecule_id, type, components, limit=48, skip=0) {
     }
 }
 
+async function retrieveSVG( smiles ) {
+  let encoded = encodeURIComponent(smiles);
+
+  const response = await fetch(`depict/cow/svg?smi=${encoded}&w=40&h=40`);
+  
+  const svg = await response.text();
+  let result = {}
+  result["svg"] = svg;
+  result["smiles"] = smiles;
+  return result
+}
+
+async function retrieveAllSVGs( items ) {
+  return await Promise.all( items.map( (item) => { 
+      return retrieveSVG(item.smiles)
+   } ) )
+}
+
+function dynamicGrid( svgs ) {
+
+  return (
+      <Container>
+      <Grid container spacing={2} sx= {{ mt: 3 }}>
+      {
+      svgs.map((result) => (
+      <Grid item xs={12} md={4}>
+          <Item>
+          <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(result.svg)}`} />
+          <Typography sx={{ wordBreak: "break-word" }}>{ result.smiles }</Typography>
+          </Item> 
+      </Grid>
+      ))
+      }
+      
+  </Grid>
+  </Container>
+  )
+}
+
 export default function NeighborSearchHook () {
 
     const interval = 15;
@@ -187,8 +226,10 @@ export default function NeighborSearchHook () {
     function loadImages() {
 
         const fetchData = async () => {
-            const moleculeData = await NeighborSearch(moleculeid, type, components, interval, skip);
-            return moleculeData
+            const molecule_data = await NeighborSearch(moleculeid, type, components, interval, skip);
+            const svg_data = await retrieveAllSVGs(molecule_data);
+
+            return [ molecule_data, svg_data ]
         }
 
         fetchData()
@@ -201,17 +242,17 @@ export default function NeighborSearchHook () {
             setIsLoadingMore(false) 
         } )
         .then( (items )=> {
-            setMolData(items);
+            setMolData(items[0]);
 
-            // if (searchPage == 1) {
-            // setSVGResults(items[1]);
-            // setResults(items[0]);
-            // }
+            if (searchPage == 1) {
+            setSVGResults(items[1]);
+            setResults(items[0]);
+            }
 
-            // else {
-            //     setSVGResults(svg_results.concat(items[1]));
-            //     setResults(results.concat(items[0]) )
-            // }
+            else {
+                setSVGResults(svg_results.concat(items[1]));
+                setResults(results.concat(items[0]) )
+            }
 
             setIsLoading(false);
             setIsLoadingMore(false);
@@ -276,8 +317,15 @@ export default function NeighborSearchHook () {
             <Box sx={{ display: 'flex' }}>
             { !isLoading && !validMolecule && <Typography>No results found for Molecule ID.</Typography> } 
             </Box>
+            <Box>
+            { !isLoading && validMolecule && Object.keys(molData).length > 0 && <Container>{ Graph() }</Container> } 
+            </Box>
             <Box sx={{ display: 'flex' }}>
-            { !isLoading && validMolecule && Object.keys(molData).length > 0 && <Typography>Results.</Typography> && <Container>{ Graph() }</Container> } 
+            { !isLoading && validMolecule && Object.keys(svg_results).length > 0 && 
+             <Container> 
+                { dynamicGrid(svg_results)  }
+                { isLoadingMore ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <Button variant="contained" style={{backgroundColor: "#ed1c24"}} sx={{ my: 3 }} onClick={ () => loadMore() }>Load More</Button> }
+            </Container>  }
             </Box>
         </Container>
         </Container>
