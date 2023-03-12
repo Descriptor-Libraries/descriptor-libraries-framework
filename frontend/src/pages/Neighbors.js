@@ -207,6 +207,7 @@ export default function NeighborSearchHook () {
         setSkip(skip => skip + interval);
         setSearchPage( searchPage => searchPage + 1);
         setIsLoadingMore(true);
+        loadNeighbors();
     }
 
     // Search new neighbors
@@ -223,10 +224,10 @@ export default function NeighborSearchHook () {
         setComponentArray([]);
     }
  
-    function loadImages() {
+    function loadNeighbors() {
 
         const fetchData = async () => {
-            const molecule_data = await NeighborSearch(moleculeid, type, components, interval, skip);
+            const molecule_data = await NeighborSearch(moleculeid, type, components, interval+skip);
             const svg_data = await retrieveAllSVGs(molecule_data);
 
             return [ molecule_data, svg_data ]
@@ -242,6 +243,8 @@ export default function NeighborSearchHook () {
             setIsLoadingMore(false) 
         } )
         .then( (items )=> {
+            console.log("Interval is:", interval)
+            console.log("skip is:", skip)
             setMolData(items[0]);
 
             if (searchPage == 1) {
@@ -265,7 +268,7 @@ export default function NeighborSearchHook () {
 
     // initial load of data 
     useEffect( ( ) => { 
-        loadImages() }, 
+        loadNeighbors() }, 
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [ searchPage, searchToggle ] 
@@ -273,7 +276,7 @@ export default function NeighborSearchHook () {
 
     function _handleKeyDown(event) {
         if (event.key === "Enter") {
-          loadImages();
+          loadNeighbors();
         }
       }
 
@@ -289,10 +292,6 @@ export default function NeighborSearchHook () {
                   defaultValue= {moleculeid} 
                   onChange = { event => setSearch( event.target.value ) }
                   onKeyDown = { (e) => _handleKeyDown(e) }
-                  InputProps={{endAdornment: <Button onClick={ () => { newSearch() } } 
-                  >
-                    Search
-                    </Button>}}
         />
         <TextField
             sx={{ m: 0.5 }}
@@ -311,9 +310,13 @@ export default function NeighborSearchHook () {
                   variant="outlined"
                   defaultValue= {components} 
                   onChange = { event => setComponents( event.target.value ) }
+                  InputProps={{endAdornment: <Button onClick={ () => { newSearch() } } 
+                  >
+                    Search
+                    </Button>}}
         />
 
-        <Container sx={{display: 'flex', justifyContent: 'center', my: 3}}>
+        <Container sx={{justifyContent: 'center', my: 3}}>
             <Box sx={{ display: 'flex' }}>
             { !isLoading && !validMolecule && <Typography>No results found for Molecule ID.</Typography> } 
             </Box>
