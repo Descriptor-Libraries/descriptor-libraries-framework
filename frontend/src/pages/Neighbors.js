@@ -81,7 +81,6 @@ export default function NeighborSearchHook () {
 
     const [ moleculeid, setSearch ] = useState(1);
     const [ type, setType ] = useState("pca");
-    const [ components, setComponents ] = useState("1,2,3,4");
     const [ skip, setSkip ] = useState(0);
     const [ results, setResults ] = useState([]);
     const [ validMolecule, setValidMolecule ] = useState(true);
@@ -91,7 +90,7 @@ export default function NeighborSearchHook () {
     const [ searchToggle, setSearchToggle ] = useState(true);
     const [ isLoadingMore, setIsLoadingMore ] = useState(false);
     const [ molData, setMolData] = useState([]);
-    const [ componentArray, setComponentArray ] = useState([]);
+    const [ componentArrayForm, setComponentArrayForm ] = useState([]);
 
     // Plotting functions to show molecules on hover
     function showSVGWindow(svg, event) {
@@ -127,11 +126,6 @@ export default function NeighborSearchHook () {
         document.getElementById("molecule").remove()
     }
     
-    }
-    
-    // Returns the components entered as an array of strings
-    function getComponents(components){
-        return components.split(",");
     }
 
     function Graph(){
@@ -181,7 +175,7 @@ export default function NeighborSearchHook () {
           style: {width: '100%', height: '100%'},
           xaxis: {
             title: {
-              text: molData[0].type + componentArray[0],
+              text: molData[0].type + componentArrayForm[0],
               font: {
                 size: 18,
                 color: '#7f7f7f'
@@ -191,7 +185,7 @@ export default function NeighborSearchHook () {
     
         yaxis: {
           title: {
-            text: molData[0].type + componentArray[1],
+            text: molData[0].type + componentArrayForm[1],
             font: {
               size: 18,
               color: '#7f7f7f'
@@ -203,6 +197,27 @@ export default function NeighborSearchHook () {
     return (
         myPlot
       );
+    }
+
+    function buildComponentArray(event, label){
+      // Add new label if the checkbox was checked
+      if (event === true) {
+        componentArrayForm.push(label);
+      }
+      // Remove label
+      else {
+        let index = componentArrayForm.indexOf(label);
+        if (index !== -1) {
+          componentArrayForm.splice(index, 1);
+        }
+      }
+      // Sort the array right at the end.
+      componentArrayForm.sort();
+    }
+
+    // Returns the components selcted as a comma seperated string
+    function arrayToString(components){
+      return components.join(", ");
     }
 
     // Loadmore neighbors
@@ -224,13 +239,12 @@ export default function NeighborSearchHook () {
         setIsLoading(true);
         setSearchToggle(!searchToggle);
         setMolData([]);
-        setComponentArray([]);
     }
  
     function loadNeighbors() {
 
         const fetchData = async () => {
-            const molecule_data = await NeighborSearch(moleculeid, type, components, interval+skip);
+            const molecule_data = await NeighborSearch(moleculeid, type, arrayToString(componentArrayForm), interval+skip);
             const svg_data = await retrieveAllSVGs(molecule_data);
 
             return [ molecule_data, svg_data ]
@@ -261,7 +275,6 @@ export default function NeighborSearchHook () {
             setIsLoading(false);
             setIsLoadingMore(false);
             setValidMolecule(true);
-            setComponentArray(getComponents(components));
 
           })
 
@@ -275,12 +288,6 @@ export default function NeighborSearchHook () {
         [ searchPage, searchToggle ] 
     );
 
-    function _handleKeyDown(event) {
-        if (event.key === "Enter") {
-          loadNeighbors();
-        }
-      }
-
     return (
         <Container maxWidth="lg">
         <h2>Neighbor Search</h2>
@@ -292,40 +299,31 @@ export default function NeighborSearchHook () {
                   variant="outlined"
                   defaultValue= {moleculeid} 
                   onChange = { event => setSearch( event.target.value ) }
-                  onKeyDown = { (e) => _handleKeyDown(e) }
         />
         <TextField
             sx={{ m: 0.5 }}
             select
             id="dimension-outline"
             value={type}
-            onChange={event => setType(event.target.value)}
+            onChange={ event => setType(event.target.value)}
         >
             <MenuItem value={"pca"}>PCA</MenuItem>
             <MenuItem value={"umap"}>UMAP</MenuItem>
         </TextField>
-        <TextField
-                  sx={{ m: 0.5}} 
-                  id="component-outline" 
-                  label="Enter Components" 
-                  variant="outlined"
-                  defaultValue= {components} 
-                  onChange = { event => setComponents( event.target.value ) }
-        />
 
         {type == "pca" ? <FormGroup sx={{position: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
-                          <FormControlLabel control={<Checkbox />} label="1" />
-                          <FormControlLabel control={<Checkbox />} label="2" />
-                          <FormControlLabel control={<Checkbox />} label="3" />
-                          <FormControlLabel control={<Checkbox />} label="4" />
+                          <FormControlLabel control={<Checkbox onChange = {event => buildComponentArray(event.target.checked, "1")}/>} label="1" />
+                          <FormControlLabel control={<Checkbox onChange = {event => buildComponentArray(event.target.checked, "2")}/>} label="2" />
+                          <FormControlLabel control={<Checkbox onChange = {event => buildComponentArray(event.target.checked, "3")}/>} label="3" />
+                          <FormControlLabel control={<Checkbox onChange = {event => buildComponentArray(event.target.checked, "4")}/>} label="4" />
                         </FormGroup> :
                         <FormGroup sx={{position: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
-                          <FormControlLabel control={<Checkbox />} label="1" />
-                          <FormControlLabel control={<Checkbox />} label="2" />
+                          <FormControlLabel control={<Checkbox onChange = {event => buildComponentArray(event.target.checked, "1")}/>} label="1" />
+                          <FormControlLabel control={<Checkbox onChange = {event => buildComponentArray(event.target.checked, "2")}/>} label="2" />
                         </FormGroup>
         }
         
-        <Button variant="contained" sx={{ m: 0.5 }} onClick={ () => { newSearch() } } >Search</Button>
+        <Button variant="contained" sx={{ m: 0.5 }} onClick={ function(event) { newSearch(); loadNeighbors(); } } >Search</Button>
         { isLoadingMore ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <Button variant="contained" style={{backgroundColor: "#ed1c24"}} sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> }
         <Container sx={{justifyContent: 'center', my: 3}}>
             <Box sx={{ display: 'flex' }}>
