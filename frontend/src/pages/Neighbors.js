@@ -90,7 +90,7 @@ export default function NeighborSearchHook () {
     const [ searchToggle, setSearchToggle ] = useState(true);
     const [ isLoadingMore, setIsLoadingMore ] = useState(false);
     const [ molData, setMolData] = useState([]);
-    const [ componentArrayForm, setComponentArrayForm ] = useState([]);
+    const [ componentArrayForm, setComponentArrayForm ] = useState(["1", "2"]);
 
     // Plotting functions to show molecules on hover
     function showSVGWindow(svg, event) {
@@ -305,21 +305,20 @@ export default function NeighborSearchHook () {
             select
             id="dimension-outline"
             value={type}
-            onChange={ event => setType(event.target.value)}
+            onChange={ function(event) {setType(event.target.value); setComponentArrayForm(["1", "2"])}}
         >
             <MenuItem value={"pca"}>PCA</MenuItem>
             <MenuItem value={"umap"}>UMAP</MenuItem>
         </TextField>
-
         {type == "pca" ? <FormGroup sx={{position: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
-                          <FormControlLabel control={<Checkbox onChange = {event => buildComponentArray(event.target.checked, "1")}/>} label="1" />
-                          <FormControlLabel control={<Checkbox onChange = {event => buildComponentArray(event.target.checked, "2")}/>} label="2" />
+                          <FormControlLabel control={<Checkbox defaultChecked onChange = {event => buildComponentArray(event.target.checked, "1")}/>} label="1" />
+                          <FormControlLabel control={<Checkbox defaultChecked onChange = {event => buildComponentArray(event.target.checked, "2")}/>} label="2" />
                           <FormControlLabel control={<Checkbox onChange = {event => buildComponentArray(event.target.checked, "3")}/>} label="3" />
                           <FormControlLabel control={<Checkbox onChange = {event => buildComponentArray(event.target.checked, "4")}/>} label="4" />
                         </FormGroup> :
                         <FormGroup sx={{position: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
-                          <FormControlLabel control={<Checkbox onChange = {event => buildComponentArray(event.target.checked, "1")}/>} label="1" />
-                          <FormControlLabel control={<Checkbox onChange = {event => buildComponentArray(event.target.checked, "2")}/>} label="2" />
+                          <FormControlLabel control={<Checkbox defaultChecked onChange = {event => buildComponentArray(event.target.checked, "1")}/>} label="1" />
+                          <FormControlLabel control={<Checkbox defaultChecked onChange = {event => buildComponentArray(event.target.checked, "2")}/>} label="2" />
                         </FormGroup>
         }
         
