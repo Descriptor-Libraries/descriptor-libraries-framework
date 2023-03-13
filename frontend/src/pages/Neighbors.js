@@ -10,6 +10,9 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -243,8 +246,6 @@ export default function NeighborSearchHook () {
             setIsLoadingMore(false) 
         } )
         .then( (items )=> {
-            console.log("Interval is:", interval)
-            console.log("skip is:", skip)
             setMolData(items[0]);
 
             if (searchPage == 1) {
@@ -310,24 +311,33 @@ export default function NeighborSearchHook () {
                   variant="outlined"
                   defaultValue= {components} 
                   onChange = { event => setComponents( event.target.value ) }
-                  InputProps={{endAdornment: <Button onClick={ () => { newSearch() } } 
-                  >
-                    Search
-                    </Button>}}
         />
 
+        {type == "pca" ? <FormGroup sx={{position: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
+                          <FormControlLabel control={<Checkbox />} label="1" />
+                          <FormControlLabel control={<Checkbox />} label="2" />
+                          <FormControlLabel control={<Checkbox />} label="3" />
+                          <FormControlLabel control={<Checkbox />} label="4" />
+                        </FormGroup> :
+                        <FormGroup sx={{position: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
+                          <FormControlLabel control={<Checkbox />} label="1" />
+                          <FormControlLabel control={<Checkbox />} label="2" />
+                        </FormGroup>
+        }
+        
+        <Button variant="contained" sx={{ m: 0.5 }} onClick={ () => { newSearch() } } >Search</Button>
+        { isLoadingMore ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <Button variant="contained" style={{backgroundColor: "#ed1c24"}} sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> }
         <Container sx={{justifyContent: 'center', my: 3}}>
             <Box sx={{ display: 'flex' }}>
-            { !isLoading && !validMolecule && <Typography>No results found for Molecule ID.</Typography> } 
+            { !isLoading && !validMolecule && Object.keys(molData).length == 0 && <Typography>No results found for Molecule ID.</Typography> } 
             </Box>
-            <Box>
+            <Box sx={{ display: 'flex', height: 750}}>
             { !isLoading && validMolecule && Object.keys(molData).length > 0 && <Container>{ Graph() }</Container> } 
             </Box>
             <Box sx={{ display: 'flex' }}>
             { !isLoading && validMolecule && Object.keys(svg_results).length > 0 && 
              <Container> 
                 { dynamicGrid(svg_results)  }
-                { isLoadingMore ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <Button variant="contained" style={{backgroundColor: "#ed1c24"}} sx={{ my: 3 }} onClick={ () => loadMore() }>Load More</Button> }
             </Container>  }
             </Box>
         </Container>
