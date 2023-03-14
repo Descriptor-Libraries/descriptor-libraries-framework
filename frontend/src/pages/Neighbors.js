@@ -36,7 +36,7 @@ async function NeighborSearch(molecule_id, type, components, limit=48, skip=0) {
     }
 }
 
-async function retrieveSVG( smiles ) {
+async function retrieveSVG( smiles, distance ) {
   let encoded = encodeURIComponent(smiles);
 
   const response = await fetch(`depict/cow/svg?smi=${encoded}&w=40&h=40`);
@@ -45,12 +45,13 @@ async function retrieveSVG( smiles ) {
   let result = {}
   result["svg"] = svg;
   result["smiles"] = smiles;
+  result["distance"] = distance;
   return result
 }
 
 async function retrieveAllSVGs( items ) {
   return await Promise.all( items.map( (item) => { 
-      return retrieveSVG(item.smiles)
+      return retrieveSVG(item.smiles, item.dist)
    } ) )
 }
 
@@ -62,10 +63,15 @@ function dynamicGrid( svgs ) {
       {
       svgs.map((result) => (
       <Grid item xs={12} md={4}>
+          {result.distance == 0 ? <Item sx={{border: 3, borderColor: '#ed1c24'}}>
+          <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(result.svg)}`} />
+          <Typography sx={{ wordBreak: "break-word" }}> <strong>Smiles: </strong> { result.smiles }</Typography>
+          </Item> :
           <Item>
           <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(result.svg)}`} />
-          <Typography sx={{ wordBreak: "break-word" }}>{ result.smiles }</Typography>
-          </Item> 
+          <Typography sx={{ wordBreak: "break-word" }}> <strong>Smiles: </strong> { result.smiles }</Typography>
+          <Typography sx={{ wordBreak: "break-word" }}> <strong>Distance: </strong> { result.distance }</Typography>
+          </Item>} 
       </Grid>
       ))
       }
