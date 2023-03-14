@@ -311,25 +311,25 @@ export default function NeighborSearchHook () {
             <MenuItem value={"umap"}>UMAP</MenuItem>
         </TextField>
         {type == "pca" ? <FormGroup sx={{position: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
-                          <FormControlLabel control={<Checkbox defaultChecked onChange = {event => buildComponentArray(event.target.checked, "1")}/>} label="1" />
-                          <FormControlLabel control={<Checkbox defaultChecked onChange = {event => buildComponentArray(event.target.checked, "2")}/>} label="2" />
+                          <FormControlLabel control={<Checkbox defaultChecked value={"1"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="1" />
+                          <FormControlLabel control={<Checkbox defaultChecked value={"2"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="2" />
                           <FormControlLabel control={<Checkbox onChange = {event => buildComponentArray(event.target.checked, "3")}/>} label="3" />
                           <FormControlLabel control={<Checkbox onChange = {event => buildComponentArray(event.target.checked, "4")}/>} label="4" />
                         </FormGroup> :
                         <FormGroup sx={{position: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
-                          <FormControlLabel control={<Checkbox defaultChecked onChange = {event => buildComponentArray(event.target.checked, "1")}/>} label="1" />
-                          <FormControlLabel control={<Checkbox defaultChecked onChange = {event => buildComponentArray(event.target.checked, "2")}/>} label="2" />
+                          <FormControlLabel control={<Checkbox defaultChecked value={"1"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="1" />
+                          <FormControlLabel control={<Checkbox defaultChecked value={"2"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="2" />
                         </FormGroup>
         }
         
-        <Button variant="contained" sx={{ m: 0.5 }} onClick={ function(event) { newSearch(); loadNeighbors(); } } >Search</Button>
+        <Button variant="contained" sx={{ m: 0.5 }} onClick={ function() { newSearch(); loadNeighbors(); } } >Search</Button>
         { isLoadingMore ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <Button variant="contained" style={{backgroundColor: "#ed1c24"}} sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> }
         <Container sx={{justifyContent: 'center', my: 3}}>
             <Box sx={{ display: 'flex' }}>
             { !isLoading && !validMolecule && Object.keys(molData).length == 0 && <Typography>No results found for Molecule ID.</Typography> } 
             </Box>
-            <Box sx={{ display: 'flex', height: 750}}>
-            { !isLoading && validMolecule && Object.keys(molData).length > 0 && <Container>{ Graph() }</Container> } 
+            <Box>
+            { !isLoading && validMolecule && Object.keys(molData).length > 0 && componentArrayForm.length == 2 && <Container sx={{ display: 'flex', height: 750}}>{ Graph() }</Container> } 
             </Box>
             <Box sx={{ display: 'flex' }}>
             { !isLoading && validMolecule && Object.keys(svg_results).length > 0 && 
