@@ -250,7 +250,7 @@ export default function NeighborSearchHook () {
     function loadNeighbors() {
 
         const fetchData = async () => {
-            const molecule_data = await NeighborSearch(moleculeid, type, arrayToString(componentArrayForm), interval+skip);
+            const molecule_data = await NeighborSearch(moleculeid, type, arrayToString(componentArrayForm), interval, skip);
             const svg_data = await retrieveAllSVGs(molecule_data);
 
             return [ molecule_data, svg_data ]
@@ -266,14 +266,15 @@ export default function NeighborSearchHook () {
             setIsLoadingMore(false) 
         } )
         .then( (items )=> {
-            setMolData(items[0]);
 
             if (searchPage == 1) {
+            setMolData(items[0]);
             setSVGResults(items[1]);
             setResults(items[0]);
             }
 
             else {
+                setMolData(molData.concat(items[0]));
                 setSVGResults(svg_results.concat(items[1]));
                 setResults(results.concat(items[0]) )
             }
