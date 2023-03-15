@@ -70,7 +70,7 @@ function dynamicGrid( svgs ) {
           <Item>
           <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(result.svg)}`} />
           <Typography sx={{ wordBreak: "break-word" }}> <strong>Smiles: </strong> { result.smiles }</Typography>
-          <Typography sx={{ wordBreak: "break-word" }}> <strong>Distance: </strong> { result.distance }</Typography>
+          <Typography sx={{ wordBreak: "break-word" }}> <strong>Distance: </strong> { result.distance.toExponential(2) }</Typography>
           </Item>} 
       </Grid>
       ))
