@@ -84,7 +84,8 @@ function dynamicGrid( svgs ) {
 export default function NeighborSearchHook () {
 
     const interval = 15;
-
+    const axis_dict = {"pca1": "pc1", "pca2": "pc2", "pca3": "pc3", "pca4": "pc4", "umap1": "umap1", "umap2": "umap2"};
+    
     const [ moleculeid, setSearch ] = useState(1);
     const [ type, setType ] = useState("pca");
     const [ skip, setSkip ] = useState(0);
@@ -181,7 +182,7 @@ export default function NeighborSearchHook () {
           style: {width: '100%', height: '100%'},
           xaxis: {
             title: {
-              text: molData[0].type + componentArrayForm[0],
+              text: axis_dict[molData[0].type + componentArrayForm[0]],
               font: {
                 size: 18,
                 color: '#7f7f7f'
@@ -191,7 +192,7 @@ export default function NeighborSearchHook () {
     
         yaxis: {
           title: {
-            text: molData[0].type + componentArrayForm[1],
+            text: axis_dict[molData[0].type + componentArrayForm[1]],
             font: {
               size: 18,
               color: '#7f7f7f'
