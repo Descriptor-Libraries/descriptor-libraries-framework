@@ -313,7 +313,8 @@ export default function NeighborSearchHook () {
             select
             id="dimension-outline"
             value={type}
-            onChange={ function(event) {setType(event.target.value); setComponentArrayForm(["1", "2"]) }}
+            // Need to clear MolData and SVGResults here. This is okay because when we switch type we need to do a new search right after.
+            onChange={ function(event) {setType(event.target.value); setComponentArrayForm(["1", "2"]); setMolData([]); setSVGResults([]) }}
         >
             <MenuItem value={"pca"}>PCA</MenuItem>
             <MenuItem value={"umap"}>UMAP</MenuItem>
