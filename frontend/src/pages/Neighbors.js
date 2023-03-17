@@ -258,17 +258,20 @@ export default function NeighborSearchHook () {
 
       // Add new label if the checkbox was checked
       if (event === true) {
-        componentArrayForm.push(label);
+        setComponentArrayForm(prevArray => {
+          const newArray = [...prevArray, label];
+          newArray.sort();
+          return newArray;
+        });
       }
       // Remove label otherwise
       else {
-        let index = componentArrayForm.indexOf(label);
-        if (index !== -1) {
-          componentArrayForm.splice(index, 1);
-        }
+        setComponentArrayForm(prevArray => {
+          const newArray = prevArray.filter(item => item !== label);
+          newArray.sort();
+          return newArray;
+        });
       }
-      // Sort the array right at the end.
-      componentArrayForm.sort();
     }
 
     function arrayToString(components){
@@ -352,6 +355,24 @@ export default function NeighborSearchHook () {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [ searchPage, searchToggle ] 
     );
+    
+    // new search if dropdown changes
+    useEffect(() => {
+      newSearch();
+      loadNeighbors();
+    }, [type]);
+
+    // new search if the molecule id changes
+    useEffect(() => {
+      newSearch();
+      loadNeighbors();
+    }, [moleculeid]);
+
+    // new search if components change.
+    useEffect(() => {
+    newSearch();
+    loadNeighbors();
+  }, [componentArrayForm]);
 
     return (
         <Container maxWidth="lg">
@@ -388,7 +409,6 @@ export default function NeighborSearchHook () {
                           <FormControlLabel control={<Checkbox defaultChecked value={"2"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="2" />
                         </FormGroup>
         }
-        <Button variant="contained" sx={{ m: 0.5 }} onClick={ function() { newSearch(); loadNeighbors(); } } >Search</Button>
         { isLoadingMore ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <Button variant="contained" style={{backgroundColor: "#ed1c24"}} sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> }
         <Container sx={{justifyContent: 'center', my: 3}}>
             <Box sx={{ display: 'flex' }}>
@@ -405,7 +425,24 @@ export default function NeighborSearchHook () {
              <Container> 
                 { dynamicGrid(svg_results)  }
             </Container>  }
+            
             </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+            {isLoadingMore ? (
+              <CircularProgress sx={{ color: "#ed1c24" }} />
+            ) : (
+              <Button
+                variant="contained"
+                style={{ backgroundColor: "#ed1c24" }}
+                sx={{ m: 0.5 }}
+                onClick={() => loadMore()}
+              >
+                Load More
+              </Button>
+            )}
+          </Box>
+
+
         </Container>
         </Container>
     )
