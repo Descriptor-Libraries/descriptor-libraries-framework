@@ -46,6 +46,12 @@ async function NeighborSearch(molecule_id, type, components, limit=48, skip=0) {
 }
 
 async function retrieveSVG( smiles, distance ) {
+  /**
+   * Retrieves an svg for a molecule smiles.
+   * @param {string} smiles Molecule smile representation.
+   * @param {number} distance Distance between the molecule and the target.
+   * @return {dictionary} A dictionary for each item which contains its svg, smiles string and distance from the target molecule.
+   */
   let encoded = encodeURIComponent(smiles);
 
   const response = await fetch(`depict/cow/svg?smi=${encoded}&w=40&h=40`);
@@ -59,13 +65,23 @@ async function retrieveSVG( smiles, distance ) {
 }
 
 async function retrieveAllSVGs( items ) {
+  /**
+   * Retrieves all SVGs for the neighbor molecules.
+   * @param {json} items Json containing all the molecule data returned from the neighbor search.
+   * @return {json} Json containing the svg, smiles and distance for each neighbor.
+   */
   return await Promise.all( items.map( (item) => { 
       return retrieveSVG(item.smiles, item.dist)
    } ) )
 }
 
 function dynamicGrid( svgs ) {
-
+  /**
+   * Generates a Grid filled with the svgs for the molecules.
+   * @param {json} svgs Json containing the svg, smiles, and distance for each neighbor.
+   * @return {jsx} The front end JSX that will generate the HTML users will interact with. It is a grid of items (described above) filled with the 
+   * svg, smiles and distance of the molecule.
+   */
   return (
       <Container>
       <Grid container spacing={2} sx= {{ mt: 3 }}>
@@ -91,14 +107,17 @@ function dynamicGrid( svgs ) {
 }
 
 export default function NeighborSearchHook () {
-
+    /**
+     * React functional component to generate the neighborhood UI.
+     * @returns {jsx} The front end JSX that will generate the HTML users will interact with. It contains a search bar as well as generated 
+     * a graph, and the dynamic grid component based on what data is available.
+     */
     const interval = 15;
     const axis_dict = {"pca1": "pc1", "pca2": "pc2", "pca3": "pc3", "pca4": "pc4", "umap1": "umap1", "umap2": "umap2"};
     
     const [ moleculeid, setSearch ] = useState(1);
     const [ type, setType ] = useState("pca");
     const [ skip, setSkip ] = useState(0);
-    const [ results, setResults ] = useState([]);
     const [ validMolecule, setValidMolecule ] = useState(true);
     const [ svg_results, setSVGResults ] = useState([])
     const [ searchPage, setSearchPage ] = useState(1);
@@ -110,6 +129,11 @@ export default function NeighborSearchHook () {
 
     // Plotting functions to show molecules on hover
     function showSVGWindow(svg, event) {
+      /**
+       * Creates SVG window on the molecule element when hovering of a point on the plotly graph.
+       * @param {string} svg Svg of the molecule.
+       * @param {event} event Hover event when hovering over a point on the plotly graph.
+       */
 
         // remove in case existing
         if (document.getElementById("molecule")) {
@@ -131,20 +155,30 @@ export default function NeighborSearchHook () {
         mol.style.top = `${ypos}px`;
       
     }
-      
+  
     function showSVG(event) {
-    fetch(`depict/cow/svg?smi=${event.points[0].text}&w=40&h=40`).then(response => 
-        response.text() ).then( body => showSVGWindow(body, event) );
+      /**
+       * Requests svg data for the molecule you are hovering on.
+       * @param {event} event Hover even when hovering over a point on the plotly graph.
+       */
+      fetch(`depict/cow/svg?smi=${event.points[0].text}&w=40&h=40`).then(response => 
+          response.text() ).then( body => showSVGWindow(body, event) );
     }
     
-    function hideSVG(event) {
-    if (document.getElementById("molecule")) {
-        document.getElementById("molecule").remove()
-    }
-    
+    function hideSVG() {
+      /**
+       * Removes molecule element which holds its SVG, when you are no longer hovering.
+       */
+      if (document.getElementById("molecule")) {
+          document.getElementById("molecule").remove()
+      }
     }
 
     function Graph(){
+        /**
+         * Generates plotly react graph. The target molecule is a red triangle facing up while the neighbors are grey triangles facing down.
+         * The x and y labels are mapped to the axis dictionary to write pc1 instead of pca1.
+         */
         // Shifting the data by 1, to avoid overwriting the target of the search
         let neighbors = molData.slice(1);
         let myPlot = <Plot onHover={ (event) => showSVG(event) } 
@@ -216,11 +250,17 @@ export default function NeighborSearchHook () {
     }
 
     function buildComponentArray(event, label){
+      /**
+       * Manages the array of components based on how many checkboxes are ticked.
+       * @param {event} event Selecting or deselecting the checkbox event.
+       * @param {string} label The label of the checkbox.
+       */
+
       // Add new label if the checkbox was checked
       if (event === true) {
         componentArrayForm.push(label);
       }
-      // Remove label
+      // Remove label otherwise
       else {
         let index = componentArrayForm.indexOf(label);
         if (index !== -1) {
@@ -231,25 +271,32 @@ export default function NeighborSearchHook () {
       componentArrayForm.sort();
     }
 
-    // Returns the components selcted as a comma seperated string
     function arrayToString(components){
+      /**
+       * Converts components from an array to a comma separated string to use in our neighbor search API.
+       * @param {string[]} components An array of components as strings.
+       * @returns A comma separated string of the components.
+       */
       return components.join(", ");
     }
 
-    // Loadmore neighbors
     function loadMore() {
+      /**
+       * Loads more neighbors into the UI. 
+       */
         setSkip(skip => skip + interval);
         setSearchPage( searchPage => searchPage + 1);
         setIsLoadingMore(true);
         loadNeighbors();
     }
 
-    // Search new neighbors
     function newSearch() {
+      /**
+       * Searches for new neighbors. Resets alot of the props to their original state.
+       */
         setSkip(0);
         setSearchPage(1);
         setSVGResults([]);
-        setResults([]);
         // Just need to toggle this to make sure it toggles
         // so that effect will be triggered
         setIsLoading(true);
@@ -258,6 +305,10 @@ export default function NeighborSearchHook () {
     }
  
     function loadNeighbors() {
+      /**
+       * Main driver function which loads the neighbors for a molecule requested by the user.
+       * 
+       */
 
         const fetchData = async () => {
             const molecule_data = await NeighborSearch(moleculeid, type, arrayToString(componentArrayForm), interval, skip);
@@ -270,7 +321,6 @@ export default function NeighborSearchHook () {
         .catch( (error) => {
             console.log(error) 
             setValidMolecule(false);
-            setResults([]);
             setSVGResults([])
             setIsLoading(false)
             setIsLoadingMore(false) 
@@ -280,13 +330,11 @@ export default function NeighborSearchHook () {
             if (searchPage == 1) {
             setMolData(items[0]);
             setSVGResults(items[1]);
-            setResults(items[0]);
             }
 
             else {
                 setMolData(molData.concat(items[0]));
                 setSVGResults(svg_results.concat(items[1]));
-                setResults(results.concat(items[0]) )
             }
 
             setIsLoading(false);
