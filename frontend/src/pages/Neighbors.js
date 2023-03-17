@@ -150,7 +150,7 @@ export default function NeighborSearchHook () {
         let ypos = event.event.clientY - 160;
       
         plotly_container[0].appendChild(mol);
-        mol.style.position = "absolute";
+        mol.style.position = "fixed";
         mol.style.left = `${xpos}px`;
         mol.style.top = `${ypos}px`;
       
