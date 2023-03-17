@@ -23,6 +23,15 @@ const Item = styled(Paper)(({ theme }) => ({
   }));
 
 async function NeighborSearch(molecule_id, type, components, limit=48, skip=0) {
+  /**
+   * Requests neighbor data on the molecule from the backend.
+   * @param {number} molecule_id Id of the molecule to query.
+   * @param {string} type Type of dimensionality reduction. Can be one of PCA or UMAP.
+   * @param {string} components String of comma separated integers.
+   * @param {number} limit Limit of the search.
+   * @param {number} skip How many values to skip.
+   * @return {json}  The response json.
+   */
     let encoded = encodeURIComponent(components);
 
     const response =  await fetch(`/api/molecules/${molecule_id}/neighbors/?type=${type}&components=${encoded}&skip=${skip}&limit=${limit}`)
@@ -335,12 +344,15 @@ export default function NeighborSearchHook () {
         { isLoadingMore ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <Button variant="contained" style={{backgroundColor: "#ed1c24"}} sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> }
         <Container sx={{justifyContent: 'center', my: 3}}>
             <Box sx={{ display: 'flex' }}>
+            {/* If molecule is not valid and there is no mol data, then state that there are no results for the molecule ID requested*/}
             { !isLoading && !validMolecule && Object.keys(molData).length == 0 && <Typography>No results found for Molecule ID.</Typography> } 
             </Box>
             <Box>
+            {/* If molecule is valid and there is mol data and the number of components is 2, then generate the graph based on the data*/}
             { !isLoading && validMolecule && Object.keys(molData).length > 0 && componentArrayForm.length == 2 && <Container sx={{ display: 'flex', height: 750}}>{ Graph() }</Container> } 
             </Box>
             <Box sx={{ display: 'flex' }}>
+            {/* If molecule is valid and there is svg data, then generate the images of the molecules*/}
             { !isLoading && validMolecule && Object.keys(svg_results).length > 0 && 
              <Container> 
                 { dynamicGrid(svg_results)  }
