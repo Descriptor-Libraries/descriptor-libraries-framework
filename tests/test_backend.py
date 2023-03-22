@@ -1,8 +1,10 @@
 """
 Tests for backend
 """
+from unicodedata import category
 import urllib.parse
 import requests
+import pytest
 
 # Helper functions to reuse API requests
 def get_molecule(molecule_id):
@@ -37,15 +39,17 @@ def get_dimensions(type, category, components, skip=0, limit=100):
 
 # Tests
 # Retrieve tests (status_code == 200)
-def test_retrieve_molecule():
+@pytest.mark.parametrize("molecule_id", [("1"), ("50"), ("12000"), ("234023"), ("331422")])
+def test_retrieve_molecule(molecule_id):
 
-    response = get_molecule(1)
+    response = get_molecule(molecule_id)
     assert response.status_code == 200
 
 
-def test_retrieve_molecule_umap():
+@pytest.mark.parametrize("category, show_ml", [("", False)])
+def test_retrieve_molecule_umap(category, show_ml):
 
-    response = get_molecule_umap("", False)
+    response = get_molecule_umap(category, show_ml)
     assert response.status_code == 200
 
 
@@ -75,7 +79,7 @@ def test_retrieve_molecule_under_range():
     response = get_molecule(-1)
     assert response.status_code == 500
 
-
+# For numbers greater than we have it should be a 404.
 def test_retrieve_molecule_over_range():
 
     response = get_molecule(400000)
@@ -94,6 +98,7 @@ def test_retrieve_molecule_neighbors_invalid_type():
     assert response.status_code == 400
 
 
+# Use pytest paramaterize the inputs to the functions above and the status_codes / outputs.
 def test_retrieve_molecule_neighbors_invalid_components():
 
     response = get_molecule_neighbors(1, "pca", "1, 2, 3, 4, 5")
@@ -128,7 +133,7 @@ def test_retrieve_dimensions_invalid_components_2():
 
     response = get_dimensions("umap", "", "5")
     assert response.status_code == 400
-    
+
 # Output tests (correct number of items returned)
 # Output tests (correct components returned)
 # Output tests (correct values returned)
