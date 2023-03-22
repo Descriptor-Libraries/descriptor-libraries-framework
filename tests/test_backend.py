@@ -46,93 +46,73 @@ def test_retrieve_molecule(molecule_id):
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize("category, show_ml", [("", False)])
+# Note: Wrong categories are returned as an empty JSON.
+@pytest.mark.parametrize("category, show_ml", [("", False), ("", True), ("pc3", False), ("pcn", False), ("pon", True), ("wrong_category", True)])
 def test_retrieve_molecule_umap(category, show_ml):
 
     response = get_molecule_umap(category, show_ml)
     assert response.status_code == 200
 
 
-def test_retrieve_substructure_search():
+@pytest.mark.parametrize("substructure", [("C=O"), ("C=CC"), ("C=N"), ("N=N"), ("C-P"), ("C=C-P")])
+def test_retrieve_substructure_search(substructure):
 
-    response = get_molecule_substructure_search("C=O")
+    response = get_molecule_substructure_search(substructure)
     assert response.status_code == 200
 
 
-def test_retrieve_molecule_neighbors():
+@pytest.mark.parametrize("molecule_id, type, components", [(1, "pca", "1, 2, 3"), (1, "umap", "1, 2"), (1, "pca", "1, 3, 2"), (1, "pca", "1, 4"), (1, "pca", "1"), (1, "umap", "1"), (35, "umap", "1, 2"), (300000, "umap", "2"), (35, "PCA", "1, 2"), (35, "UMAP", "1, 2")])
+def test_retrieve_molecule_neighbors(molecule_id, type, components):
 
-    response = get_molecule_neighbors(1, "pca", "1, 2, 3")
+    response = get_molecule_neighbors(molecule_id, type, components)
     assert response.status_code == 200
 
 
-def test_retrieve_dimensions():
+@pytest.mark.parametrize("type, category, components", [("pca", "", "1, 2, 3"), ("pca", "", "1"), ("pca", "", "4"), ("pca", "", "1, 3, 2"), ("pca", "", "1, 4"), ("umap", "", "1, 2"), ("umap", "", "1"), ("umap", "", "2"), ("umap", "pc3", "1, 2"), ("umap", "pon", "1, 2"), ("umap", "pcn", "1, 2")])
+def test_retrieve_dimensions(type, category, components):
 
-    response = get_dimensions("pca", "", "1, 2, 3")
+    response = get_dimensions(type, category, components)
     assert response.status_code == 200
 
 
 # TODO:
 # Failing tests (status_code == 400)
 # TODO: Set up catch on backend if the molecule id is out of range.
-def test_retrieve_molecule_under_range():
+@pytest.mark.parametrize("molecule_id", [("0"), ("-1"), ("-50"), ("-12000"), ("-234023"), ("-331422")])
+def test_retrieve_molecule_under_range(molecule_id):
 
-    response = get_molecule(-1)
+    response = get_molecule(molecule_id)
     assert response.status_code == 500
+
 
 # For numbers greater than we have it should be a 404.
-def test_retrieve_molecule_over_range():
+@pytest.mark.parametrize("molecule_id", [("331423"), ("350000"), ("400000")])
+def test_retrieve_molecule_over_range(molecule_id):
 
-    response = get_molecule(400000)
+    response = get_molecule(molecule_id)
     assert response.status_code == 500
 
 
-def test_retrieve_substructure_search_invalid_smiles():
+@pytest.mark.parametrize("substructure", [("C=XX"), ("P=XX"), ("P=F"), ("C==C"), ("-C-"), ("C=F=C")])
+def test_retrieve_substructure_search_invalid_smiles(substructure):
 
-    response = get_molecule_substructure_search("C=XX")
+    response = get_molecule_substructure_search(substructure)
     assert response.status_code == 400
 
 
-def test_retrieve_molecule_neighbors_invalid_type():
+@pytest.mark.parametrize("molecule_id, type, components", [(1, "wrong_type", "1, 2, 3"), (1, "pcca", "1, 2, 3"), (1, "umaaaap", "1, 2, 3"), (1, "pca", "1, 2, 3, 4, 5"), (1, "pca", "1, 15"), (1, "pca", "45"), (1, "umap", "3")])
+def test_retrieve_molecule_neighbors_invalid_parameters(molecule_id, type, components):
 
-    response = get_molecule_neighbors(1, "wrong_type", "1, 2, 3")
+    response = get_molecule_neighbors(molecule_id, type, components)
     assert response.status_code == 400
 
 
-# Use pytest paramaterize the inputs to the functions above and the status_codes / outputs.
-def test_retrieve_molecule_neighbors_invalid_components():
+@pytest.mark.parametrize("type, category, components", [("wrong_type", "", "1, 2, 3"), ("pca", "wrong_category", "1, 2, 3"), ("pca", "", "1, 2, 3, 4, 5"), ("pca", "", "1, 15"), ("pca", "", "45"), ("umap", "", "3")])
+def test_retrieve_dimensions_invalid_parameters(type, category, components):
 
-    response = get_molecule_neighbors(1, "pca", "1, 2, 3, 4, 5")
+    response = get_dimensions(type, category, components)
     assert response.status_code == 400
 
-
-def test_retrieve_molecule_neighbors_invalid_components_2():
-
-    response = get_molecule_neighbors(1, "umap", "4")
-    assert response.status_code == 400
-
-
-def test_retrieve_dimensions_invalid_type():
-
-    response = get_dimensions("wrong_type", "", "1, 2, 3")
-    assert response.status_code == 400
-
-
-def test_retrieve_dimensions_invalid_category():
-
-    response = get_dimensions("pca", "wrong_category", "1, 2, 3")
-    assert response.status_code == 400
-
-
-def test_retrieve_dimensions_invalid_components():
-
-    response = get_dimensions("pca", "", "1, 2, 3, 4, 5")
-    assert response.status_code == 400
-
-
-def test_retrieve_dimensions_invalid_components_2():
-
-    response = get_dimensions("umap", "", "5")
-    assert response.status_code == 400
 
 # Output tests (correct number of items returned)
 # Output tests (correct components returned)
