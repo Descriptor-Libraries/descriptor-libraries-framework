@@ -94,6 +94,15 @@ def get_molecule_umap(
 
 @router.get("/{molecule_id}", response_model=schemas.Molecule)
 def get_a_single_molecule(molecule_id: int, db: Session = Depends(deps.get_db)):
+
+    # Generalized - get max molecule id.
+    query = text(f"SELECT MAX(molecule_id) FROM molecule;")
+    max_molecule_id = db.execute(query).fetchall()[0][0]
+
+    # Check to see if the molecule_id is within range.
+    if molecule_id > max_molecule_id:
+        raise HTTPException(status_code=404, detail=f"Molecule with ID supplied not found, the maximum ID is {max_molecule_id}")
+
     molecule = (
         db.query(models.molecule)
         .filter(models.molecule.molecule_id == molecule_id)
@@ -168,6 +177,14 @@ def search_neighbors(
 ):
     
     type = type.lower()
+
+    # Generalized - get max molecule id.
+    query = text(f"SELECT MAX(molecule_id) FROM molecule;")
+    max_molecule_id = db.execute(query).fetchall()[0][0]
+
+    # Check to see if the molecule_id is within range.
+    if molecule_id > max_molecule_id:
+        raise HTTPException(status_code=404, detail=f"Molecule with ID supplied not found, the maximum ID is {max_molecule_id}")
     
     # Check for valid neighbor type.
     if type not in  ["pca", "umap"]:
