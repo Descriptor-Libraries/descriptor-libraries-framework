@@ -176,6 +176,8 @@ def test_retrieve_dimensions_output_lengths(type, category, components, total_le
     # Check each child for this length instead of just the first one?
     assert len(response.json()[0]) == child_length
     assert len(response.json()[0]["components"]) == components_length
+
+    
 # Output tests (correct components returned)
 # Output tests (correct values returned)
 
