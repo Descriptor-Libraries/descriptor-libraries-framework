@@ -11,12 +11,10 @@ const structServiceProvider = new StandaloneStructServiceProvider()
 class KetcherSketcher extends React.Component {
     render () {
         return (
-            <div>
-                <Editor
-                staticResourcesUrl={process.env.PUBLIC_URL}
-                structServiceProvider={structServiceProvider}
-                />
-            </div>
+            <Editor
+            staticResourcesUrl={process.env.PUBLIC_URL}
+            structServiceProvider={structServiceProvider}
+            />
     )
     }
 }
