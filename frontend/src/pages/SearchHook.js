@@ -134,6 +134,7 @@ export default function SearchHook () {
 
             setIsLoading(false);
             setIsLoadingMore(false);
+            setValidSmiles(true);
 
           })
 
@@ -157,7 +158,7 @@ export default function SearchHook () {
         <Container maxWidth="lg">
         <h2>Substructure Search</h2>
         <TextField id="search-outline" 
-                  label="Enter a SMILES String to Search" 
+                  label="Enter a SMILES or SMARTS String to Search" 
                   variant="outlined"
                   defaultValue= {searchString} 
                   onChange = { event => setSearch( event.target.value ) }
@@ -171,7 +172,7 @@ export default function SearchHook () {
         <Container sx={{display: 'flex', justifyContent: 'center', my: 3}}>
             <Box sx={{ display: 'flex' }}>
              { isLoading && <CircularProgress sx={{ color: "#ed1c24" }} /> }
-             { !isLoading && !validSmiles  && <Typography>Invalid Smiles String</Typography> }
+             { !isLoading && !validSmiles  && <Typography>Search string is not valid SMILES or SMARTS. Please provide valid SMILES or SMARTS strings.</Typography> }
              { !isLoading && validSmiles && Object.keys(svg_results).length > 0 && 
              <Container> 
                 { dynamicGrid(svg_results)  }
