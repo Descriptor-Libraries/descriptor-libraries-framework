@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Ketcher } from 'ketcher-core';
 import { StandaloneStructServiceProvider } from 'ketcher-standalone';
 import { Editor } from 'ketcher-react';
 import Button from '@mui/material/Button';
@@ -12,7 +13,7 @@ const structServiceProvider = new StandaloneStructServiceProvider()
 
 function KetcherSketcher() {
     const [ketcher, setKetcher] = useState()
-    const onClick = () => ketcher.getSmarts().then(result => console.log(result))
+    const onClick = () => ketcher.getSmiles().then(result => console.log(result))
 
         return (
             <Container>
@@ -20,8 +21,8 @@ function KetcherSketcher() {
                 <Editor
                     staticResourcesUrl={process.env.PUBLIC_URL}
                     structServiceProvider={structServiceProvider}
-                    onInit={(ketcherInstance) => {
-                        setKetcher(ketcherInstance)
+                    onInit={(ketcher) => {
+                        setKetcher(ketcher)
                     }}
                 />
             </Container>
