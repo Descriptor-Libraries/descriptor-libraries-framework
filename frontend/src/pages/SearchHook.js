@@ -98,9 +98,9 @@ export default function SearchHook () {
     const [ isLoading, setIsLoading ] = useState(true);
     const [ searchToggle, setSearchToggle ] = useState(true);
     const [ isLoadingMore, setIsLoadingMore ] = useState(false);
-    const [ketcher, setKetcher] = useState();
-    const [smiles, setSmiles] = useState();
-    const [SMARTS, setSMARTS] = useState();
+    const [ ketcher, setKetcher ] = useState();
+    const [ smiles, setSmiles ] = useState();
+    const [ SMARTS, setSMARTS ] = useState();
 
     // Ketcher
     function FullScreenDialog() {
@@ -207,6 +207,11 @@ export default function SearchHook () {
         setSearch(smiles);
       }, [smiles]);
 
+    // Update searchString if SMARTS changes
+    useEffect(() => {
+        setSearch(SMARTS);
+      }, [SMARTS]);
+
     // New search if searchString changes
     useEffect(() => {
         loadImages();
@@ -224,7 +229,8 @@ export default function SearchHook () {
         <TextField id="search-outline" 
                   label="Enter a SMILES or SMARTS String to Search" 
                   variant="outlined"
-                  defaultValue= {searchString} 
+                  defaultValue = {searchString} 
+                  value = {searchString}
                   onChange = { event => setSearch( event.target.value ) }
                   onKeyDown = { (e) => _handleKeyDown(e) }
                   InputProps={{endAdornment: FullScreenDialog()}}
