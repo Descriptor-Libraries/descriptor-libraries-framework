@@ -9,6 +9,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import Dialog from '@mui/material/Dialog';
 import Slide from '@mui/material/Slide';
+import { Switch } from '@mui/material';
+import { Stack } from '@mui/material';
 
 import { Ketcher } from 'ketcher-core';
 import { StandaloneStructServiceProvider } from 'ketcher-standalone';
@@ -101,6 +103,7 @@ export default function SearchHook () {
     const [ ketcher, setKetcher ] = useState();
     const [ smiles, setSmiles ] = useState();
     const [ SMARTS, setSMARTS ] = useState();
+    const [ representation, setRepresentation ] = useState("smiles");
 
     // Ketcher
     function FullScreenDialog() {
@@ -111,7 +114,12 @@ export default function SearchHook () {
         };
       
         const handleClose = () => {
-            ketcher.getSmiles().then(result => {setSmiles(result);});
+            if (representation === "smiles"){
+                ketcher.getSmiles().then(result => {setSmiles(result);});
+            }
+            if (representation === "SMARTS"){
+                ketcher.getSmarts().then(result => {setSMARTS(result);});
+            }
             setOpen(false);
         };
       
@@ -138,6 +146,17 @@ export default function SearchHook () {
           </div>
         );
       }
+    
+    function switchRepresentations(event) {
+        // Switch representations between SMARTS and smiles
+      if (event === true) {
+        setRepresentation("smiles");
+      }
+      // Remove label otherwise
+      else {
+        setRepresentation("SMARTS");
+      }
+    }
     
     // loadmore
     function loadMore() {
@@ -227,14 +246,25 @@ export default function SearchHook () {
         <Container maxWidth="lg">
         <h2>Substructure Search</h2>
         <TextField id="search-outline" 
-                  label="Enter a SMILES or SMARTS String to Search" 
-                  variant="outlined"
-                  defaultValue = {searchString} 
-                  value = {searchString}
-                  onChange = { event => setSearch( event.target.value ) }
-                  onKeyDown = { (e) => _handleKeyDown(e) }
-                  InputProps={{endAdornment: FullScreenDialog()}}
+                style = {{width: 450}}
+                label="Enter a SMILES or SMARTS String to Search" 
+                variant="outlined"
+                defaultValue = {searchString} 
+                value = {searchString}
+                onChange = { event => setSearch( event.target.value ) }
+                onKeyDown = { (e) => _handleKeyDown(e) }
+                InputProps={{endAdornment: FullScreenDialog()}}
                     />
+        <Grid component="label" container alignItems="center" spacing={1} sx={{position: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
+            <Grid item>SMARTS</Grid>
+            <Grid item>
+                <Switch
+                defaultChecked
+                onChange={ event => switchRepresentations(event.target.checked)}
+                />
+            </Grid>
+            <Grid item>SMILES</Grid>
+        </Grid>
 
         <Container sx={{display: 'flex', justifyContent: 'center', my: 3}}>
             <Box sx={{ display: 'flex' }}>
@@ -248,8 +278,6 @@ export default function SearchHook () {
             { !isLoading && validSmiles && Object.keys(svg_results).length==0 && <Typography>No results found for SMILES string.</Typography> } 
             </Box>
         </Container>
-
-            
 
         </Container>
     )
