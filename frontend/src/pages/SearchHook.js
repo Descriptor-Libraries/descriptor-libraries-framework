@@ -233,6 +233,7 @@ export default function SearchHook () {
 
     // New search if searchString changes
     useEffect(() => {
+        newSearch();
         loadImages();
       }, [searchString]);
 
