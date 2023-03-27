@@ -7,7 +7,21 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import CircularProgress from '@mui/material/CircularProgress';
 
+import Dialog from '@mui/material/Dialog';
+import Slide from '@mui/material/Slide';
+
+import { Ketcher } from 'ketcher-core';
+import { StandaloneStructServiceProvider } from 'ketcher-standalone';
+import { Editor } from 'ketcher-react';
+import "ketcher-react/dist/index.css";
+
 import Button from '@mui/material/Button';
+
+const structServiceProvider = new StandaloneStructServiceProvider();
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+    return <Slide direction="up" ref={ref} {...props} />;
+  });
 
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -84,6 +98,46 @@ export default function SearchHook () {
     const [ isLoading, setIsLoading ] = useState(true);
     const [ searchToggle, setSearchToggle ] = useState(true);
     const [ isLoadingMore, setIsLoadingMore ] = useState(false);
+    const [ketcher, setKetcher] = useState();
+    const [smiles, setSmiles] = useState();
+    const [SMARTS, setSMARTS] = useState();
+
+    // Ketcher
+    function FullScreenDialog() {
+        const [open, setOpen] = React.useState(false);
+      
+        const handleClickOpen = () => {
+            setOpen(true);
+        };
+      
+        const handleClose = () => {
+            ketcher.getSmiles().then(result => {setSmiles(result);});
+            setOpen(false);
+        };
+      
+        return (
+          <div>
+            <Button onClick={handleClickOpen}>
+              DRAW
+            </Button>
+            <Dialog
+              fullWidth={true}
+              maxWidth={"lg"}
+              open={open}
+              onClose={handleClose}
+              TransitionComponent={Transition}
+            >
+                <Editor
+                    staticResourcesUrl={process.env.PUBLIC_URL}
+                    structServiceProvider={structServiceProvider}
+                    onInit={(ketcher) => {
+                        setKetcher(ketcher)
+                    }}
+                />
+            </Dialog>
+          </div>
+        );
+      }
     
     // loadmore
     function loadMore() {
@@ -148,6 +202,16 @@ export default function SearchHook () {
         [ searchPage, searchToggle ] 
     );
 
+    // Update searchString if smiles changes
+    useEffect(() => {
+        setSearch(smiles);
+      }, [smiles]);
+
+    // New search if searchString changes
+    useEffect(() => {
+        loadImages();
+      }, [searchString]);
+
     function _handleKeyDown(event) {
         if (event.key === "Enter") {
           loadImages();
@@ -163,10 +227,7 @@ export default function SearchHook () {
                   defaultValue= {searchString} 
                   onChange = { event => setSearch( event.target.value ) }
                   onKeyDown = { (e) => _handleKeyDown(e) }
-                  InputProps={{endAdornment: <Button onClick={ () => { newSearch() } } 
-                  >
-                    Search
-                    </Button>}}
+                  InputProps={{endAdornment: FullScreenDialog()}}
                     />
 
         <Container sx={{display: 'flex', justifyContent: 'center', my: 3}}>

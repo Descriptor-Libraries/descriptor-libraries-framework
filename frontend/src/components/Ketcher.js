@@ -8,16 +8,23 @@ import Container from '@mui/material/Container';
 
 import "ketcher-react/dist/index.css";
 
-
 const structServiceProvider = new StandaloneStructServiceProvider()
 
 function KetcherSketcher() {
-    const [ketcher, setKetcher] = useState()
-    const onClick = () => ketcher.getSmiles().then(result => console.log(result))
+    const [ketcher, setKetcher] = useState();
+    const [smiles, setSmiles] = useState();
+    const [SMARTS, setSMARTS] = useState();
 
+    function onClick(){
+        ketcher.getSmiles().then(result => {setSmiles(result);});
+    }
+    function onClick2(){
+        ketcher.getSmarts().then(result => {setSMARTS(result);});
+    }
         return (
             <Container>
-                <Button onClick={onClick}>get value</Button>
+                <Button onClick={onClick}>get smiles</Button>
+                <Button onClick={onClick2}>get smarts</Button>
                 <Editor
                     staticResourcesUrl={process.env.PUBLIC_URL}
                     structServiceProvider={structServiceProvider}
