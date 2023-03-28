@@ -10,16 +10,10 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Dialog from '@mui/material/Dialog';
 import Slide from '@mui/material/Slide';
 import { Switch } from '@mui/material';
-import { Stack } from '@mui/material';
-
-import { Ketcher } from 'ketcher-core';
-import { StandaloneStructServiceProvider } from 'ketcher-standalone';
-import { Editor } from 'ketcher-react';
-import "ketcher-react/dist/index.css";
 
 import Button from '@mui/material/Button';
 
-const structServiceProvider = new StandaloneStructServiceProvider();
+import FullScreenDialog from '../components/KetcherPopup';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -100,52 +94,19 @@ export default function SearchHook () {
     const [ isLoading, setIsLoading ] = useState(true);
     const [ searchToggle, setSearchToggle ] = useState(true);
     const [ isLoadingMore, setIsLoadingMore ] = useState(false);
-    const [ ketcher, setKetcher ] = useState();
     const [ smiles, setSmiles ] = useState();
     const [ SMARTS, setSMARTS ] = useState();
     const [ representation, setRepresentation ] = useState("smiles");
 
-    // Ketcher
-    function FullScreenDialog() {
-        const [open, setOpen] = React.useState(false);
-      
-        const handleClickOpen = () => {
-            setOpen(true);
-        };
-      
-        const handleClose = () => {
-            if (representation === "smiles"){
-                ketcher.getSmiles().then(result => {setSmiles(result);});
-            }
-            if (representation === "SMARTS"){
-                ketcher.getSmarts().then(result => {setSMARTS(result);});
-            }
-            setOpen(false);
-        };
-      
-        return (
-          <div>
-            <Button onClick={handleClickOpen}>
-              DRAW
-            </Button>
-            <Dialog
-              fullWidth={true}
-              maxWidth={"lg"}
-              open={open}
-              onClose={handleClose}
-              TransitionComponent={Transition}
-            >
-                <Editor
-                    staticResourcesUrl={process.env.PUBLIC_URL}
-                    structServiceProvider={structServiceProvider}
-                    onInit={(ketcher) => {
-                        setKetcher(ketcher)
-                    }}
-                />
-            </Dialog>
-          </div>
-        );
-      }
+    // Call back function to get the smiles from ketcher
+    const smilesChange = (newState) => {
+        setSmiles(newState);
+      };
+
+    // Call back function to get the SMARTS from ketcher
+    const smartsChange = (newState) => {
+        setSMARTS(newState);
+    };
     
     function switchRepresentations(event) {
         // Switch representations between SMARTS and smiles
@@ -254,7 +215,7 @@ export default function SearchHook () {
                 value = {searchString}
                 onChange = { event => setSearch( event.target.value ) }
                 onKeyDown = { (e) => _handleKeyDown(e) }
-                InputProps={{endAdornment: FullScreenDialog()}}
+                InputProps={{endAdornment: <FullScreenDialog representation={representation} smilesChange={smilesChange} smartsChange={smartsChange}/>}}
                     />
         <Grid component="label" container alignItems="center" spacing={1} sx={{position: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
             <Grid item>SMARTS</Grid>

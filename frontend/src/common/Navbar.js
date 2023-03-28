@@ -16,7 +16,6 @@ import Contact from '../pages/Contact'
 import Download from '../pages/Download'
 import Search  from '../pages/SearchHook';
 import NeighborSearch  from '../pages/Neighbors';
-import FullScreenDialog from '../components/KetcherPopup';
 
 import '../assets/custom.css'
 
@@ -34,7 +33,6 @@ const pages ={
               'About': <About />, 
               'Search': <Search />,
               'Neighbors': <NeighborSearch/>, 
-              'Ketcher': <FullScreenDialog/>, 
               'Download': <Download />,
               'Contact': <Contact />
             };
