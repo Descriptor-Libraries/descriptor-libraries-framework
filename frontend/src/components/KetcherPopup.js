@@ -18,8 +18,6 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 export default function FullScreenDialog({ representation, smilesChange, smartsChange }) {
   const [ open, setOpen ] = React.useState(false);
-  const [ smiles, setSmiles ] = useState();
-  const [ SMARTS, setSMARTS ] = useState();
   const [ ketcher, setKetcher ] = useState();
     
   const handleClickOpen = () => {
@@ -28,21 +26,13 @@ export default function FullScreenDialog({ representation, smilesChange, smartsC
 
   const handleClose = () => {
       if (representation === "smiles"){
-          ketcher.getSmiles().then(result => {setSmiles(result);});
+          ketcher.getSmiles().then(result => {smilesChange(result);});
       }
       if (representation === "SMARTS"){
-          ketcher.getSmarts().then(result => {setSMARTS(result);});
+          ketcher.getSmarts().then(result => {smartsChange(result);});
       }
       setOpen(false);
   };
-
-  useEffect(() => {
-    smartsChange(SMARTS);
-  }, [SMARTS]);
-
-  useEffect(() => {
-    smilesChange(smiles);
-  }, [smiles]);
 
   return (
     <div>

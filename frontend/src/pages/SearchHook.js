@@ -94,18 +94,22 @@ export default function SearchHook () {
     const [ isLoading, setIsLoading ] = useState(true);
     const [ searchToggle, setSearchToggle ] = useState(true);
     const [ isLoadingMore, setIsLoadingMore ] = useState(false);
-    const [ smiles, setSmiles ] = useState();
-    const [ SMARTS, setSMARTS ] = useState();
+    const [ smiles, setSmiles ] = useState('PC=C');
+    const [ SMARTS, setSMARTS ] = useState('[#15]-[#6]=[#6]');
     const [ representation, setRepresentation ] = useState("smiles");
 
     // Call back function to get the smiles from ketcher
     const smilesChange = (newState) => {
         setSmiles(newState);
+        newSearch();
+        setSearch(newState);
       };
 
     // Call back function to get the SMARTS from ketcher
     const smartsChange = (newState) => {
         setSMARTS(newState);
+        newSearch();
+        setSearch(newState);
     };
     
     function switchRepresentations(event) {
@@ -182,27 +186,24 @@ export default function SearchHook () {
         [ searchPage, searchToggle ] 
     );
 
-    // Update searchString if smiles changes
-    useEffect(() => {
-        setSearch(smiles);
-      }, [smiles]);
-
+    // TODO: Remove the SMARTS and smiles use effect hooks, they are no longer necessary, we update the searchstring in the call back functions above.
     // Update searchString if SMARTS changes
     useEffect(() => {
-        setSearch(SMARTS);
+        console.log("SMARTS are:", SMARTS);
       }, [SMARTS]);
+
+    // Update searchString if smiles changes
+    useEffect(() => {
+        console.log("smiles are:", smiles);
+      }, [smiles]);
+
 
     // New search if searchString changes
     useEffect(() => {
+        console.log("Search string is:", searchString);
         newSearch();
         loadImages();
       }, [searchString]);
-
-    function _handleKeyDown(event) {
-        if (event.key === "Enter") {
-          loadImages();
-        }
-      }
 
     return (
         <Container maxWidth="lg">
@@ -211,10 +212,8 @@ export default function SearchHook () {
                 style = {{width: 450}}
                 label="Enter a SMILES or SMARTS String to Search" 
                 variant="outlined"
-                defaultValue = {searchString} 
                 value = {searchString}
                 onChange = { event => setSearch( event.target.value ) }
-                onKeyDown = { (e) => _handleKeyDown(e) }
                 InputProps={{endAdornment: <FullScreenDialog representation={representation} smilesChange={smilesChange} smartsChange={smartsChange}/>}}
                     />
         <Grid component="label" container alignItems="center" spacing={1} sx={{position: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
