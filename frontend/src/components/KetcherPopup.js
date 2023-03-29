@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import Slide from '@mui/material/Slide';
-import Box from '@mui/material/Box';
 
 import { Ketcher } from 'ketcher-core';
 import { StandaloneStructServiceProvider } from 'ketcher-standalone';
