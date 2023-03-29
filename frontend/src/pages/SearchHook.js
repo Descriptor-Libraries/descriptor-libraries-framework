@@ -7,17 +7,12 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import Dialog from '@mui/material/Dialog';
 import Slide from '@mui/material/Slide';
 import { Switch } from '@mui/material';
 
 import Button from '@mui/material/Button';
 
 import FullScreenDialog from '../components/KetcherPopup';
-
-const Transition = React.forwardRef(function Transition(props, ref) {
-    return <Slide direction="up" ref={ref} {...props} />;
-  });
 
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
