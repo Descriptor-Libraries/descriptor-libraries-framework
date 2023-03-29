@@ -16,7 +16,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function FullScreenDialog({ representation, smilesChange, smartsChange }) {
+export default function FullScreenDialog({ ketcherCallBack }) {
   const [ open, setOpen ] = React.useState(false);
   const [ ketcher, setKetcher ] = useState();
     
@@ -24,13 +24,10 @@ export default function FullScreenDialog({ representation, smilesChange, smartsC
       setOpen(true);
   };
 
-  const handleClose = () => {
-      if (representation === "smiles"){
-          ketcher.getSmiles().then(result => {smilesChange(result);});
-      }
-      if (representation === "SMARTS"){
-          ketcher.getSmarts().then(result => {smartsChange(result);});
-      }
+  async function handleClose() {
+      const smiles = await ketcher.getSmiles().then(result => {return result;});
+      const SMARTS = await ketcher.getSmarts().then(result => {return result;});
+      ketcherCallBack([smiles, SMARTS]);
       setOpen(false);
   };
 

@@ -98,19 +98,20 @@ export default function SearchHook () {
     const [ SMARTS, setSMARTS ] = useState('[#15]-[#6]=[#6]');
     const [ representation, setRepresentation ] = useState("smiles");
 
-    // Call back function to get the smiles from ketcher
-    const smilesChange = (newState) => {
-        setSmiles(newState);
+    // Call back function to get the smiles and SMARTS from ketcher
+    const ketcherCallBack = (newState) => {
+        // Set the smiles and SMARTS for the current molecule
+        setSmiles(newState[0]);
+        setSMARTS(newState[1]);
+        // Need new search here or else ghost images persist after loading more images and drawing a new molecule
         newSearch();
-        setSearch(newState);
+        if (representation === "smiles"){
+            setSearch(newState[0]);
+        }
+        else if (representation === "SMARTS"){
+            setSearch(newState[1]);
+        }
       };
-
-    // Call back function to get the SMARTS from ketcher
-    const smartsChange = (newState) => {
-        setSMARTS(newState);
-        newSearch();
-        setSearch(newState);
-    };
     
     function switchRepresentations(event) {
         // Switch representations between SMARTS and smiles
@@ -186,17 +187,17 @@ export default function SearchHook () {
         [ searchPage, searchToggle ] 
     );
 
-    // TODO: Remove the SMARTS and smiles use effect hooks, they are no longer necessary, we update the searchstring in the call back functions above.
-    // Update searchString if SMARTS changes
+    // Update searchString if representation changes
     useEffect(() => {
-        console.log("SMARTS are:", SMARTS);
-      }, [SMARTS]);
-
-    // Update searchString if smiles changes
-    useEffect(() => {
-        console.log("smiles are:", smiles);
-      }, [smiles]);
-
+        // Need new search here or else ghost images persist after clicking load more and then switching representations
+        newSearch();
+        if (representation === "smiles"){
+            setSearch(smiles);
+        }
+        else if (representation === "SMARTS"){
+            setSearch(SMARTS);
+        }
+      }, [representation]);
 
     // New search if searchString changes
     useEffect(() => {
@@ -214,7 +215,7 @@ export default function SearchHook () {
                 variant="outlined"
                 value = {searchString}
                 onChange = { event => setSearch( event.target.value ) }
-                InputProps={{endAdornment: <FullScreenDialog representation={representation} smilesChange={smilesChange} smartsChange={smartsChange}/>}}
+                InputProps={{endAdornment: <FullScreenDialog ketcherCallBack={ketcherCallBack} />}}
                     />
         <Grid component="label" container alignItems="center" spacing={1} sx={{position: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
             <Grid item>SMARTS</Grid>
