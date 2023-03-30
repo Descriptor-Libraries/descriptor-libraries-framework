@@ -5,6 +5,7 @@ from unicodedata import category
 import urllib.parse
 import requests
 import pytest
+import json
 
 # Helper functions to reuse API requests
 def get_molecule(molecule_id):
@@ -112,7 +113,7 @@ def test_retrieve_dimensions_invalid_parameters(type, category, components):
     assert response.status_code == 400
 
 
-# Output tests (correct number of items returned per key)
+# Output tests (correct number of items returned per key (might be redundant due to the tests below))
 @pytest.mark.parametrize("molecule_id, dft_data, xtb_data, xtb_ni_data, ml_data", [("1", 5, 3, 3, 5), ("129", 5, 3, 3, 5), ("1290", 5, 3, 3, 5), ("57", 5, 3, 3, 5), ("565", 5, 3, 3, 5)])
 def test_retrieve_molecule_output_lengths(molecule_id, dft_data, xtb_data, xtb_ni_data, ml_data):
 
@@ -178,6 +179,90 @@ def test_retrieve_dimensions_output_lengths(type, category, components, total_le
     assert len(response.json()[0]["components"]) == components_length
 
     
-# Output tests (correct components returned)
 # Output tests (correct values returned)
+@pytest.mark.parametrize("molecule_id", [("1"), ("129"), ("1290"), ("57"), ("565")])
+def test_retrieve_molecule_output_results(molecule_id):
 
+    response = get_molecule(molecule_id)
+
+    ## Will need to export these jsons again when we point the DB to the smaller one. Then use the information here to check the results of the output
+    # with open(f'data/get_molecule_{molecule_id}.json', 'w', encoding='utf-8') as f:
+    #     json.dump(response.json(), f, ensure_ascii=False, indent=4)
+
+    # Read ground truth data and then compare.
+    with open(f'data/get_molecule_{molecule_id}.json') as json_file:
+        data = json.load(json_file)
+
+    # Check to see if the data returned is identical
+    assert response.json() == data
+
+
+@pytest.mark.parametrize("test_case, category, show_ml", [(1, "", False), (2, "", True), (3, "pc3", False), (4, "pcn", False), (5, "pon", True), (6, "wrong_category", True)])
+def test_retrieve_molecule_umap_results(test_case, category, show_ml):
+
+    response = get_molecule_umap(category, show_ml)
+
+    ## Will need to export these jsons again when we point the DB to the smaller one. Then use the information here to check the results of the output
+    # with open(f'data/get_molecule_umap_{test_case}.json', 'w', encoding='utf-8') as f:
+    #     json.dump(response.json(), f, ensure_ascii=False, indent=4)
+
+    # Read ground truth data and then compare.
+    with open(f'data/get_molecule_umap_{test_case}.json') as json_file:
+        data = json.load(json_file)
+
+    # Check to see if the data returned is identical
+    assert response.json() == data
+
+
+# The total length when deploying to github will be max 61, since thats the max number of molecules int the small db
+@pytest.mark.parametrize("test_case, substructure", [(1, "C=O"), (2, "C=CC"), (3, "C=N"), (4, "N=N"), (5, "C-P"), (6, "C=C-P")])
+def test_retrieve_substructure_search_results(test_case, substructure):
+
+    response = get_molecule_substructure_search(substructure)
+
+    ## Will need to export these jsons again when we point the DB to the smaller one. Then use the information here to check the results of the output
+    # with open(f'data/get_molecule_substructure_search_{test_case}.json', 'w', encoding='utf-8') as f:
+    #     json.dump(response.json(), f, ensure_ascii=False, indent=4)
+
+    # Read ground truth data and then compare.
+    with open(f'data/get_molecule_substructure_search_{test_case}.json') as json_file:
+        data = json.load(json_file)
+
+    # Check to see if the data returned is identical
+    assert response.json() == data
+
+
+# The total length when deploying to github will be max 61, since thats the max number of molecules int the small db
+@pytest.mark.parametrize("molecule_id, type, components", [(1, "pca", "1, 2, 3"), (1, "umap", "1, 2"), (1, "pca", "1, 3, 2"), (1, "pca", "1, 4"), (1, "pca", "1"), (1, "umap", "1"), (57, "umap", "1, 2"), (565, "umap", "2"), (57, "PCA", "1, 2"), (57, "UMAP", "1, 2")])
+def test_retrieve_molecule_neighbors_results(molecule_id, type, components):
+
+    response = get_molecule_neighbors(molecule_id, type, components)
+    
+    ## Will need to export these jsons again when we point the DB to the smaller one. Then use the information here to check the results of the output
+    # with open(f'data/get_molecule_neighbors_{molecule_id}.json', 'w', encoding='utf-8') as f:
+    #     json.dump(response.json(), f, ensure_ascii=False, indent=4)
+
+    # Read ground truth data and then compare.
+    with open(f'data/get_molecule_neighbors_{molecule_id}.json') as json_file:
+        data = json.load(json_file)
+
+    # Check to see if the data returned is identical
+    assert response.json() == data
+
+
+# The total length when deploying to github will be max 61, since thats the max number of molecules int the small db
+@pytest.mark.parametrize("test_case, type, category, components", [(1, "pca", "", "1, 2, 3"), (2, "pca", "", "1"), (3, "pca", "", "4"), (4, "pca", "", "1, 3, 2"), (5, "pca", "", "1, 4"), (6, "umap", "", "1, 2"), (7, "umap", "", "1"), (8, "umap", "", "2"), (9, "umap", "pc3", "1, 2"), (10, "umap", "pon", "1, 2"), (11, "umap", "pcn", "1, 2")])
+def test_retrieve_dimensions_results(test_case, type, category, components):
+
+    response = get_dimensions(type, category, components)
+
+    ## Will need to export these jsons again when we point the DB to the smaller one. Then use the information here to check the results of the output
+    # with open(f'data/get_dimensions_{test_case}.json', 'w', encoding='utf-8') as f:
+    #     json.dump(response.json(), f, ensure_ascii=False, indent=4)
+
+    # Read ground truth data and then compare.
+    with open(f'data/get_dimensions_{test_case}.json') as json_file:
+        data = json.load(json_file)
+
+    # Check to see if the data returned is identical
+    assert response.json() == data
