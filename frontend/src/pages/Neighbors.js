@@ -427,6 +427,7 @@ export default function NeighborSearchHook () {
             </Container>  }
             
             </Box>
+            { !isLoading && Object.keys(svg_results).length > 0 && 
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
             {isLoadingMore ? (
               <CircularProgress sx={{ color: "#ed1c24" }} />
@@ -441,7 +442,7 @@ export default function NeighborSearchHook () {
               </Button>
             )}
           </Box>
-
+          }
 
         </Container>
         </Container>
