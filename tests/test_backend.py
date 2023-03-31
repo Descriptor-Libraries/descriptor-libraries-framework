@@ -233,17 +233,17 @@ def test_retrieve_substructure_search_results(test_case, substructure):
 
 
 # The total length when deploying to github will be max 61, since thats the max number of molecules int the small db
-@pytest.mark.parametrize("molecule_id, type, components", [(1, "pca", "1, 2, 3"), (1, "umap", "1, 2"), (1, "pca", "1, 3, 2"), (1, "pca", "1, 4"), (1, "pca", "1"), (1, "umap", "1"), (57, "umap", "1, 2"), (565, "umap", "2"), (57, "PCA", "1, 2"), (57, "UMAP", "1, 2")])
-def test_retrieve_molecule_neighbors_results(molecule_id, type, components):
+@pytest.mark.parametrize("test_case, molecule_id, type, components", [(1, 1, "pca", "1, 2, 3"), (2, 1, "umap", "1, 2"), (3, 1, "pca", "1, 3, 2"), (4, 1, "pca", "1, 4"), (5, 1, "pca", "1"), (6, 57, "umap", "1"), (7, 57, "umap", "1, 2"), (8, 565, "umap", "2"), (9, 57, "PCA", "1, 2"), (10, 57, "UMAP", "1, 2")])
+def test_retrieve_molecule_neighbors_results(test_case, molecule_id, type, components):
 
     response = get_molecule_neighbors(molecule_id, type, components)
     
-    ## Will need to export these jsons again when we point the DB to the smaller one. Then use the information here to check the results of the output
-    # with open(f'data/get_molecule_neighbors_{molecule_id}.json', 'w', encoding='utf-8') as f:
+    # Will need to export these jsons again when we point the DB to the smaller one. Then use the information here to check the results of the output
+    # with open(f'data/get_molecule_neighbors_{test_case}.json', 'w', encoding='utf-8') as f:
     #     json.dump(response.json(), f, ensure_ascii=False, indent=4)
 
     # Read ground truth data and then compare.
-    with open(f'data/get_molecule_neighbors_{molecule_id}.json') as json_file:
+    with open(f'data/get_molecule_neighbors_{test_case}.json') as json_file:
         data = json.load(json_file)
 
     # Check to see if the data returned is identical

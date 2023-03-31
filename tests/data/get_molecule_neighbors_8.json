@@ -311,21 +311,21 @@
     },
     {
         "type": "umap",
-        "molecule_id": 153807,
-        "pat": "pc3",
-        "smiles": "C[Sn](C)(C)CCP(CC[Sn](C)(C)C)CC1OCCCO1",
-        "components": [
-            6.674993515014648
-        ],
-        "dist": 0.0008783340454101562
-    },
-    {
-        "type": "umap",
         "molecule_id": 16466,
         "pat": "pc3",
         "smiles": "CC(C)C(C(C)C)P(CC(C)(C)C)CC(C)(C)C",
         "components": [
             6.676750183105469
+        ],
+        "dist": 0.0008783340454101562
+    },
+    {
+        "type": "umap",
+        "molecule_id": 153807,
+        "pat": "pc3",
+        "smiles": "C[Sn](C)(C)CCP(CC[Sn](C)(C)C)CC1OCCCO1",
+        "components": [
+            6.674993515014648
         ],
         "dist": 0.0008783340454101562
     },
