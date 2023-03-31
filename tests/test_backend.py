@@ -89,7 +89,7 @@ def test_retrieve_molecule_under_range(molecule_id):
 def test_retrieve_molecule_over_range(molecule_id):
 
     response = get_molecule(molecule_id)
-    assert response.status_code == 500
+    assert response.status_code == 404
 
 
 @pytest.mark.parametrize("substructure", [("C=XX"), ("P=XX"), ("P=F"), ("C==C"), ("-C-"), ("C=F=C")])
