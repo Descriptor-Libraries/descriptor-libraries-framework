@@ -3,8 +3,8 @@
     "smiles": "CN(C)P(c1ccccc1)c1ccccc1",
     "molecular_weight": 229.26300048828125,
     "conformers_id": [
-        29562,
-        29563
+        29563,
+        29562
     ],
     "dft_data": {
         "max_data": {
