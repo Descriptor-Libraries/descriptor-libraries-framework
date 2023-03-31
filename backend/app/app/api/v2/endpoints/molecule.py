@@ -221,7 +221,7 @@ def search_neighbors(
         (SELECT {type} FROM molecule WHERE molecule_id=:molecule_id) as p1, 
         cube_subset(molecule.{type}, {array_substitute_two}) as p2
     ORDER BY 
-        dist
+        dist, molecule_id
     OFFSET 
         :offset 
     LIMIT 
@@ -313,10 +313,10 @@ def get_molecule_dimensions(
     FROM 
         molecule
     {where_clause}
+    ORDER BY molecule_id
     OFFSET 
         :offset 
-    LIMIT 
-        :limit
+    FETCH FIRST :limit ROWS ONLY
     """
     sql = text(query)
 
