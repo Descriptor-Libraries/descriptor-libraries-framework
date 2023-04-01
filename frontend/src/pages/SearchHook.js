@@ -92,6 +92,7 @@ export default function SearchHook () {
     const [ smiles, setSmiles ] = useState('PC=C');
     const [ SMARTS, setSMARTS ] = useState('[#15]-[#6]=[#6]');
     const [ representation, setRepresentation ] = useState("smiles");
+    const [ toggleRepresentation, setToggleRepresentation ] = useState(true);
 
     // Call back function to get the smiles and SMARTS from ketcher
     const ketcherCallBack = (newState) => {
@@ -106,6 +107,7 @@ export default function SearchHook () {
         else if (representation === "SMARTS"){
             setSearch(newState[1]);
         }
+        setToggleRepresentation(true);
       };
     
     function switchRepresentations(event) {
@@ -209,9 +211,11 @@ export default function SearchHook () {
                 label="Enter a SMILES or SMARTS String to Search" 
                 variant="outlined"
                 value = {searchString}
-                onChange = { event => setSearch( event.target.value ) }
+                // If we change the textfield, then clear the SMILES and SMARTS that were imported from the previous drawing, and disable the switch.
+                onChange = { event => {setSearch( event.target.value ); setSmiles(""); setSMARTS(""); setToggleRepresentation(false);}}
                 InputProps={{endAdornment: <FullScreenDialog ketcherCallBack={ketcherCallBack} />}}
                     />
+        { toggleRepresentation &&
         <Grid component="label" container alignItems="center" spacing={1} sx={{position: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
             <Grid item>SMARTS</Grid>
             <Grid item>
@@ -222,7 +226,7 @@ export default function SearchHook () {
             </Grid>
             <Grid item>SMILES</Grid>
         </Grid>
-
+        }
         <Container sx={{display: 'flex', justifyContent: 'center', my: 3}}>
             <Box sx={{ display: 'flex' }}>
              { isLoading && <CircularProgress sx={{ color: "#ed1c24" }} /> }
