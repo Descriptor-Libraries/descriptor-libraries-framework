@@ -93,6 +93,7 @@ export default function SearchHook () {
     const [ SMARTS, setSMARTS ] = useState('[#15]-[#6]=[#6]');
     const [ representation, setRepresentation ] = useState("smiles");
     const [ toggleRepresentation, setToggleRepresentation ] = useState(true);
+    const [ switchCheck, setSwitchCheck ] = useState(true);
 
     // Call back function to get the smiles and SMARTS from ketcher
     const ketcherCallBack = (newState) => {
@@ -114,10 +115,12 @@ export default function SearchHook () {
         // Switch representations between SMARTS and smiles
       if (event === true) {
         setRepresentation("smiles");
+        setSwitchCheck(true);
       }
       // Remove label otherwise
       else {
         setRepresentation("SMARTS");
+        setSwitchCheck(false);
       }
     }
     
@@ -220,7 +223,7 @@ export default function SearchHook () {
             <Grid item>SMARTS</Grid>
             <Grid item>
                 <Switch
-                defaultChecked
+                checked={ switchCheck }
                 onChange={ event => switchRepresentations(event.target.checked)}
                 />
             </Grid>
