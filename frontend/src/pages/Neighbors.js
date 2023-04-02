@@ -217,7 +217,8 @@ export default function NeighborSearchHook () {
                         line: {
                           width: 2,
                           color: 'DarkSlateGrey'}},
-              name: 'P[C]<sub>3</sub>'
+              name: 'P[C]<sub>3</sub>',
+              showlegend: neighbors.map( row => {if (row.pat == "pc3") { return true } }).some((element) => element == true)
             },
             // pn3
             {
@@ -233,7 +234,8 @@ export default function NeighborSearchHook () {
                       line: {
                         width: 2,
                         color: 'DarkSlateGrey'}},
-              name: 'P[N]<sub>3</sub>'
+              name: 'P[N]<sub>3</sub>',
+              showlegend: neighbors.map( row => {if (row.pat == "pn3") { return true } }).some((element) => element == true)
             },
             // po3
             {
@@ -249,7 +251,8 @@ export default function NeighborSearchHook () {
                         line: {
                           width: 2,
                           color: 'DarkSlateGrey'}},
-              name: 'P[O]<sub>3</sub>'
+              name: 'P[O]<sub>3</sub>',
+              showlegend: neighbors.map( row => {if (row.pat == "po3") { return true } }).some((element) => element == true)
             },
             // pcn
             {
@@ -265,7 +268,8 @@ export default function NeighborSearchHook () {
                       line: {
                         width: 2,
                         color: 'DarkSlateGrey'}},
-              name: 'P[C]<sub>n</sub>[N]<sub>m</sub>'
+              name: 'P[C]<sub>n</sub>[N]<sub>m</sub>',
+              showlegend: neighbors.map( row => {if (row.pat == "pcn") { return true } }).some((element) => element == true)
             },
             // phal
             {
@@ -281,7 +285,8 @@ export default function NeighborSearchHook () {
                       line: {
                         width: 2,
                         color: 'DarkSlateGrey'}},
-              name: 'PF<sub>n</sub>[R]<sub>m</sub>'
+              name: 'PF<sub>n</sub>[R]<sub>m</sub>',
+              showlegend: neighbors.map( row => {if (row.pat == "phal") { return true } }).some((element) => element == true)
             },
             // pon
             {
@@ -297,7 +302,8 @@ export default function NeighborSearchHook () {
                       line: {
                         width: 2,
                         color: 'DarkSlateGrey'}},
-              name: 'P[O]<sub>n</sub>[N]<sub>m</sub>'
+              name: 'P[O]<sub>n</sub>[N]<sub>m</sub>',
+              showlegend: neighbors.map( row => {if (row.pat == "pon") { return true } }).some((element) => element == true)
             },
             // pco
             {
@@ -313,7 +319,8 @@ export default function NeighborSearchHook () {
                       line: {
                         width: 2,
                         color: 'DarkSlateGrey'}},
-              name: 'P[C]<sub>n</sub>[O]<sub>m</sub>'
+              name: 'P[C]<sub>n</sub>[O]<sub>m</sub>',
+              showlegend: neighbors.map( row => {if (row.pat == "pco") { return true } }).some((element) => element == true)
             },
             // psi
             {
@@ -329,7 +336,8 @@ export default function NeighborSearchHook () {
                       line: {
                         width: 2,
                         color: 'DarkSlateGrey'}},
-              name: 'P[S]<sub>n</sub>[I]<sub>m</sub>'
+              name: 'P[S]<sub>n</sub>[I]<sub>m</sub>',
+              showlegend: neighbors.map( row => {if (row.pat == "psi") { return true } }).some((element) => element == true)
             },
             // other
             {
@@ -345,7 +353,8 @@ export default function NeighborSearchHook () {
                       line: {
                         width: 2,
                         color: 'DarkSlateGrey'}},
-              name: 'Other'
+              name: 'Other',
+              showlegend: neighbors.map( row => {if (row.pat == "other") { return true } }).some((element) => element == true)
             }
         ]}
         layout={ { 
