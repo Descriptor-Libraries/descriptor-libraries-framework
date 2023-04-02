@@ -202,22 +202,151 @@ export default function NeighborSearchHook () {
                         color: 'DarkSlateGrey'}},
             name: 'Target'
             },
-            // Creating the data series for the neighbors
-          {
-            x: neighbors.map( row => { return row.components[0] }),
-            y: neighbors.map( row => { return row.components[1] }),
-            text: neighbors.map( row => { return encodeURIComponent(row.smiles) }),
-            hovertemplate: "( %{x}, %{y})",
-            hovermode: "closest",
-            type: 'scatter',
-            mode: 'markers',
-            marker: {color: 'SlateGrey', size: 12 ,
-                    symbol: 'triangle-down', 
-                    line: {
+            // Creating the data series for the neighbors, by type
+            // pc3
+            {
+              x: neighbors.map( row => {if (row.pat == "pc3") { return row.components[0] } }),
+              y: neighbors.map( row => {if (row.pat == "pc3") { return row.components[1] } }),
+              text: neighbors.map( row => { return encodeURIComponent(row.smiles) }),
+              hovertemplate: "( %{x}, %{y})",
+              hovermode: "closest",
+              type: 'scatter',
+              mode: 'markers',
+              marker: {color: 'SlateGrey', size: 12 ,
+                      symbol: 'triangle-down', 
+                        line: {
+                          width: 2,
+                          color: 'DarkSlateGrey'}},
+              name: 'P[C]<sub>3</sub>'
+            },
+            // pn3
+            {
+              x: neighbors.map( row => {if (row.pat == "pn3") { return row.components[0] } }),
+              y: neighbors.map( row => {if (row.pat == "pn3") { return row.components[1] } }),
+              text: neighbors.map( row => { return encodeURIComponent(row.smiles) }),
+              hovertemplate: "( %{x}, %{y})",
+              hovermode: "closest",
+              type: 'scatter',
+              mode: 'markers',
+              marker: {color: 'blue', size: 12,
+                      symbol: 'circle',
+                      line: {
                         width: 2,
                         color: 'DarkSlateGrey'}},
-            name: 'Neighbor'
-          }
+              name: 'P[N]<sub>3</sub>'
+            },
+            // po3
+            {
+              x: neighbors.map( row => {if (row.pat == "po3") { return row.components[0] } }),
+              y: neighbors.map( row => {if (row.pat == "po3") { return row.components[1] } }),
+              text: neighbors.map( row => { return encodeURIComponent(row.smiles) }),
+              hovertemplate: "( %{x}, %{y})",
+              hovermode: "closest",
+              type: 'scatter',
+              mode: 'markers',
+              marker: {color: 'yellow', size: 12 , 
+                      symbol: "triangle-down",
+                        line: {
+                          width: 2,
+                          color: 'DarkSlateGrey'}},
+              name: 'P[O]<sub>3</sub>'
+            },
+            // pcn
+            {
+              x: neighbors.map( row => {if (row.pat == "pcn") { return row.components[0] } }),
+              y: neighbors.map( row => {if (row.pat == "pcn") { return row.components[1] } }),
+              text: neighbors.map( row => { return encodeURIComponent(row.smiles) }),
+              hovertemplate: "( %{x}, %{y})",
+              hovermode: "closest",
+              type: 'scatter',
+              mode: 'markers',
+              marker: {color: 'DarkBlue', size: 12,
+                      symbol: 'hexagon',
+                      line: {
+                        width: 2,
+                        color: 'DarkSlateGrey'}},
+              name: 'P[C]<sub>n</sub>[N]<sub>m</sub>'
+            },
+            // phal
+            {
+              x: neighbors.map( row => {if (row.pat == "phal") { return row.components[0] } }),
+              y: neighbors.map( row => {if (row.pat == "phal") { return row.components[1] } }),
+              text: neighbors.map( row => { return encodeURIComponent(row.smiles) }),
+              hovertemplate: "( %{x}, %{y})",
+              hovermode: "closest",
+              type: 'scatter',
+              mode: 'markers',
+              marker: {color: 'LimeGreen', size: 12,
+                      symbol: 'hexagon2',
+                      line: {
+                        width: 2,
+                        color: 'DarkSlateGrey'}},
+              name: 'PF<sub>n</sub>[R]<sub>m</sub>'
+            },
+            // pon
+            {
+              x: neighbors.map( row => {if (row.pat == "pon") { return row.components[0] } }),
+              y: neighbors.map( row => {if (row.pat == "pon") { return row.components[1] } }),
+              text: neighbors.map( row => { return encodeURIComponent(row.smiles) }),
+              hovertemplate: "( %{x}, %{y})",
+              hovermode: "closest",
+              type: 'scatter',
+              mode: 'markers',
+              marker: {color: 'orange', size: 12,
+                      symbol: 'circle',
+                      line: {
+                        width: 2,
+                        color: 'DarkSlateGrey'}},
+              name: 'P[O]<sub>n</sub>[N]<sub>m</sub>'
+            },
+            // pco
+            {
+              x: neighbors.map( row => {if (row.pat == "pco") { return row.components[0] } }),
+              y: neighbors.map( row => {if (row.pat == "pco") { return row.components[1] } }),
+              text: neighbors.map( row => { return encodeURIComponent(row.smiles) }),
+              hovertemplate: "( %{x}, %{y})",
+              hovermode: "closest",
+              type: 'scatter',
+              mode: 'markers',
+              marker: {color: 'purple', size: 12,
+                      symbol: 'triangle-down',
+                      line: {
+                        width: 2,
+                        color: 'DarkSlateGrey'}},
+              name: 'P[C]<sub>n</sub>[O]<sub>m</sub>'
+            },
+            // psi
+            {
+              x: neighbors.map( row => {if (row.pat == "psi") { return row.components[0] } }),
+              y: neighbors.map( row => {if (row.pat == "psi") { return row.components[1] } }),
+              text: neighbors.map( row => { return encodeURIComponent(row.smiles) }),
+              hovertemplate: "( %{x}, %{y})",
+              hovermode: "closest",
+              type: 'scatter',
+              mode: 'markers',
+              marker: {color: 'pink', size: 12,
+                      symbol: 'hexagon2',
+                      line: {
+                        width: 2,
+                        color: 'DarkSlateGrey'}},
+              name: 'P[S]<sub>n</sub>[I]<sub>m</sub>'
+            },
+            // other
+            {
+              x: neighbors.map( row => {if (row.pat == "other") { return row.components[0] } }),
+              y: neighbors.map( row => {if (row.pat == "other") { return row.components[1] } }),
+              text: neighbors.map( row => { return encodeURIComponent(row.smiles) }),
+              hovertemplate: "( %{x}, %{y})",
+              hovermode: "closest",
+              type: 'scatter',
+              mode: 'markers',
+              marker: {color: 'black', size: 12,
+                      symbol: 'square',
+                      line: {
+                        width: 2,
+                        color: 'DarkSlateGrey'}},
+              name: 'Other'
+            }
         ]}
         layout={ { 
           autosize: true,
