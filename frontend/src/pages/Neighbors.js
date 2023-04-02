@@ -218,7 +218,7 @@ export default function NeighborSearchHook () {
                           width: 2,
                           color: 'DarkSlateGrey'}},
               name: 'P[C]<sub>3</sub>',
-              showlegend: neighbors.map( row => {if (row.pat == "pc3") { return true } }).some((element) => element == true)
+              showlegend: neighbors.some((element) => element.pat == "pc3")
             },
             // pn3
             {
@@ -235,7 +235,7 @@ export default function NeighborSearchHook () {
                         width: 2,
                         color: 'DarkSlateGrey'}},
               name: 'P[N]<sub>3</sub>',
-              showlegend: neighbors.map( row => {if (row.pat == "pn3") { return true } }).some((element) => element == true)
+              showlegend: neighbors.some((element) => element.pat == "pn3")
             },
             // po3
             {
@@ -252,7 +252,7 @@ export default function NeighborSearchHook () {
                           width: 2,
                           color: 'DarkSlateGrey'}},
               name: 'P[O]<sub>3</sub>',
-              showlegend: neighbors.map( row => {if (row.pat == "po3") { return true } }).some((element) => element == true)
+              showlegend: neighbors.some((element) => element.pat == "po3")
             },
             // pcn
             {
@@ -269,7 +269,7 @@ export default function NeighborSearchHook () {
                         width: 2,
                         color: 'DarkSlateGrey'}},
               name: 'P[C]<sub>n</sub>[N]<sub>m</sub>',
-              showlegend: neighbors.map( row => {if (row.pat == "pcn") { return true } }).some((element) => element == true)
+              showlegend: neighbors.some((element) => element.pat == "pcn")
             },
             // phal
             {
@@ -286,7 +286,7 @@ export default function NeighborSearchHook () {
                         width: 2,
                         color: 'DarkSlateGrey'}},
               name: 'PF<sub>n</sub>[R]<sub>m</sub>',
-              showlegend: neighbors.map( row => {if (row.pat == "phal") { return true } }).some((element) => element == true)
+              showlegend: neighbors.some((element) => element.pat == "phal")
             },
             // pon
             {
@@ -303,7 +303,7 @@ export default function NeighborSearchHook () {
                         width: 2,
                         color: 'DarkSlateGrey'}},
               name: 'P[O]<sub>n</sub>[N]<sub>m</sub>',
-              showlegend: neighbors.map( row => {if (row.pat == "pon") { return true } }).some((element) => element == true)
+              showlegend: neighbors.some((element) => element.pat == "pon")
             },
             // pco
             {
@@ -320,7 +320,7 @@ export default function NeighborSearchHook () {
                         width: 2,
                         color: 'DarkSlateGrey'}},
               name: 'P[C]<sub>n</sub>[O]<sub>m</sub>',
-              showlegend: neighbors.map( row => {if (row.pat == "pco") { return true } }).some((element) => element == true)
+              showlegend: neighbors.some((element) => element.pat == "pco")
             },
             // psi
             {
@@ -337,7 +337,7 @@ export default function NeighborSearchHook () {
                         width: 2,
                         color: 'DarkSlateGrey'}},
               name: 'P[S]<sub>n</sub>[I]<sub>m</sub>',
-              showlegend: neighbors.map( row => {if (row.pat == "psi") { return true } }).some((element) => element == true)
+              showlegend: neighbors.some((element) => element.pat == "psi")
             },
             // other
             {
@@ -354,7 +354,7 @@ export default function NeighborSearchHook () {
                         width: 2,
                         color: 'DarkSlateGrey'}},
               name: 'Other',
-              showlegend: neighbors.map( row => {if (row.pat == "other") { return true } }).some((element) => element == true)
+              showlegend: neighbors.some((element) => element.pat == "other")
             }
         ]}
         layout={ { 
