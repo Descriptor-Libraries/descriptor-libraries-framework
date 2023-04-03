@@ -94,6 +94,7 @@ export default function SearchHook () {
     const [ toggleRepresentation, setToggleRepresentation ] = useState(true);
     const [ switchCheck, setSwitchCheck ] = useState(true);
     const [ketcherToggle, setKetcherToggle] = useState(true);
+    const [fromKetcher, setFromKetcher] = useState(false);
 
 
     // Call back function to get the smiles and SMARTS from ketcher
@@ -101,6 +102,10 @@ export default function SearchHook () {
         // Set the smiles and SMARTS for the current molecule
         setSmiles(newState[0]);
         setSMARTS(newState[1]);
+
+        // This came from ketcher
+        setFromKetcher(true);
+
         // Need new search here or else ghost images persist after loading more images and drawing a new molecule
         newSearch();
         if (representation === "smiles"){
@@ -206,9 +211,15 @@ export default function SearchHook () {
 
     function _handleKeyDown(event) {
         if (event.key === "Enter") {
+          setFromKetcher(false);
           loadImages();
         }
       }
+
+    function searchButton() {
+        setFromKetcher(false);
+        newSearch();
+    }
 
     return (
         <Container maxWidth="lg">
@@ -221,7 +232,7 @@ export default function SearchHook () {
                   value= {searchString} 
                   onChange = { event => setSearch( event.target.value ) }
                   onKeyDown = { (e) => _handleKeyDown(e) }
-                  InputProps={{endAdornment: <Button onClick={ () => { newSearch() } } 
+                  InputProps={{endAdornment: <Button onClick={ () => { searchButton() } } 
                   >
                     Search
                     </Button>}}
@@ -233,6 +244,7 @@ export default function SearchHook () {
                 <Switch
                 checked={ switchCheck }
                 onChange={ event => switchRepresentations(event.target.checked)}
+                disabled={!fromKetcher}
                 />
             </Grid>
             <Grid item>SMILES</Grid>
