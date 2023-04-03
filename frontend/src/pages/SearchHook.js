@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { styled } from '@mui/material/styles';
 import { TextField, Typography } from "@mui/material";
 import Paper from '@mui/material/Paper';
@@ -209,17 +209,20 @@ export default function SearchHook () {
         }
       }, [representation]);
 
-    function _handleKeyDown(event) {
-        if (event.key === "Enter") {
-          setFromKetcher(false);
-          loadImages();
-        }
-      }
+      const _handleKeyDown = useCallback(
+        (event) => {
+          if (event.key === "Enter") {
+            setFromKetcher(false);
+            newSearch();
+          }
+        },
+        [newSearch, setFromKetcher]
+      );
 
-    function searchButton() {
+      const searchButton = useCallback(() => {
         setFromKetcher(false);
         newSearch();
-    }
+      }, [newSearch, setFromKetcher]);
 
     return (
         <Container maxWidth="lg">
