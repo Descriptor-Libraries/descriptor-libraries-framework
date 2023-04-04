@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { styled } from '@mui/material/styles';
 import { TextField, Typography } from "@mui/material";
 import Paper from '@mui/material/Paper';
@@ -7,7 +7,11 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import CircularProgress from '@mui/material/CircularProgress';
 
+import { Switch } from '@mui/material';
+
 import Button from '@mui/material/Button';
+
+import FullScreenDialog from '../components/KetcherPopup';
 
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -19,7 +23,7 @@ const Item = styled(Paper)(({ theme }) => ({
 
 async function substructureSearch(substructure, limit=48, skip=0) {
     let encoded = encodeURIComponent(substructure);
-
+    
     const response =  await fetch(`/api/molecules/search/?substructure=${encoded}&skip=${skip}&limit=${limit}`)
 
     if (!response.ok) {
@@ -84,6 +88,51 @@ export default function SearchHook () {
     const [ isLoading, setIsLoading ] = useState(true);
     const [ searchToggle, setSearchToggle ] = useState(true);
     const [ isLoadingMore, setIsLoadingMore ] = useState(false);
+    const [ smiles, setSmiles ] = useState('PC=C');
+    const [ SMARTS, setSMARTS ] = useState('[#15]-[#6]=[#6]');
+    const [ representation, setRepresentation ] = useState("smiles");
+    const [ toggleRepresentation, setToggleRepresentation ] = useState(true);
+    const [ switchCheck, setSwitchCheck ] = useState(true);
+    const [ketcherToggle, setKetcherToggle] = useState(true);
+    const [fromKetcher, setFromKetcher] = useState(false);
+
+
+    // Call back function to get the smiles and SMARTS from ketcher
+    const ketcherCallBack = (newState) => {
+        // Set the smiles and SMARTS for the current molecule
+        setSmiles(newState[0]);
+        setSMARTS(newState[1]);
+
+        // This came from ketcher
+        setFromKetcher(true);
+
+        // Need new search here or else ghost images persist after loading more images and drawing a new molecule
+        newSearch();
+        if (representation === "smiles"){
+            setSearch(newState[0]);
+        }
+        else if (representation === "SMARTS"){
+            setSearch(newState[1]);
+        }
+        setToggleRepresentation(true);
+
+        // Just toggle this to trigger new search
+        setKetcherToggle(!ketcherToggle);
+      };
+      
+    
+    function switchRepresentations(event) {
+        // Switch representations between SMARTS and smiles
+      if (event === true) {
+        setRepresentation("smiles");
+        setSwitchCheck(true);
+      }
+      // Remove label otherwise
+      else {
+        setRepresentation("SMARTS");
+        setSwitchCheck(false);
+      }
+    }
     
     // loadmore
     function loadMore() {
@@ -145,30 +194,65 @@ export default function SearchHook () {
         loadImages() }, 
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [ searchPage, searchToggle ] 
+        [ searchPage, searchToggle, ketcherToggle ] 
     );
 
-    function _handleKeyDown(event) {
-        if (event.key === "Enter") {
-          loadImages();
+    // Update searchString if representation changes
+    useEffect(() => {
+        // Need new search here or else ghost images persist after clicking load more and then switching representations
+        newSearch();
+        if (representation === "smiles"){
+            setSearch(smiles);
         }
-      }
+        else if (representation === "SMARTS"){
+            setSearch(SMARTS);
+        }
+      }, [representation]);
+
+      const _handleKeyDown = useCallback(
+        (event) => {
+          if (event.key === "Enter") {
+            setFromKetcher(false);
+            newSearch();
+          }
+        },
+        [newSearch, setFromKetcher]
+      );
+
+      const searchButton = useCallback(() => {
+        setFromKetcher(false);
+        newSearch();
+      }, [newSearch, setFromKetcher]);
 
     return (
         <Container maxWidth="lg">
         <h2>Substructure Search</h2>
+        <FullScreenDialog ketcherCallBack={ketcherCallBack} />
+
         <TextField id="search-outline" 
-                  label="Enter a SMILES or SMARTS String to Search" 
+                  label="Search for SMILES or SMARTS String" 
                   variant="outlined"
-                  defaultValue= {searchString} 
+                  value= {searchString} 
                   onChange = { event => setSearch( event.target.value ) }
                   onKeyDown = { (e) => _handleKeyDown(e) }
-                  InputProps={{endAdornment: <Button onClick={ () => { newSearch() } } 
+                  InputProps={{endAdornment: <Button onClick={ () => { searchButton() } } 
                   >
                     Search
                     </Button>}}
                     />
-
+        { toggleRepresentation &&
+        <Grid component="label" container alignItems="center" spacing={1} sx={{position: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
+            <Grid item>SMARTS</Grid>
+            <Grid item>
+                <Switch
+                checked={ switchCheck }
+                onChange={ event => switchRepresentations(event.target.checked)}
+                disabled={!fromKetcher}
+                />
+            </Grid>
+            <Grid item>SMILES</Grid>
+        </Grid>
+        }
         <Container sx={{display: 'flex', justifyContent: 'center', my: 3}}>
             <Box sx={{ display: 'flex' }}>
              { isLoading && <CircularProgress sx={{ color: "#ed1c24" }} /> }
@@ -176,13 +260,11 @@ export default function SearchHook () {
              { !isLoading && validSmiles && Object.keys(svg_results).length > 0 && 
              <Container> 
                 { dynamicGrid(svg_results)  }
-                { isLoadingMore ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <Button variant="contained" style={{backgroundColor: "#ed1c24"}} sx={{ my: 3 }} onClick={ () => loadMore() }>Load More</Button> }
+                { isLoadingMore ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <Button variant="contained" style={{backgroundColor: "#ed1c24"}} sx={{ my: 3 }} onClick={ () => loadMore() } disabled={isLoadingMore}>Load More</Button> }
             </Container>  }
             { !isLoading && validSmiles && Object.keys(svg_results).length==0 && <Typography>No results found for SMILES string.</Typography> } 
             </Box>
         </Container>
-
-            
 
         </Container>
     )
