@@ -40,6 +40,7 @@ export default function FullScreenDialog({ ketcherCallBack }) {
         maxWidth={"lg"}
         open={open}
         onClose={handleClose}
+        keepMounted
         TransitionComponent={Transition}
       >
           <Editor
