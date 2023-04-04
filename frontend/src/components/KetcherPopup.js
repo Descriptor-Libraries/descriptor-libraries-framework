@@ -32,14 +32,15 @@ export default function FullScreenDialog({ ketcherCallBack }) {
 
   return (
     <div>
-      <Button onClick={handleClickOpen}>
-        DRAW
+      <Button variant="contained" style={{backgroundColor: "#ed1c24"}} sx={{ mb: 5 }} onClick={handleClickOpen}>
+        Open Molecular Sketcher
       </Button>
       <Dialog
         fullWidth={true}
         maxWidth={"lg"}
         open={open}
         onClose={handleClose}
+        keepMounted
         TransitionComponent={Transition}
       >
           <Editor
