@@ -14,13 +14,6 @@
         "smiles": "CP(F)F"
     },
     {
-        "molecule_id": 139,
-        "umap1": 1.6914994716644287,
-        "umap2": 4.160795211791992,
-        "pat": null,
-        "smiles": "CCOP(c1ccccc1)c1ccccc1"
-    },
-    {
         "molecule_id": 8,
         "umap1": 3.598444938659668,
         "umap2": 6.260385513305664,
@@ -84,74 +77,11 @@
         "smiles": "CCCCP(CCCC)N(CC)CC"
     },
     {
-        "molecule_id": 9,
-        "umap1": 6.293145656585693,
-        "umap2": 8.905426979064941,
-        "pat": null,
-        "smiles": "Cc1ccccc1P(c1ccccc1C)c1ccccc1C"
-    },
-    {
-        "molecule_id": 138,
-        "umap1": 1.7021713256835938,
-        "umap2": 4.477718353271484,
-        "pat": null,
-        "smiles": "COP(c1ccccc1)c1ccccc1"
-    },
-    {
-        "molecule_id": 143,
-        "umap1": 1.040917158126831,
-        "umap2": 4.37474250793457,
-        "pat": null,
-        "smiles": "COP(OC)c1ccccc1"
-    },
-    {
-        "molecule_id": 129,
-        "umap1": 2.159601926803589,
-        "umap2": 5.0302557945251465,
-        "pat": null,
-        "smiles": "CN(C)P(c1ccccc1)c1ccccc1"
-    },
-    {
-        "molecule_id": 59,
-        "umap1": 2.044620513916016,
-        "umap2": 5.17310094833374,
-        "pat": null,
-        "smiles": "CN(C)P(c1ccccc1)N(C)C"
-    },
-    {
         "molecule_id": 318,
         "umap1": 1.8592379093170168,
         "umap2": 5.779830932617188,
         "pat": null,
         "smiles": "CCN(CC)P(C[Si](C)(C)C)N(CC)CC"
-    },
-    {
-        "molecule_id": 144,
-        "umap1": 0.779035210609436,
-        "umap2": 4.228854656219482,
-        "pat": null,
-        "smiles": "CCOP(OCC)c1ccccc1"
-    },
-    {
-        "molecule_id": 140,
-        "umap1": 1.786062240600586,
-        "umap2": 4.126868724822998,
-        "pat": null,
-        "smiles": "CC(C)OP(c1ccccc1)c1ccccc1"
-    },
-    {
-        "molecule_id": 58,
-        "umap1": 1.9426419734954836,
-        "umap2": 5.365811824798584,
-        "pat": null,
-        "smiles": "CC(C)N(C(C)C)P(c1ccccc1)N(C(C)C)C(C)C"
-    },
-    {
-        "molecule_id": 57,
-        "umap1": 1.9482804536819456,
-        "umap2": 5.50447940826416,
-        "pat": null,
-        "smiles": "CCN(CC)P(c1ccccc1)N(CC)CC"
     },
     {
         "molecule_id": 10,
@@ -161,46 +91,11 @@
         "smiles": "CCCCP(C12CC3CC(CC(C3)C1)C2)C12CC3CC(CC(C3)C1)C2"
     },
     {
-        "molecule_id": 505,
-        "umap1": 2.155478239059448,
-        "umap2": 5.14211893081665,
-        "pat": null,
-        "smiles": "COP(c1ccccc1)N(C(C)C)C(C)C"
-    },
-    {
-        "molecule_id": 238,
-        "umap1": 1.8939481973648071,
-        "umap2": 4.001185894012451,
-        "pat": null,
-        "smiles": "CCCCOP(c1ccccc1)c1ccccc1"
-    },
-    {
-        "molecule_id": 146,
-        "umap1": 0.6956245303153992,
-        "umap2": 3.8985326290130615,
-        "pat": null,
-        "smiles": "CCCCOP(OCCCC)c1ccccc1"
-    },
-    {
-        "molecule_id": 267,
-        "umap1": 4.586603164672852,
-        "umap2": 8.97031021118164,
-        "pat": null,
-        "smiles": "CCSP(c1ccccc1)c1c(F)c(F)c(F)c(F)c1F"
-    },
-    {
         "molecule_id": 1005,
         "umap1": 5.2986931800842285,
         "umap2": 7.127920150756836,
         "pat": null,
         "smiles": "CC(C)P(B1Nc2ccccc2-c2ccccc21)C(C)C"
-    },
-    {
-        "molecule_id": 7,
-        "umap1": 8.470039367675781,
-        "umap2": 3.6782431602478023,
-        "pat": null,
-        "smiles": "COc1cccc(OC)c1-c1ccccc1P(c1ccccc1)c1ccccc1"
     },
     {
         "molecule_id": 2,
@@ -245,13 +140,6 @@
         "smiles": "COc1ccccc1-c1cc2ccccc2n1P(C1CCCCC1)C1CCCCC1"
     },
     {
-        "molecule_id": 1287,
-        "umap1": 0.47343710064888,
-        "umap2": 5.320948600769043,
-        "pat": null,
-        "smiles": "FP(F)c1ccccc1"
-    },
-    {
         "molecule_id": 6,
         "umap1": 4.234940528869629,
         "umap2": 5.697756290435791,
@@ -264,47 +152,5 @@
         "umap2": 5.598455429077148,
         "pat": null,
         "smiles": "c1ccc(-c2ccccc2P(C2CCCCC2)C2CCCCC2)cc1"
-    },
-    {
-        "molecule_id": 1012,
-        "umap1": 2.2251620292663574,
-        "umap2": 4.687414169311523,
-        "pat": null,
-        "smiles": "FP(c1ccccc1)c1ccccc1"
-    },
-    {
-        "molecule_id": 142,
-        "umap1": 1.891801714897156,
-        "umap2": 3.9267640113830566,
-        "pat": null,
-        "smiles": "Clc1ccccc1OP(c1ccccc1)c1ccccc1"
-    },
-    {
-        "molecule_id": 145,
-        "umap1": 0.7239024043083191,
-        "umap2": 3.4430091381073,
-        "pat": null,
-        "smiles": "c1ccc(OP(Oc2ccccc2)c2ccccc2)cc1"
-    },
-    {
-        "molecule_id": 141,
-        "umap1": 1.8258098363876345,
-        "umap2": 3.921042680740357,
-        "pat": null,
-        "smiles": "c1ccc(OP(c2ccccc2)c2ccccc2)cc1"
-    },
-    {
-        "molecule_id": 591,
-        "umap1": 4.684864521026611,
-        "umap2": 8.463791847229004,
-        "pat": null,
-        "smiles": "c1ccc(SP(c2ccccc2)c2ccccc2)cc1"
-    },
-    {
-        "molecule_id": 587,
-        "umap1": 3.797420978546143,
-        "umap2": 5.820850849151611,
-        "pat": null,
-        "smiles": "c1ccc(SP(Sc2ccccc2)c2ccccc2)cc1"
     }
 ]

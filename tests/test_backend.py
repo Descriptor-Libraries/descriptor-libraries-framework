@@ -222,11 +222,13 @@ def test_retrieve_substructure_search_results(test_case, substructure):
     response = get_molecule_substructure_search(substructure)
 
     # Exporting JSONs once to have ground truth, only generate once!
-    # with open(f'data/get_molecule_substructure_search_{test_case}.json', 'w', encoding='utf-8') as f:
+    # with open(f'tests/data/get_molecule_substructure_search_{test_case}.json', 'w', encoding='utf-8') as f:
     #     json.dump(response.json(), f, ensure_ascii=False, indent=4)
 
     # Read ground truth data and then compare.
-    with open(f"tests/data/get_molecule_substructure_search_{test_case}.json") as json_file:
+    with open(
+        f"tests/data/get_molecule_substructure_search_{test_case}.json"
+    ) as json_file:
         data = json.load(json_file)
 
     # Check to see if the data returned is identical
