@@ -181,7 +181,7 @@ def test_retrieve_molecule_output_results(molecule_id):
     #     json.dump(response.json(), f, ensure_ascii=False, indent=4)
 
     # Read ground truth data and then compare.
-    with open(f"data/get_molecule_{molecule_id}.json") as json_file:
+    with open(f"tests/data/get_molecule_{molecule_id}.json") as json_file:
         data = json.load(json_file)
 
     # Check to see if the data returned is identical
@@ -207,7 +207,7 @@ def test_retrieve_molecule_umap_results(test_case, category, show_ml):
     #     json.dump(response.json(), f, ensure_ascii=False, indent=4)
 
     # Read ground truth data and then compare.
-    with open(f"data/get_molecule_umap_{test_case}.json") as json_file:
+    with open(f"tests/data/get_molecule_umap_{test_case}.json") as json_file:
         data = json.load(json_file)
 
     # Check to see if the data returned is identical
@@ -226,7 +226,7 @@ def test_retrieve_substructure_search_results(test_case, substructure):
     #     json.dump(response.json(), f, ensure_ascii=False, indent=4)
 
     # Read ground truth data and then compare.
-    with open(f"data/get_molecule_substructure_search_{test_case}.json") as json_file:
+    with open(f"tests/data/get_molecule_substructure_search_{test_case}.json") as json_file:
         data = json.load(json_file)
 
     # Check to see if the data returned is identical
@@ -256,7 +256,7 @@ def test_retrieve_molecule_neighbors_results(test_case, molecule_id, type, compo
     #     json.dump(response.json(), f, ensure_ascii=False, indent=4)
 
     # Read ground truth data and then compare.
-    with open(f"data/get_molecule_neighbors_{test_case}.json") as json_file:
+    with open(f"tests/data/get_molecule_neighbors_{test_case}.json") as json_file:
         data = json.load(json_file)
 
     # Check to see if the data returned is identical
@@ -287,7 +287,7 @@ def test_retrieve_dimensions_results(test_case, type, category, components):
     #     json.dump(response.json(), f, ensure_ascii=False, indent=4)
 
     # Read ground truth data and then compare.
-    with open(f"data/get_dimensions_{test_case}.json") as json_file:
+    with open(f"tests/data/get_dimensions_{test_case}.json") as json_file:
         data = json.load(json_file)
 
     # Check to see if the data returned is identical
