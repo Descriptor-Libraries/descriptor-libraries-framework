@@ -351,7 +351,7 @@ export default function NeighborSearchHook () {
 
     useEffect(() => {
       // This effect runs whenever any of the three states changes
-      // Check if all three states have the desired values
+      // Check if all 3 states have the desired values
       if (skip >= 15 && searchPage >= 2 && isLoadingMore === true) {
         // Call the function that requires updated states
         loadNeighbors();
@@ -379,10 +379,7 @@ export default function NeighborSearchHook () {
                   variant="outlined"
                   defaultValue= {moleculeid} 
                   onChange = { event => setSearch( event.target.value ) }
-                  InputProps={{endAdornment: <Button onClick={ () => newSearch() } 
-                  >
-                    Search
-                    </Button>}}
+                  InputProps={{endAdornment: (isLoadingMore || isLoading) ? <CircularProgress/> : <Button onClick={ () => newSearch() } >Search</Button>}}
         />
         <TextField
             sx={{ m: 0.5 }}
@@ -406,7 +403,7 @@ export default function NeighborSearchHook () {
                           <FormControlLabel control={<Checkbox defaultChecked value={"2"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="2" />
                         </FormGroup>
         }
-        { isLoadingMore ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <Button variant="contained" style={{backgroundColor: "#ed1c24"}} sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> }
+        { (isLoadingMore || isLoading) ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <Button variant="contained" style={{backgroundColor: "#ed1c24"}} sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> }
         <Container sx={{justifyContent: 'center', my: 3}}>
             <Box sx={{ display: 'flex' }}>
             {/* If molecule is not valid and there is no mol data, then state that there are no results for the molecule ID requested*/}
