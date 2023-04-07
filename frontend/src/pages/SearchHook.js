@@ -126,12 +126,16 @@ export default function SearchHook () {
       if (event === true) {
         setRepresentation("smiles");
         setSwitchCheck(true);
+        setSearch(smiles);
       }
       // Remove label otherwise
       else {
         setRepresentation("SMARTS");
         setSwitchCheck(false);
+        setSearch(SMARTS);
       }
+
+      newSearch();
     }
     
     // loadmore
