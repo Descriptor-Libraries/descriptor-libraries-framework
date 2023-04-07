@@ -122,7 +122,6 @@ export default function NeighborSearchHook () {
     const [ svg_results, setSVGResults ] = useState([])
     const [ searchPage, setSearchPage ] = useState(1);
     const [ isLoading, setIsLoading ] = useState(true);
-    const [ searchToggle, setSearchToggle ] = useState(true);
     const [ isLoadingMore, setIsLoadingMore ] = useState(false);
     const [ molData, setMolData] = useState([]);
     const [ componentArrayForm, setComponentArrayForm ] = useState(["1", "2"]);
@@ -287,23 +286,23 @@ export default function NeighborSearchHook () {
       /**
        * Loads more neighbors into the UI. 
        */
+        console.log("calling loadMore");
         setSkip(skip => skip + interval);
-        setSearchPage( searchPage => searchPage + 1);
+        setSearchPage(searchPage => searchPage + 1);
         setIsLoadingMore(true);
-        loadNeighbors();
     }
 
     function newSearch() {
       /**
        * Searches for new neighbors. Resets alot of the props to their original state.
        */
+       console.log("calling newSearch and clearing shit out")
         setSkip(0);
         setSearchPage(1);
         setSVGResults([]);
         // Just need to toggle this to make sure it toggles
         // so that effect will be triggered
         setIsLoading(true);
-        setSearchToggle(!searchToggle);
         setMolData([]);
     }
  
@@ -312,7 +311,9 @@ export default function NeighborSearchHook () {
        * Main driver function which loads the neighbors for a molecule requested by the user.
        * 
        */
-
+        console.log("calling neighbors");
+        console.log("Skip: ", skip);
+        console.log("Search Page: ", searchPage);
         const fetchData = async () => {
             const molecule_data = await NeighborSearch(moleculeid, type, arrayToString(componentArrayForm), interval, skip);
             const svg_data = await retrieveAllSVGs(molecule_data);
@@ -343,36 +344,29 @@ export default function NeighborSearchHook () {
             setIsLoading(false);
             setIsLoadingMore(false);
             setValidMolecule(true);
-
+            console.log("Data fetch donezo");
           })
 
     }
 
-    // initial load of data 
-    useEffect( ( ) => { 
-        loadNeighbors() }, 
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [ searchPage, searchToggle ] 
-    );
-    
-    // new search if dropdown changes
     useEffect(() => {
-      newSearch();
-      loadNeighbors();
-    }, [type]);
+      // This effect runs whenever any of the three states changes
+      // Check if all three states have the desired values
+      if (skip >= 15 && searchPage >= 2 && isLoadingMore === true) {
+        // Call the function that requires updated states
+        loadNeighbors();
+      }
+    }, [skip, searchPage, isLoadingMore]);
 
-    // new search if the molecule id changes
+    // The states this function looks for are the initial states. Thus it will load the data on its initial load up.
     useEffect(() => {
-      newSearch();
-      loadNeighbors();
-    }, [moleculeid]);
-
-    // new search if components change.
-    useEffect(() => {
-    newSearch();
-    loadNeighbors();
-  }, [componentArrayForm]);
+      // This effect runs whenever any of the 5 states changes
+      // Check if all 5 states have the desired values
+      if (skip === 0 && searchPage === 1 && isLoading === true && svg_results.length === 0 && molData.length === 0) {
+        // Call the function that requires updated states
+        loadNeighbors();
+      }
+    }, [skip, searchPage, isLoading, svg_results, molData]);
 
     return (
         <Container maxWidth="lg">
@@ -385,14 +379,17 @@ export default function NeighborSearchHook () {
                   variant="outlined"
                   defaultValue= {moleculeid} 
                   onChange = { event => setSearch( event.target.value ) }
+                  InputProps={{endAdornment: <Button onClick={ () => newSearch() } 
+                  >
+                    Search
+                    </Button>}}
         />
         <TextField
             sx={{ m: 0.5 }}
             select
             id="dimension-outline"
             value={type}
-            // Need to clear MolData and SVGResults here. This is okay because when we switch type we need to do a new search right after.
-            onChange={ function(event) {setType(event.target.value); setComponentArrayForm(["1", "2"]); setMolData([]); setSVGResults([]) }}
+            onChange={ function(event) {setType(event.target.value); setComponentArrayForm(["1", "2"]);}}
         >
             <MenuItem value={"pca"}>PCA</MenuItem>
             <MenuItem value={"umap"}>UMAP</MenuItem>
