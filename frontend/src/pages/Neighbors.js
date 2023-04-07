@@ -377,7 +377,7 @@ export default function NeighborSearchHook () {
                   id="search-outline" 
                   label="Enter a Molecule ID to Search" 
                   variant="outlined"
-                  defaultValue= {moleculeid} 
+                  value= {moleculeid} 
                   onChange = { event => setSearch( event.target.value ) }
                   InputProps={{endAdornment: (isLoadingMore || isLoading) ? <CircularProgress/> : <Button onClick={ () => newSearch() } >Search</Button>}}
         />
