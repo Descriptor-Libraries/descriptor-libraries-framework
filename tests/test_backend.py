@@ -4,6 +4,10 @@ Tests for backend
 import requests
 import pytest
 import json
+import os
+
+# Get the absolute path of the current file
+current_path = os.path.abspath(__file__)
 
 
 # Helper functions to reuse API requests
@@ -181,7 +185,10 @@ def test_retrieve_molecule_output_results(molecule_id):
     #     json.dump(response.json(), f, ensure_ascii=False, indent=4)
 
     # Read ground truth data and then compare.
-    with open(f"tests/data/get_molecule_{molecule_id}.json") as json_file:
+    absolute_path = os.path.join(
+        os.path.dirname(current_path), "data", f"get_molecule_{molecule_id}.json"
+    )
+    with open(absolute_path) as json_file:
         data = json.load(json_file)
 
     # Check to see if the data returned is identical
@@ -207,7 +214,10 @@ def test_retrieve_molecule_umap_results(test_case, category, show_ml):
     #     json.dump(response.json(), f, ensure_ascii=False, indent=4)
 
     # Read ground truth data and then compare.
-    with open(f"tests/data/get_molecule_umap_{test_case}.json") as json_file:
+    absolute_path = os.path.join(
+        os.path.dirname(current_path), "data", f"get_molecule_umap_{test_case}.json"
+    )
+    with open(absolute_path) as json_file:
         data = json.load(json_file)
 
     # Check to see if the data returned is identical
@@ -226,9 +236,12 @@ def test_retrieve_substructure_search_results(test_case, substructure):
     #     json.dump(response.json(), f, ensure_ascii=False, indent=4)
 
     # Read ground truth data and then compare.
-    with open(
-        f"tests/data/get_molecule_substructure_search_{test_case}.json"
-    ) as json_file:
+    absolute_path = os.path.join(
+        os.path.dirname(current_path),
+        "data",
+        f"get_molecule_substructure_search_{test_case}.json",
+    )
+    with open(absolute_path) as json_file:
         data = json.load(json_file)
 
     # Check to see if the data returned is identical
@@ -258,7 +271,12 @@ def test_retrieve_molecule_neighbors_results(test_case, molecule_id, type, compo
     #     json.dump(response.json(), f, ensure_ascii=False, indent=4)
 
     # Read ground truth data and then compare.
-    with open(f"tests/data/get_molecule_neighbors_{test_case}.json") as json_file:
+    absolute_path = os.path.join(
+        os.path.dirname(current_path),
+        "data",
+        f"get_molecule_neighbors_{test_case}.json",
+    )
+    with open(absolute_path) as json_file:
         data = json.load(json_file)
 
     # Check to see if the data returned is identical
@@ -289,7 +307,10 @@ def test_retrieve_dimensions_results(test_case, type, category, components):
     #     json.dump(response.json(), f, ensure_ascii=False, indent=4)
 
     # Read ground truth data and then compare.
-    with open(f"tests/data/get_dimensions_{test_case}.json") as json_file:
+    absolute_path = os.path.join(
+        os.path.dirname(current_path), "data", f"get_dimensions_{test_case}.json"
+    )
+    with open(absolute_path) as json_file:
         data = json.load(json_file)
 
     # Check to see if the data returned is identical
