@@ -1,0 +1,662 @@
+[
+    {
+        "type": "pca",
+        "molecule_id": 1,
+        "pat": "pc3",
+        "smiles": "CC(C)c1cc(C(C)C)c(-c2ccccc2P(C2CCCCC2)C2CCCCC2)c(C(C)C)c1",
+        "components": [
+            11.802305221557615,
+            -2.5579674243927
+        ],
+        "dist": 0.0
+    },
+    {
+        "type": "pca",
+        "molecule_id": 4,
+        "pat": "pc3",
+        "smiles": "CC(C)Oc1cccc(OC(C)C)c1-c1ccccc1P(C1CCCCC1)C1CCCCC1",
+        "components": [
+            11.14712905883789,
+            -2.8176658153533936
+        ],
+        "dist": 0.7047687978789331
+    },
+    {
+        "type": "pca",
+        "molecule_id": 2,
+        "pat": "pc3",
+        "smiles": "CN(C)c1cccc(N(C)C)c1-c1ccccc1P(C1CCCCC1)C1CCCCC1",
+        "components": [
+            10.286706924438477,
+            -1.5480362176895142
+        ],
+        "dist": 1.8212630893155957
+    },
+    {
+        "type": "pca",
+        "molecule_id": 3,
+        "pat": "pc3",
+        "smiles": "COc1cccc(OC)c1-c1ccccc1P(C1CCCCC1)C1CCCCC1",
+        "components": [
+            8.049190521240234,
+            -2.304969549179077
+        ],
+        "dist": 3.761632342295168
+    },
+    {
+        "type": "pca",
+        "molecule_id": 7,
+        "pat": "pc3",
+        "smiles": "COc1cccc(OC)c1-c1ccccc1P(c1ccccc1)c1ccccc1",
+        "components": [
+            6.36913537979126,
+            -1.6704919338226318
+        ],
+        "dist": 5.505174590859225
+    },
+    {
+        "type": "pca",
+        "molecule_id": 307,
+        "pat": "pcn",
+        "smiles": "COc1ccccc1-c1cc2ccccc2n1P(C1CCCCC1)C1CCCCC1",
+        "components": [
+            8.377704620361328,
+            2.364763021469116
+        ],
+        "dist": 5.996762820082919
+    },
+    {
+        "type": "pca",
+        "molecule_id": 5,
+        "pat": "pc3",
+        "smiles": "c1ccc(-c2ccccc2P(C2CCCCC2)C2CCCCC2)cc1",
+        "components": [
+            5.673429012298584,
+            -2.627736568450928
+        ],
+        "dist": 6.129273311077258
+    },
+    {
+        "type": "pca",
+        "molecule_id": 316,
+        "pat": "pcn",
+        "smiles": "Cc1ccccc1-c1cc2ccccc2n1P(C1CCCCC1)C1CCCCC1",
+        "components": [
+            7.326417446136475,
+            2.196297168731689
+        ],
+        "dist": 6.52967098708661
+    },
+    {
+        "type": "pca",
+        "molecule_id": 6,
+        "pat": "pc3",
+        "smiles": "C1C2CC3CC1CC(P(C14CC5CC(CC(C5)C1)C4)C14CC5CC(CC(C5)C1)C4)(C2)C3",
+        "components": [
+            3.8022656440734863,
+            0.1682641953229904
+        ],
+        "dist": 8.45180288965911
+    },
+    {
+        "type": "pca",
+        "molecule_id": 1005,
+        "pat": "other",
+        "smiles": "CC(C)P(B1Nc2ccccc2-c2ccccc21)C(C)C",
+        "components": [
+            2.387653350830078,
+            -4.220148086547852
+        ],
+        "dist": 9.560257025866829
+    },
+    {
+        "type": "pca",
+        "molecule_id": 10,
+        "pat": "pc3",
+        "smiles": "CCCCP(C12CC3CC(CC(C3)C1)C2)C12CC3CC(CC(C3)C1)C2",
+        "components": [
+            1.888824701309204,
+            -1.9433128833770752
+        ],
+        "dist": 9.932517114515123
+    },
+    {
+        "type": "pca",
+        "molecule_id": 9,
+        "pat": "pc3",
+        "smiles": "Cc1ccccc1P(c1ccccc1C)c1ccccc1C",
+        "components": [
+            1.046823501586914,
+            -0.1265509575605392
+        ],
+        "dist": 11.026884104941272
+    },
+    {
+        "type": "pca",
+        "molecule_id": 645,
+        "pat": "pn3",
+        "smiles": "CCCN(CCC)P(N(CCC)CCC)N(CCC)CCC",
+        "components": [
+            1.318914532661438,
+            1.672895908355713
+        ],
+        "dist": 11.304940728567756
+    },
+    {
+        "type": "pca",
+        "molecule_id": 625,
+        "pat": "pn3",
+        "smiles": "CC(C)N(C(C)C)P(N(C(C)C)C(C)C)N(C(C)C)C(C)C",
+        "components": [
+            2.018121719360352,
+            4.15642786026001
+        ],
+        "dist": 11.866480137059838
+    },
+    {
+        "type": "pca",
+        "molecule_id": 586,
+        "pat": "other",
+        "smiles": "c1ccc(SP(Sc2ccccc2)Sc2ccccc2)cc1",
+        "components": [
+            0.8920443058013916,
+            2.1749913692474365
+        ],
+        "dist": 11.892631844641173
+    },
+    {
+        "type": "pca",
+        "molecule_id": 58,
+        "pat": "pcn",
+        "smiles": "CC(C)N(C(C)C)P(c1ccccc1)N(C(C)C)C(C)C",
+        "components": [
+            1.1937345266342163,
+            3.341646671295166
+        ],
+        "dist": 12.13866626393635
+    },
+    {
+        "type": "pca",
+        "molecule_id": 587,
+        "pat": "other",
+        "smiles": "c1ccc(SP(Sc2ccccc2)c2ccccc2)cc1",
+        "components": [
+            0.0270153433084487,
+            2.0338447093963623
+        ],
+        "dist": 12.638915712544717
+    },
+    {
+        "type": "pca",
+        "molecule_id": 591,
+        "pat": "other",
+        "smiles": "c1ccc(SP(c2ccccc2)c2ccccc2)cc1",
+        "components": [
+            -1.4917398691177368,
+            0.1977234482765197
+        ],
+        "dist": 13.57665154073794
+    },
+    {
+        "type": "pca",
+        "molecule_id": 57,
+        "pat": "pcn",
+        "smiles": "CCN(CC)P(c1ccccc1)N(CC)CC",
+        "components": [
+            -2.4192135334014893,
+            1.5791860818862915
+        ],
+        "dist": 14.811064608331506
+    },
+    {
+        "type": "pca",
+        "molecule_id": 318,
+        "pat": "pcn",
+        "smiles": "CCN(CC)P(C[Si](C)(C)C)N(CC)CC",
+        "components": [
+            -2.3893163204193115,
+            1.8523051738739007
+        ],
+        "dist": 14.861111209520129
+    },
+    {
+        "type": "pca",
+        "molecule_id": 267,
+        "pat": "other",
+        "smiles": "CCSP(c1ccccc1)c1c(F)c(F)c(F)c(F)c1F",
+        "components": [
+            -2.492025375366211,
+            1.9355485439300537
+        ],
+        "dist": 14.983977208062091
+    },
+    {
+        "type": "pca",
+        "molecule_id": 142,
+        "pat": "pco",
+        "smiles": "Clc1ccccc1OP(c1ccccc1)c1ccccc1",
+        "components": [
+            -2.131321668624878,
+            3.056647539138794
+        ],
+        "dist": 15.022312055856396
+    },
+    {
+        "type": "pca",
+        "molecule_id": 141,
+        "pat": "pco",
+        "smiles": "c1ccc(OP(c2ccccc2)c2ccccc2)cc1",
+        "components": [
+            -2.5684499740600586,
+            2.538360834121704
+        ],
+        "dist": 15.247661020986294
+    },
+    {
+        "type": "pca",
+        "molecule_id": 272,
+        "pat": "pcn",
+        "smiles": "CCCCP(CCCC)N(CC)CC",
+        "components": [
+            -3.5408642292022705,
+            -1.8257763385772705
+        ],
+        "dist": 15.360629953907457
+    },
+    {
+        "type": "pca",
+        "molecule_id": 238,
+        "pat": "pco",
+        "smiles": "CCCCOP(c1ccccc1)c1ccccc1",
+        "components": [
+            -3.4173812866210938,
+            0.468033879995346
+        ],
+        "dist": 15.517588127714797
+    },
+    {
+        "type": "pca",
+        "molecule_id": 297,
+        "pat": "pcn",
+        "smiles": "CC(C)(C)P(N[Si](C)(C)C)C(C)(C)C",
+        "components": [
+            -3.610373735427856,
+            0.7921618223190308
+        ],
+        "dist": 15.772572352053931
+    },
+    {
+        "type": "pca",
+        "molecule_id": 663,
+        "pat": "pn3",
+        "smiles": "C1CCN(P(N2CCCCC2)N2CCCCC2)CC1",
+        "components": [
+            -3.671345472335816,
+            0.9181367754936218
+        ],
+        "dist": 15.85929273975028
+    },
+    {
+        "type": "pca",
+        "molecule_id": 449,
+        "pat": "pn3",
+        "smiles": "CCN(CC)P(N(CC)CC)N(CC)CC",
+        "components": [
+            -3.3674349784851074,
+            2.1797122955322266
+        ],
+        "dist": 15.892344913994918
+    },
+    {
+        "type": "pca",
+        "molecule_id": 145,
+        "pat": "pco",
+        "smiles": "c1ccc(OP(Oc2ccccc2)c2ccccc2)cc1",
+        "components": [
+            -2.2964746952056885,
+            4.812450885772705
+        ],
+        "dist": 15.90907480679344
+    },
+    {
+        "type": "pca",
+        "molecule_id": 8,
+        "pat": "pc3",
+        "smiles": "CC(C)(C)P(C(C)(C)C)C(C)(C)C",
+        "components": [
+            -3.795037269592285,
+            1.2344127893447876
+        ],
+        "dist": 16.051767518618558
+    },
+    {
+        "type": "pca",
+        "molecule_id": 674,
+        "pat": "pn3",
+        "smiles": "CN1CCN(P(N2CCN(C)CC2)N2CCN(C)CC2)CC1",
+        "components": [
+            -3.836721897125244,
+            1.5467394590377808
+        ],
+        "dist": 16.168728701347533
+    },
+    {
+        "type": "pca",
+        "molecule_id": 505,
+        "pat": "other",
+        "smiles": "COP(c1ccccc1)N(C(C)C)C(C)C",
+        "components": [
+            -3.412828207015991,
+            3.062705516815185
+        ],
+        "dist": 16.220118666684424
+    },
+    {
+        "type": "pca",
+        "molecule_id": 129,
+        "pat": "pcn",
+        "smiles": "CN(C)P(c1ccccc1)c1ccccc1",
+        "components": [
+            -4.1337995529174805,
+            0.8722435235977173
+        ],
+        "dist": 16.301097586689103
+    },
+    {
+        "type": "pca",
+        "molecule_id": 146,
+        "pat": "pco",
+        "smiles": "CCCCOP(OCCCC)c1ccccc1",
+        "components": [
+            -3.931974411010742,
+            1.8198267221450808
+        ],
+        "dist": 16.33195141877773
+    },
+    {
+        "type": "pca",
+        "molecule_id": 1015,
+        "pat": "other",
+        "smiles": "B1NBNB(P(B2NBNBN2)B2NBNBN2)N1",
+        "components": [
+            -3.3101089000701904,
+            -9.500231742858888
+        ],
+        "dist": 16.63069735311855
+    },
+    {
+        "type": "pca",
+        "molecule_id": 140,
+        "pat": "pco",
+        "smiles": "CC(C)OP(c1ccccc1)c1ccccc1",
+        "components": [
+            -4.429044723510742,
+            1.3647788763046265
+        ],
+        "dist": 16.698642447184298
+    },
+    {
+        "type": "pca",
+        "molecule_id": 139,
+        "pat": "pco",
+        "smiles": "CCOP(c1ccccc1)c1ccccc1",
+        "components": [
+            -5.022158622741699,
+            1.1484835147857666
+        ],
+        "dist": 17.22789488627882
+    },
+    {
+        "type": "pca",
+        "molecule_id": 533,
+        "pat": "other",
+        "smiles": "CCSP(SCC)N(CC)CC",
+        "components": [
+            -5.188434600830078,
+            2.936253070831299
+        ],
+        "dist": 17.856978987561433
+    },
+    {
+        "type": "pca",
+        "molecule_id": 643,
+        "pat": "pn3",
+        "smiles": "C1CN(P(N2CCOCC2)N2CCOCC2)CCO1",
+        "components": [
+            -5.172618865966797,
+            3.0665924549102783
+        ],
+        "dist": 17.882497633526512
+    },
+    {
+        "type": "pca",
+        "molecule_id": 247,
+        "pat": "pcn",
+        "smiles": "CCN(CC)P(CC)N(CC)CC",
+        "components": [
+            -5.852454662322998,
+            1.0142494440078735
+        ],
+        "dist": 18.012531191155947
+    },
+    {
+        "type": "pca",
+        "molecule_id": 472,
+        "pat": "pn3",
+        "smiles": "C1CCN(P(N2CCCC2)N2CCCC2)C1",
+        "components": [
+            -6.058585643768311,
+            1.133285641670227
+        ],
+        "dist": 18.238332481364687
+    },
+    {
+        "type": "pca",
+        "molecule_id": 59,
+        "pat": "pcn",
+        "smiles": "CN(C)P(c1ccccc1)N(C)C",
+        "components": [
+            -5.8696722984313965,
+            2.043715238571167
+        ],
+        "dist": 18.261277961786224
+    },
+    {
+        "type": "pca",
+        "molecule_id": 138,
+        "pat": "pco",
+        "smiles": "COP(c1ccccc1)c1ccccc1",
+        "components": [
+            -6.153496742248535,
+            1.5220789909362793
+        ],
+        "dist": 18.413516853514533
+    },
+    {
+        "type": "pca",
+        "molecule_id": 1012,
+        "pat": "phal",
+        "smiles": "FP(c1ccccc1)c1ccccc1",
+        "components": [
+            -7.071224689483643,
+            1.8880680799484253
+        ],
+        "dist": 19.39013571403849
+    },
+    {
+        "type": "pca",
+        "molecule_id": 144,
+        "pat": "pco",
+        "smiles": "CCOP(OCC)c1ccccc1",
+        "components": [
+            -7.585164546966553,
+            2.954246282577514
+        ],
+        "dist": 20.155854831208448
+    },
+    {
+        "type": "pca",
+        "molecule_id": 577,
+        "pat": "pn3",
+        "smiles": "c1ccn(P(n2cccc2)n2cccc2)c1",
+        "components": [
+            -7.615025043487549,
+            4.107725620269775
+        ],
+        "dist": 20.529592747726408
+    },
+    {
+        "type": "pca",
+        "molecule_id": 128,
+        "pat": "pn3",
+        "smiles": "CN(C)P(N(C)C)N(C)C",
+        "components": [
+            -9.219647407531738,
+            3.054547071456909
+        ],
+        "dist": 21.758281441919966
+    },
+    {
+        "type": "pca",
+        "molecule_id": 143,
+        "pat": "pco",
+        "smiles": "COP(OC)c1ccccc1",
+        "components": [
+            -9.449973106384276,
+            3.283283233642578
+        ],
+        "dist": 22.040407060177134
+    },
+    {
+        "type": "pca",
+        "molecule_id": 1011,
+        "pat": "phal",
+        "smiles": "CC(C)(C)P(F)C(C)(C)C",
+        "components": [
+            -10.35232162475586,
+            3.848907709121704
+        ],
+        "dist": 23.062427011826813
+    },
+    {
+        "type": "pca",
+        "molecule_id": 452,
+        "pat": "other",
+        "smiles": "CSP(SC)SC",
+        "components": [
+            -10.970491409301758,
+            2.8566644191741943
+        ],
+        "dist": 23.40765909679669
+    },
+    {
+        "type": "pca",
+        "molecule_id": 565,
+        "pat": "other",
+        "smiles": "CSP(C)SC",
+        "components": [
+            -12.89738941192627,
+            1.2241554260253906
+        ],
+        "dist": 24.987584281859007
+    },
+    {
+        "type": "pca",
+        "molecule_id": 1287,
+        "pat": "phal",
+        "smiles": "FP(F)c1ccccc1",
+        "components": [
+            -12.83592700958252,
+            5.026537895202637
+        ],
+        "dist": 25.77920108185206
+    },
+    {
+        "type": "pca",
+        "molecule_id": 1289,
+        "pat": "phal",
+        "smiles": "CN(C)P(F)N(C)C",
+        "components": [
+            -13.671655654907228,
+            4.942412853240967
+        ],
+        "dist": 26.555195104626467
+    },
+    {
+        "type": "pca",
+        "molecule_id": 524,
+        "pat": "pn3",
+        "smiles": "O=C=NP(N=C=O)N=C=O",
+        "components": [
+            -14.681839942932127,
+            5.532557964324951
+        ],
+        "dist": 27.692355373988146
+    },
+    {
+        "type": "pca",
+        "molecule_id": 1285,
+        "pat": "phal",
+        "smiles": "CCP(F)CC",
+        "components": [
+            -15.705862998962402,
+            1.1462000608444214
+        ],
+        "dist": 27.756443857366083
+    },
+    {
+        "type": "pca",
+        "molecule_id": 1288,
+        "pat": "phal",
+        "smiles": "CC(C)(C)P(F)F",
+        "components": [
+            -15.963048934936523,
+            5.946713447570801
+        ],
+        "dist": 29.03867228661614
+    },
+    {
+        "type": "pca",
+        "molecule_id": 1283,
+        "pat": "phal",
+        "smiles": "CP(C)F",
+        "components": [
+            -19.031980514526367,
+            1.2622768878936768
+        ],
+        "dist": 31.07004093109677
+    },
+    {
+        "type": "pca",
+        "molecule_id": 1286,
+        "pat": "phal",
+        "smiles": "CCP(F)F",
+        "components": [
+            -19.82457160949707,
+            5.981271743774414
+        ],
+        "dist": 32.759394738881596
+    },
+    {
+        "type": "pca",
+        "molecule_id": 1290,
+        "pat": "phal",
+        "smiles": "CN(C)P(F)F",
+        "components": [
+            -19.96812057495117,
+            7.021976947784424
+        ],
+        "dist": 33.18335862244024
+    },
+    {
+        "type": "pca",
+        "molecule_id": 1284,
+        "pat": "phal",
+        "smiles": "CP(F)F",
+        "components": [
+            -21.349613189697266,
+            5.817772388458252
+        ],
+        "dist": 34.193606299410376
+    }
+]
