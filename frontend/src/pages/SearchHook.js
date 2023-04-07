@@ -98,23 +98,26 @@ export default function SearchHook () {
 
     // Call back function to get the smiles and SMARTS from ketcher
     const ketcherCallBack = (newState) => {
-        // Set the smiles and SMARTS for the current molecule
-        setSmiles(newState[0]);
-        setSMARTS(newState[1]);
 
-        // This came from ketcher
-        setFromKetcher(true);
-        
-        if (representation === "smiles"){
-            setSearch(newState[0]);
-        }
-        else if (representation === "SMARTS"){
-            setSearch(newState[1]);
-        }
-        setToggleRepresentation(true);
+        if (newState[0] != '') {
+          // Set the smiles and SMARTS for the current molecule
+          setSmiles(newState[0]);
+          setSMARTS(newState[1]);
 
-        // Perform search with new structure.
-        newSearch();
+          // This came from ketcher
+          setFromKetcher(true);
+          
+          if (representation === "smiles"){
+              setSearch(newState[0]);
+          }
+          else if (representation === "SMARTS"){
+              setSearch(newState[1]);
+          }
+          setToggleRepresentation(true);
+
+          // Perform search with new structure.
+          newSearch();
+        }
       };
       
     
