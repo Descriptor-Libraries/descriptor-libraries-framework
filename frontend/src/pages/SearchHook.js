@@ -21,10 +21,10 @@ const Item = styled(Paper)(({ theme }) => ({
     color: theme.palette.text.secondary,
   }));
 
-async function substructureSearch(substructure, limit=48, skip=0) {
+async function substructureSearch(substructure, limit=48, skip=0, signal) {
     let encoded = encodeURIComponent(substructure);
     
-    const response =  await fetch(`/api/molecules/search/?substructure=${encoded}&skip=${skip}&limit=${limit}`)
+    const response =  await fetch(`/api/molecules/search/?substructure=${encoded}&skip=${skip}&limit=${limit}`, {signal: signal})
 
     if (!response.ok) {
         throw new Error('invalid smiles')
@@ -35,11 +35,11 @@ async function substructureSearch(substructure, limit=48, skip=0) {
     }
 }
 
-async function retrieveSVG( smiles, substructure ) {
+async function retrieveSVG( smiles, substructure, signal ) {
     let encoded = encodeURIComponent(smiles);
     let encodedSub = encodeURIComponent(substructure);
 
-    const response = await fetch(`/depict/cow/svg?smi=${encoded}&sma=${encodedSub}&zoom=1.25&w=50&h=50`);
+    const response = await fetch(`/depict/cow/svg?smi=${encoded}&sma=${encodedSub}&zoom=1.25&w=50&h=50`, {signal: signal});
 
     const svg = await response.text();
     let result = {}
@@ -150,18 +150,18 @@ export default function SearchHook () {
         setSearchToggle(!searchToggle);
     }
  
-    function loadImages() {
+    function loadImages(signal) {
 
         const fetchData = async () => {
-            const molecule_data = await substructureSearch(searchString, interval, skip);
-            const svg_data = await retrieveAllSVGs(molecule_data, searchString);
+            const molecule_data = await substructureSearch(searchString, interval, skip, signal);
+            const svg_data = await retrieveAllSVGs(molecule_data, searchString, signal);
 
             return [ molecule_data, svg_data ]
         }
 
         fetchData()
         .catch( (error) => {
-            console.log(error) 
+            console.log(error)
             setValidSmiles(false);
             setResults([]);
             setSVGResults([])
@@ -189,8 +189,15 @@ export default function SearchHook () {
 
     // initial load of data
     // and load when search changes. 
-    useEffect( ( ) => { 
-        loadImages() 
+    useEffect( ( ) => {
+        const controller = new AbortController();
+        const signal = controller.signal;
+
+        loadImages(signal);
+        
+        return () => {
+          controller.abort();
+        }
       },
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [ searchToggle ] 
