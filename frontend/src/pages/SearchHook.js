@@ -93,7 +93,6 @@ export default function SearchHook () {
     const [ representation, setRepresentation ] = useState("smiles");
     const [ toggleRepresentation, setToggleRepresentation ] = useState(true);
     const [ switchCheck, setSwitchCheck ] = useState(true);
-    const [ketcherToggle, setKetcherToggle] = useState(true);
     const [fromKetcher, setFromKetcher] = useState(false);
 
 
@@ -105,9 +104,7 @@ export default function SearchHook () {
 
         // This came from ketcher
         setFromKetcher(true);
-
-        // Need new search here or else ghost images persist after loading more images and drawing a new molecule
-        newSearch();
+        
         if (representation === "smiles"){
             setSearch(newState[0]);
         }
@@ -116,8 +113,8 @@ export default function SearchHook () {
         }
         setToggleRepresentation(true);
 
-        // Just toggle this to trigger new search
-        setKetcherToggle(!ketcherToggle);
+        // Perform search with new structure.
+        newSearch();
       };
       
     
@@ -139,6 +136,7 @@ export default function SearchHook () {
         setSkip(skip => skip + interval);
         setSearchPage( searchPage => searchPage + 1);
         setIsLoadingMore(true);
+        setSearchToggle(!searchToggle)
     }
 
     function newSearch() {
@@ -189,18 +187,17 @@ export default function SearchHook () {
 
     }
 
-    // initial load of data 
+    // initial load of data
+    // and load when search changes. 
     useEffect( ( ) => { 
-        loadImages() }, 
-
+        loadImages() 
+      },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [ searchPage, searchToggle, ketcherToggle ] 
+        [ searchToggle ] 
     );
 
     // Update searchString if representation changes
     useEffect(() => {
-        // Need new search here or else ghost images persist after clicking load more and then switching representations
-        newSearch();
         if (representation === "smiles"){
             setSearch(smiles);
         }
