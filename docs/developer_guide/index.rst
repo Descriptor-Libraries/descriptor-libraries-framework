@@ -10,3 +10,4 @@ can set up your local machine to develop for the app.
 
    environment
    architecture_overview
+   substructure_search

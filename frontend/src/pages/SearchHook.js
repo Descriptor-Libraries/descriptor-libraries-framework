@@ -21,10 +21,10 @@ const Item = styled(Paper)(({ theme }) => ({
     color: theme.palette.text.secondary,
   }));
 
-async function substructureSearch(substructure, limit=48, skip=0) {
+async function substructureSearch(substructure, limit=48, skip=0, signal) {
     let encoded = encodeURIComponent(substructure);
     
-    const response =  await fetch(`/api/molecules/search/?substructure=${encoded}&skip=${skip}&limit=${limit}`)
+    const response =  await fetch(`/api/molecules/search/?substructure=${encoded}&skip=${skip}&limit=${limit}`, {signal: signal})
 
     if (!response.ok) {
         throw new Error('invalid smiles')
@@ -35,11 +35,11 @@ async function substructureSearch(substructure, limit=48, skip=0) {
     }
 }
 
-async function retrieveSVG( smiles, substructure ) {
+async function retrieveSVG( smiles, substructure, signal ) {
     let encoded = encodeURIComponent(smiles);
     let encodedSub = encodeURIComponent(substructure);
 
-    const response = await fetch(`/depict/cow/svg?smi=${encoded}&sma=${encodedSub}&zoom=1.25&w=50&h=50`);
+    const response = await fetch(`/depict/cow/svg?smi=${encoded}&sma=${encodedSub}&zoom=1.25&w=50&h=50`, {signal: signal});
 
     const svg = await response.text();
     let result = {}
@@ -93,31 +93,31 @@ export default function SearchHook () {
     const [ representation, setRepresentation ] = useState("smiles");
     const [ toggleRepresentation, setToggleRepresentation ] = useState(true);
     const [ switchCheck, setSwitchCheck ] = useState(true);
-    const [ketcherToggle, setKetcherToggle] = useState(true);
     const [fromKetcher, setFromKetcher] = useState(false);
 
 
     // Call back function to get the smiles and SMARTS from ketcher
     const ketcherCallBack = (newState) => {
-        // Set the smiles and SMARTS for the current molecule
-        setSmiles(newState[0]);
-        setSMARTS(newState[1]);
 
-        // This came from ketcher
-        setFromKetcher(true);
+        if (newState[0] != '') {
+          // Set the smiles and SMARTS for the current molecule
+          setSmiles(newState[0]);
+          setSMARTS(newState[1]);
 
-        // Need new search here or else ghost images persist after loading more images and drawing a new molecule
-        newSearch();
-        if (representation === "smiles"){
-            setSearch(newState[0]);
+          // This came from ketcher
+          setFromKetcher(true);
+          
+          if (representation === "smiles"){
+              setSearch(newState[0]);
+          }
+          else if (representation === "SMARTS"){
+              setSearch(newState[1]);
+          }
+          setToggleRepresentation(true);
+
+          // Perform search with new structure.
+          newSearch();
         }
-        else if (representation === "SMARTS"){
-            setSearch(newState[1]);
-        }
-        setToggleRepresentation(true);
-
-        // Just toggle this to trigger new search
-        setKetcherToggle(!ketcherToggle);
       };
       
     
@@ -126,12 +126,16 @@ export default function SearchHook () {
       if (event === true) {
         setRepresentation("smiles");
         setSwitchCheck(true);
+        setSearch(smiles);
       }
       // Remove label otherwise
       else {
         setRepresentation("SMARTS");
         setSwitchCheck(false);
+        setSearch(SMARTS);
       }
+
+      newSearch();
     }
     
     // loadmore
@@ -139,6 +143,7 @@ export default function SearchHook () {
         setSkip(skip => skip + interval);
         setSearchPage( searchPage => searchPage + 1);
         setIsLoadingMore(true);
+        setSearchToggle(!searchToggle)
     }
 
     function newSearch() {
@@ -152,18 +157,18 @@ export default function SearchHook () {
         setSearchToggle(!searchToggle);
     }
  
-    function loadImages() {
+    function loadImages(signal) {
 
         const fetchData = async () => {
-            const molecule_data = await substructureSearch(searchString, interval, skip);
-            const svg_data = await retrieveAllSVGs(molecule_data, searchString);
+            const molecule_data = await substructureSearch(searchString, interval, skip, signal);
+            const svg_data = await retrieveAllSVGs(molecule_data, searchString, signal);
 
             return [ molecule_data, svg_data ]
         }
 
         fetchData()
         .catch( (error) => {
-            console.log(error) 
+            console.log(error)
             setValidSmiles(false);
             setResults([]);
             setSVGResults([])
@@ -189,18 +194,24 @@ export default function SearchHook () {
 
     }
 
-    // initial load of data 
-    useEffect( ( ) => { 
-        loadImages() }, 
+    // initial load of data
+    // and load when search changes. 
+    useEffect( ( ) => {
+        const controller = new AbortController();
+        const signal = controller.signal;
 
+        loadImages(signal);
+        
+        return () => {
+          controller.abort();
+        }
+      },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [ searchPage, searchToggle, ketcherToggle ] 
+        [ searchToggle ] 
     );
 
     // Update searchString if representation changes
     useEffect(() => {
-        // Need new search here or else ghost images persist after clicking load more and then switching representations
-        newSearch();
         if (representation === "smiles"){
             setSearch(smiles);
         }
