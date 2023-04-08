@@ -297,7 +297,6 @@ export default function NeighborSearchHook () {
       /**
        * Loads more neighbors into the UI. 
        */
-        console.log("calling loadMore");
         setSkip(skip => skip + interval);
         setSearchPage(searchPage => searchPage + 1);
         setIsLoadingMore(true);
@@ -307,7 +306,6 @@ export default function NeighborSearchHook () {
       /**
        * Searches for new neighbors. Resets alot of the props to their original state.
        */
-       console.log("calling newSearch and clearing previous data out")
         setSkip(0);
         setSearchPage(1);
         setSVGResults([]);
@@ -370,21 +368,8 @@ export default function NeighborSearchHook () {
 
     // If any parameters change, we must set updatedParameters to true.
     useEffect(() => {
-      console.log("Updated from component array");
       setUpdatedParameters(true);
-    }, [componentArrayForm])
-
-    // If any parameters change, we must set updatedParameters to true.
-    useEffect(() => {
-      console.log("Updated from type");
-      setUpdatedParameters(true);
-    }, [type])
-
-    // If any parameters change, we must set updatedParameters to true.
-    useEffect(() => {
-      console.log("Updated from molecule id");
-      setUpdatedParameters(true);
-    }, [moleculeid])
+    }, [moleculeid, type, componentArrayForm])
 
     // This use effect fires when we are loading more data on a previous search
     useEffect(() => {
@@ -402,7 +387,6 @@ export default function NeighborSearchHook () {
       // This effect runs whenever any of the 5 states changes
       // Check if all 5 states have the desired values
       if (skip === 0 && searchPage === 1 && isLoading === true && svg_results.length === 0 && molData.length === 0) {
-        console.log("initial load");
         // Set updated parameters to false, since we are making a new search and would not have updated any parameters.
         setUpdatedParameters(false);
         // Call the function that requires updated states
@@ -454,7 +438,7 @@ export default function NeighborSearchHook () {
             { !isLoading && !validMolecule && Object.keys(molData).length == 0 && <Typography>No results found for Molecule ID.</Typography> } 
             </Box>
             <Box>
-            {/* If molecule is valid and there is mol data and the number of components is 2, then generate the graph based on the data*/}
+            {/* If molecule is valid and showGraph is true, then generate the graph based on the data*/}
             { !isLoading && validMolecule && Object.keys(molData).length > 0 && showGraph && <Container sx={{ display: 'flex', height: 750}}>{ Graph() }</Container> } 
             </Box>
             <Box sx={{ display: 'flex' }}>
