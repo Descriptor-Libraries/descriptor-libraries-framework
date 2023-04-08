@@ -135,6 +135,7 @@ export default function NeighborSearchHook () {
     const [ molData, setMolData] = useState([]);
     const [ componentArrayForm, setComponentArrayForm ] = useState(["1", "2"]);
     const [ updatedParameters, setUpdatedParameters ] = useState(true);
+    const [ showGraph, setShowGraph ] = useState(true);
 
     // Plotting functions to show molecules on hover
     function showSVGWindow(svg, event) {
@@ -354,6 +355,14 @@ export default function NeighborSearchHook () {
             setIsLoading(false);
             setIsLoadingMore(false);
             setValidMolecule(true);
+
+            if (componentArrayForm.length == 2){
+              setShowGraph(true);
+            }
+            else {
+              setShowGraph(false);
+            }
+
             console.log("Data fetch donezo");
           })
 
@@ -373,7 +382,7 @@ export default function NeighborSearchHook () {
 
     // If any parameters change, we must set updatedParameters to true.
     useEffect(() => {
-      console.log("Updated from component array");
+      console.log("Updated from molecule id");
       setUpdatedParameters(true);
     }, [moleculeid])
 
@@ -446,7 +455,7 @@ export default function NeighborSearchHook () {
             </Box>
             <Box>
             {/* If molecule is valid and there is mol data and the number of components is 2, then generate the graph based on the data*/}
-            { !isLoading && validMolecule && Object.keys(molData).length > 0 && (componentArrayForm.length == 2 || updatedParameters) && <Container sx={{ display: 'flex', height: 750}}>{ Graph() }</Container> } 
+            { !isLoading && validMolecule && Object.keys(molData).length > 0 && showGraph && <Container sx={{ display: 'flex', height: 750}}>{ Graph() }</Container> } 
             </Box>
             <Box sx={{ display: 'flex' }}>
             {/* If molecule is valid and there is svg data, then generate the images of the molecules*/}
