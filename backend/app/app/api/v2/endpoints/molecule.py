@@ -190,6 +190,10 @@ def search_neighbors(
     if molecule_id > max_molecule_id:
         raise HTTPException(status_code=404, detail=f"Molecule with ID supplied not found, the maximum ID is {max_molecule_id}")
     
+    # Check to see if the molecule_id is within range.
+    if molecule_id <= 0:
+        raise HTTPException(status_code=500)
+    
     # Check for valid neighbor type.
     if type not in ["pca", "umap"]:
         raise HTTPException(status_code=400, detail="Invalid neighbor type.")

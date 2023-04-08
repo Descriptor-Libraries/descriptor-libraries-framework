@@ -320,9 +320,6 @@ export default function NeighborSearchHook () {
        * Main driver function which loads the neighbors for a molecule requested by the user.
        * 
        */
-        console.log("calling neighbors");
-        console.log("Skip: ", skip);
-        console.log("Search Page: ", searchPage);
         const fetchData = async () => {
             const molecule_data = await NeighborSearch(moleculeid, type, arrayToString(componentArrayForm), interval, skip);
             const svg_data = await retrieveAllSVGs(molecule_data);
@@ -360,10 +357,7 @@ export default function NeighborSearchHook () {
             else {
               setShowGraph(false);
             }
-
-            console.log("Data fetch donezo");
           })
-
     }
 
     // If any parameters change, we must set updatedParameters to true.
