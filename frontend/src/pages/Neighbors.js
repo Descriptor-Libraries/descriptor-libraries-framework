@@ -306,7 +306,7 @@ export default function NeighborSearchHook () {
       /**
        * Searches for new neighbors. Resets alot of the props to their original state.
        */
-       console.log("calling newSearch and clearing shit out")
+       console.log("calling newSearch and clearing previous data out")
         setSkip(0);
         setSearchPage(1);
         setSVGResults([]);
