@@ -405,6 +405,7 @@ export default function NeighborSearchHook () {
         <Container maxWidth="lg">
         <h2>Neighbor Search</h2>
         <TextField 
+                  disabled={isLoadingMore || isLoading}
                   style = {{width: 350}}
                   sx={{ m: 0.5}}
                   id="search-outline" 
@@ -415,6 +416,7 @@ export default function NeighborSearchHook () {
                   InputProps={{endAdornment: (isLoadingMore || isLoading) ? <CircularProgress/> : <Button onClick={ () => newSearch() } >Search</Button>}}
         />
         <TextField
+            disabled={isLoadingMore || isLoading}
             sx={{ m: 0.5 }}
             select
             id="dimension-outline"
@@ -425,15 +427,15 @@ export default function NeighborSearchHook () {
             <MenuItem value={"umap"}>UMAP</MenuItem>
         </TextField>
         {type == "pca" && <FormGroup sx={{position: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
-                          <FormControlLabel control={<Checkbox defaultChecked value={"1"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="1" />
-                          <FormControlLabel control={<Checkbox defaultChecked value={"2"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="2" />
-                          <FormControlLabel control={<Checkbox onChange = {event => buildComponentArray(event.target.checked, "3")}/>} label="3" />
-                          <FormControlLabel control={<Checkbox onChange = {event => buildComponentArray(event.target.checked, "4")}/>} label="4" />
+                          <FormControlLabel disabled={isLoadingMore || isLoading} control={<Checkbox defaultChecked value={"1"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="1" />
+                          <FormControlLabel disabled={isLoadingMore || isLoading} control={<Checkbox defaultChecked value={"2"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="2" />
+                          <FormControlLabel disabled={isLoadingMore || isLoading} control={<Checkbox onChange = {event => buildComponentArray(event.target.checked, "3")}/>} label="3" />
+                          <FormControlLabel disabled={isLoadingMore || isLoading} control={<Checkbox onChange = {event => buildComponentArray(event.target.checked, "4")}/>} label="4" />
                         </FormGroup>
         }
         {type == "umap" && <FormGroup sx={{position: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
-                          <FormControlLabel control={<Checkbox defaultChecked value={"1"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="1" />
-                          <FormControlLabel control={<Checkbox defaultChecked value={"2"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="2" />
+                          <FormControlLabel disabled={isLoadingMore || isLoading} control={<Checkbox defaultChecked value={"1"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="1" />
+                          <FormControlLabel disabled={isLoadingMore || isLoading} control={<Checkbox defaultChecked value={"2"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="2" />
                         </FormGroup>
         }
         { (isLoadingMore || isLoading) ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <ThemeProvider theme={theme}> <Button disabled={updatedParameters} variant="contained" sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> </ThemeProvider>}
