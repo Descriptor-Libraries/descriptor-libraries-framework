@@ -3,6 +3,7 @@ import Plot from 'react-plotly.js';
 
 export default function Graph({ molData, componentArray, neighborSearch }){
 
+    const symbols = [0, 1, 2, 13, 14, 15, 16, 17, 18]
     // Still need to be genericized
     const axis_dict = {"pca1": "pc1", "pca2": "pc2", "pca3": "pc3", "pca4": "pc4", "umap1": "umap1", "umap2": "umap2"};
     const pattern_dict = {"pc3": "P[C]<sub>3</sub>", 
@@ -61,22 +62,6 @@ export default function Graph({ molData, componentArray, neighborSearch }){
     }
     }
     
-    function extractPattern(molData) {
-        let patterns = new Set(molData.filter(obj => obj.hasOwnProperty("pat")).map(obj => obj["pat"]));
-        return patterns;
-    }
-
-    let pats = extractPattern(molData);
-
-    // Shifting the data by 1, to avoid overwriting the target of the search if we are plotting a neighbor search.
-    let values;
-    if (neighborSearch) {
-        values = molData.slice(1);
-    }
-    else {
-        values = molData;
-    }
-
     /**
      * Creates plotly react graph object.
      * The x and y labels are mapped to the axis dictionary to write pc1 instead of pca1.
@@ -114,6 +99,24 @@ export default function Graph({ molData, componentArray, neighborSearch }){
                     } }
                 />
     
+    let values;
+    
+    // Shifting the data by 1, to avoid overwriting the target of the search if we are plotting a neighbor search.
+    if (neighborSearch) {
+        values = molData.slice(1);
+    }
+    else {
+        values = molData;
+    }
+    
+    function extractPatterns(molData) {
+        let patterns = new Set(molData.filter(obj => obj.hasOwnProperty("pat")).map(obj => obj["pat"]));
+        return patterns;
+    }
+
+    let pats = extractPatterns(molData);
+
+    // Fill in data for the graph
     // Loop over all the patterns we have to add them as elements to that data props.
     pats.forEach(function(element) {
         myPlot.props.data.push(                        
@@ -126,8 +129,10 @@ export default function Graph({ molData, componentArray, neighborSearch }){
                 hovermode: "closest",
                 type: 'scatter',
                 mode: 'markers',
-                marker: {color: 'SlateGrey', size: 12 ,
-                        symbol: 'triangle-down', 
+                marker: {size: 12 ,
+                        // Randomly assigning symbols from the designated ones above
+                        // This causes the symbols to change on data load, which is not bueno.
+                        symbol: symbols[Math.floor(Math.random() * symbols.length)],
                         line: {
                             width: 2,
                             color: 'DarkSlateGrey'}},
