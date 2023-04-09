@@ -3,8 +3,18 @@ import Plot from 'react-plotly.js';
 
 export default function Graph({ molData, componentArray, neighborSearch }){
 
+    // Still need to be genericized
     const axis_dict = {"pca1": "pc1", "pca2": "pc2", "pca3": "pc3", "pca4": "pc4", "umap1": "umap1", "umap2": "umap2"};
-    
+    const pattern_dict = {"pc3": "P[C]<sub>3</sub>", 
+                        "pn3": "P[N]<sub>3</sub>", 
+                        "po3": "P[O]<sub>3</sub>", 
+                        "pcn": "P[C]<sub>n</sub>[N]<sub>m</sub>", 
+                        "phal": "PF<sub>n</sub>[R]<sub>m</sub>", 
+                        "pon": "P[O]<sub>n</sub>[N]<sub>m</sub>", 
+                        "pco": "P[C]<sub>n</sub>[O]<sub>m</sub>", 
+                        "psi": "P[S]<sub>n</sub>[I]<sub>m</sub>", 
+                        "other": "other"}
+
     // Plotting functions to show molecules on hover
     function showSVGWindow(svg, event) {
     /**
@@ -51,11 +61,14 @@ export default function Graph({ molData, componentArray, neighborSearch }){
     }
     }
     
-    /**
-     * Generates plotly react graph.
-     * The x and y labels are mapped to the axis dictionary to write pc1 instead of pca1.
-     */
-    // Shifting the data by 1, to avoid overwriting the target of the search if we need it.
+    function extractPattern(molData) {
+        let patterns = new Set(molData.filter(obj => obj.hasOwnProperty("pat")).map(obj => obj["pat"]));
+        return patterns;
+    }
+
+    let pats = extractPattern(molData);
+
+    // Shifting the data by 1, to avoid overwriting the target of the search if we are plotting a neighbor search.
     let values;
     if (neighborSearch) {
         values = molData.slice(1);
@@ -64,170 +77,18 @@ export default function Graph({ molData, componentArray, neighborSearch }){
         values = molData;
     }
 
+    /**
+     * Creates plotly react graph object.
+     * The x and y labels are mapped to the axis dictionary to write pc1 instead of pca1.
+     */
     let myPlot = <Plot 
                     onHover={ (event) => showSVG(event) } 
                     onUnhover={ (event)=> hideSVG(event) } 
                     style={{'width': '100%', 'height': '100%' }}
                     useResizeHandler={true}
-
-                    // Starting data generation
-                    data={[
-                        // Creating the data series for the values, by type
-                        // pc3
-                        {
-                            x: values.map( row => {if (row.pat == "pc3") { return row.components[0] } }),
-                            y: values.map( row => {if (row.pat == "pc3") { return row.components[1] } }),
-                            text: values.map( row => { return encodeURIComponent(row.smiles) }),
-                            hovertemplate: "( %{x}, %{y})",
-                            hovermode: "closest",
-                            type: 'scatter',
-                            mode: 'markers',
-                            marker: {color: 'SlateGrey', size: 12 ,
-                                    symbol: 'triangle-down', 
-                                    line: {
-                                        width: 2,
-                                        color: 'DarkSlateGrey'}},
-                            name: 'P[C]<sub>3</sub>',
-                            showlegend: values.some((element) => element.pat == "pc3")
-                        },
-                        // pn3
-                        {
-                            x: values.map( row => {if (row.pat == "pn3") { return row.components[0] } }),
-                            y: values.map( row => {if (row.pat == "pn3") { return row.components[1] } }),
-                            text: values.map( row => { return encodeURIComponent(row.smiles) }),
-                            hovertemplate: "( %{x}, %{y})",
-                            hovermode: "closest",
-                            type: 'scatter',
-                            mode: 'markers',
-                            marker: {color: 'blue', size: 12,
-                                    symbol: 'circle',
-                                    line: {
-                                    width: 2,
-                                    color: 'DarkSlateGrey'}},
-                            name: 'P[N]<sub>3</sub>',
-                            showlegend: values.some((element) => element.pat == "pn3")
-                        },
-                        // po3
-                        {
-                            x: values.map( row => {if (row.pat == "po3") { return row.components[0] } }),
-                            y: values.map( row => {if (row.pat == "po3") { return row.components[1] } }),
-                            text: values.map( row => { return encodeURIComponent(row.smiles) }),
-                            hovertemplate: "( %{x}, %{y})",
-                            hovermode: "closest",
-                            type: 'scatter',
-                            mode: 'markers',
-                            marker: {color: 'yellow', size: 12 , 
-                                    symbol: "triangle-down",
-                                    line: {
-                                        width: 2,
-                                        color: 'DarkSlateGrey'}},
-                            name: 'P[O]<sub>3</sub>',
-                            showlegend: values.some((element) => element.pat == "po3")
-                        },
-                        // pcn
-                        {
-                            x: values.map( row => {if (row.pat == "pcn") { return row.components[0] } }),
-                            y: values.map( row => {if (row.pat == "pcn") { return row.components[1] } }),
-                            text: values.map( row => { return encodeURIComponent(row.smiles) }),
-                            hovertemplate: "( %{x}, %{y})",
-                            hovermode: "closest",
-                            type: 'scatter',
-                            mode: 'markers',
-                            marker: {color: 'DarkBlue', size: 12,
-                                    symbol: 'hexagon',
-                                    line: {
-                                    width: 2,
-                                    color: 'DarkSlateGrey'}},
-                            name: 'P[C]<sub>n</sub>[N]<sub>m</sub>',
-                            showlegend: values.some((element) => element.pat == "pcn")
-                        },
-                        // phal
-                        {
-                            x: values.map( row => {if (row.pat == "phal") { return row.components[0] } }),
-                            y: values.map( row => {if (row.pat == "phal") { return row.components[1] } }),
-                            text: values.map( row => { return encodeURIComponent(row.smiles) }),
-                            hovertemplate: "( %{x}, %{y})",
-                            hovermode: "closest",
-                            type: 'scatter',
-                            mode: 'markers',
-                            marker: {color: 'LimeGreen', size: 12,
-                                    symbol: 'hexagon2',
-                                    line: {
-                                    width: 2,
-                                    color: 'DarkSlateGrey'}},
-                            name: 'PF<sub>n</sub>[R]<sub>m</sub>',
-                            showlegend: values.some((element) => element.pat == "phal")
-                        },
-                        // pon
-                        {
-                            x: values.map( row => {if (row.pat == "pon") { return row.components[0] } }),
-                            y: values.map( row => {if (row.pat == "pon") { return row.components[1] } }),
-                            text: values.map( row => { return encodeURIComponent(row.smiles) }),
-                            hovertemplate: "( %{x}, %{y})",
-                            hovermode: "closest",
-                            type: 'scatter',
-                            mode: 'markers',
-                            marker: {color: 'orange', size: 12,
-                                    symbol: 'circle',
-                                    line: {
-                                    width: 2,
-                                    color: 'DarkSlateGrey'}},
-                            name: 'P[O]<sub>n</sub>[N]<sub>m</sub>',
-                            showlegend: values.some((element) => element.pat == "pon")
-                        },
-                        // pco
-                        {
-                            x: values.map( row => {if (row.pat == "pco") { return row.components[0] } }),
-                            y: values.map( row => {if (row.pat == "pco") { return row.components[1] } }),
-                            text: values.map( row => { return encodeURIComponent(row.smiles) }),
-                            hovertemplate: "( %{x}, %{y})",
-                            hovermode: "closest",
-                            type: 'scatter',
-                            mode: 'markers',
-                            marker: {color: 'purple', size: 12,
-                                    symbol: 'triangle-down',
-                                    line: {
-                                    width: 2,
-                                    color: 'DarkSlateGrey'}},
-                            name: 'P[C]<sub>n</sub>[O]<sub>m</sub>',
-                            showlegend: values.some((element) => element.pat == "pco")
-                        },
-                        // psi
-                        {
-                            x: values.map( row => {if (row.pat == "psi") { return row.components[0] } }),
-                            y: values.map( row => {if (row.pat == "psi") { return row.components[1] } }),
-                            text: values.map( row => { return encodeURIComponent(row.smiles) }),
-                            hovertemplate: "( %{x}, %{y})",
-                            hovermode: "closest",
-                            type: 'scatter',
-                            mode: 'markers',
-                            marker: {color: 'pink', size: 12,
-                                    symbol: 'hexagon2',
-                                    line: {
-                                    width: 2,
-                                    color: 'DarkSlateGrey'}},
-                            name: 'P[S]<sub>n</sub>[I]<sub>m</sub>',
-                            showlegend: values.some((element) => element.pat == "psi")
-                        },
-                        // other
-                        {
-                            x: values.map( row => {if (row.pat == "other") { return row.components[0] } }),
-                            y: values.map( row => {if (row.pat == "other") { return row.components[1] } }),
-                            text: values.map( row => { return encodeURIComponent(row.smiles) }),
-                            hovertemplate: "( %{x}, %{y})",
-                            hovermode: "closest",
-                            type: 'scatter',
-                            mode: 'markers',
-                            marker: {color: 'black', size: 12,
-                                    symbol: 'square',
-                                    line: {
-                                    width: 2,
-                                    color: 'DarkSlateGrey'}},
-                            name: 'Other',
-                            showlegend: values.some((element) => element.pat == "other")
-                        }
-                    ]}
-                    layout={ { 
+                    // Empty data to fill in later
+                    data={[]}
+                    layout={ {
                         autosize: true,
                         useResizeHandler: true,
                         style: {width: '100%', height: '100%'},
@@ -241,21 +102,44 @@ export default function Graph({ molData, componentArray, neighborSearch }){
                         }
                     },
 
-                    yaxis: {
-                        title: {
-                        text: axis_dict[molData[0].type + componentArray[1]],
-                        font: {
-                            size: 18,
-                            color: '#7f7f7f'
+                        yaxis: {
+                            title: {
+                            text: axis_dict[molData[0].type + componentArray[1]],
+                            font: {
+                                size: 18,
+                                color: '#7f7f7f'
+                            }
                         }
-                    }
                     }
                     } }
                 />
     
+    // Loop over all the patterns we have to add them as elements to that data props.
+    pats.forEach(function(element) {
+        myPlot.props.data.push(                        
+            // Creating the data series for each pattern
+            {
+                x: values.map( row => {if (row.pat == element) { return row.components[0] } }),
+                y: values.map( row => {if (row.pat == element) { return row.components[1] } }),
+                text: values.map( row => { return encodeURIComponent(row.smiles) }),
+                hovertemplate: "( %{x}, %{y})",
+                hovermode: "closest",
+                type: 'scatter',
+                mode: 'markers',
+                marker: {color: 'SlateGrey', size: 12 ,
+                        symbol: 'triangle-down', 
+                        line: {
+                            width: 2,
+                            color: 'DarkSlateGrey'}},
+                name: pattern_dict[element],
+            });
+        }
+    );
+
+    // If we are plotting a neighbor search, we need to add the target to the data of the plot.
     if (neighborSearch) {
         myPlot.props.data.push(                        
-        // Creating the data series for the target of the search
+        // Creating the data series for the target of the search using the first element in molData since that is the target
         {
         x: [molData[0].components[0]],
         y: [molData[0].components[1]],
@@ -270,7 +154,7 @@ export default function Graph({ molData, componentArray, neighborSearch }){
                     width: 2,
                     color: 'DarkSlateGrey'}},
         name: 'Target'
-        },)
+        });
     }
 
     return (
