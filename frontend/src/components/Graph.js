@@ -1,7 +1,15 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Plot from 'react-plotly.js';
 
+import { Container } from "@mui/material";
+import { TextField } from '@mui/material';
+import MenuItem from '@mui/material/MenuItem';
+
+
 export default function Graph({ molData, componentArray, type, neighborSearch }){
+
+    const [ xIndex, setXIndex ] = useState(0);
+    const [ yIndex, setYIndex ] = useState(1);
 
     const symbols = [0, 1, 2, 13, 14, 15, 16, 17, 18];
     // Still need to be genericized
@@ -66,7 +74,7 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
      * Creates plotly react graph object.
      * The x and y labels are mapped to the axis dictionary to write pc1 instead of pca1.
      */
-    let myPlot = <Plot 
+    let myPlot = <Plot
                     onHover={ (event) => showSVG(event) } 
                     onUnhover={ (event)=> hideSVG(event) } 
                     style={{'width': '100%', 'height': '100%' }}
@@ -79,7 +87,7 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
                         style: {width: '100%', height: '100%'},
                         xaxis: {
                         title: {
-                            text: axis_dict[type + componentArray[0]],
+                            text: axis_dict[type + componentArray[xIndex]],
                             font: {
                             size: 18,
                             color: '#7f7f7f'
@@ -89,7 +97,7 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
 
                         yaxis: {
                             title: {
-                            text: axis_dict[type + componentArray[1]],
+                            text: axis_dict[type + componentArray[yIndex]],
                             font: {
                                 size: 18,
                                 color: '#7f7f7f'
@@ -122,8 +130,8 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
         myPlot.props.data.push(                        
             // Creating the data series for each pattern
             {
-                x: values.map( row => {if (row.pat == element) { return row.components[0] } }),
-                y: values.map( row => {if (row.pat == element) { return row.components[1] } }),
+                x: values.map( row => {if (row.pat == element) { return row.components[xIndex] } }),
+                y: values.map( row => {if (row.pat == element) { return row.components[yIndex] } }),
                 text: values.map( row => { return encodeURIComponent(row.smiles) }),
                 hovertemplate: "( %{x}, %{y})",
                 hovermode: "closest",
@@ -163,6 +171,33 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
     }
 
     return (
-        myPlot
-        );
+        <Container style={{ height: '100%' }}>
+        <Container sx={{display: 'flex', flexDirection: "row", justifyContent: 'center'}}>
+            <TextField
+                id="dimension-outline"
+                value="HM"
+                label="x-axis"
+                select
+                style={{width: 250}}
+                sx={{ m: 0.5 }}
+            >
+                {componentArray.map(item => (
+                    <MenuItem value={item}>{axis_dict[type + item]}</MenuItem>
+                ))}
+            </TextField>
+            <TextField
+                id="dimension-outline"
+                value="HM"
+                label="y-axis"
+                select
+                style={{width: 250}}
+                sx={{ m: 0.5 }}
+            >
+                {componentArray.map(item => (
+                    <MenuItem value={item}>{axis_dict[type + item]}</MenuItem>
+                ))}
+            </TextField>
+      </Container>
+        {myPlot}
+      </Container>);
 }

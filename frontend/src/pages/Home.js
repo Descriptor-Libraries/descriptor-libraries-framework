@@ -8,7 +8,7 @@ function Home() {
    const [ components, setComponents ] = useState(["1", "2"]);
    const [ type, setType ] = useState("umap");
 
-   async function umap(type, components, limit=100) {
+   async function umap(type, components, limit=1000) {
       /**
        * Requests general umap data from the backend.
        * @param {string} type Type of dimensionality reduction. Can be one of PCA or UMAP.
