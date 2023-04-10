@@ -8,6 +8,7 @@ import MenuItem from '@mui/material/MenuItem';
 
 export default function Graph({ molData, componentArray, type, neighborSearch }){
 
+    // Set the x and y indices to the first 2 values in the component array.
     const [ xIndex, setXIndex ] = useState(0);
     const [ yIndex, setYIndex ] = useState(1);
 
@@ -175,28 +176,28 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
         <Container sx={{display: 'flex', flexDirection: "row", justifyContent: 'center'}}>
             <TextField
                 id="dimension-outline"
-                value={(xIndex + 1).toString()}
+                value={(xIndex).toString()}
                 label="x-axis"
                 select
                 style={{width: 250}}
                 sx={{ m: 0.5 }}
-                onChange={ function(event) {setXIndex(parseInt(event.target.value) - 1);}}
+                onChange={ function(event) {setXIndex(parseInt(event.target.value));}}
             >
-                {componentArray.map(item => (
-                    <MenuItem value={item}>{axis_dict[type + item]}</MenuItem>
+                {componentArray.map((item, index) => (
+                    <MenuItem value={index}>{axis_dict[type + item]}</MenuItem>
                 ))}
             </TextField>
             <TextField
                 id="dimension-outline"
-                value={(yIndex + 1).toString()}
+                value={(yIndex).toString()}
                 label="y-axis"
                 select
                 style={{width: 250}}
                 sx={{ m: 0.5 }}
-                onChange={ function(event) {setYIndex(parseInt(event.target.value) - 1);}}
+                onChange={ function(event) {setYIndex(parseInt(event.target.value));}}
             >
-                {componentArray.map(item => (
-                    <MenuItem value={item}>{axis_dict[type + item]}</MenuItem>
+                {componentArray.map((item, index) => (
+                    <MenuItem value={index}>{axis_dict[type + item]}</MenuItem>
                 ))}
             </TextField>
       </Container>
