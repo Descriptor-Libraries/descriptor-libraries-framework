@@ -175,11 +175,12 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
         <Container sx={{display: 'flex', flexDirection: "row", justifyContent: 'center'}}>
             <TextField
                 id="dimension-outline"
-                value="HM"
+                value={(xIndex + 1).toString()}
                 label="x-axis"
                 select
                 style={{width: 250}}
                 sx={{ m: 0.5 }}
+                onChange={ function(event) {setXIndex(parseInt(event.target.value) - 1);}}
             >
                 {componentArray.map(item => (
                     <MenuItem value={item}>{axis_dict[type + item]}</MenuItem>
@@ -187,11 +188,12 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
             </TextField>
             <TextField
                 id="dimension-outline"
-                value="HM"
+                value={(yIndex + 1).toString()}
                 label="y-axis"
                 select
                 style={{width: 250}}
                 sx={{ m: 0.5 }}
+                onChange={ function(event) {setYIndex(parseInt(event.target.value) - 1);}}
             >
                 {componentArray.map(item => (
                     <MenuItem value={item}>{axis_dict[type + item]}</MenuItem>
