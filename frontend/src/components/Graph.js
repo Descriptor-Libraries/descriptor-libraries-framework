@@ -176,7 +176,7 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
         <Container sx={{display: 'flex', flexDirection: "row", justifyContent: 'center'}}>
             <TextField
                 id="dimension-outline"
-                value={(xIndex).toString()}
+                value={xIndex}
                 label="x-axis"
                 select
                 style={{width: 250}}
@@ -189,7 +189,7 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
             </TextField>
             <TextField
                 id="dimension-outline"
-                value={(yIndex).toString()}
+                value={yIndex}
                 label="y-axis"
                 select
                 style={{width: 250}}
