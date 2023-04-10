@@ -294,7 +294,7 @@ export default function NeighborSearchHook () {
             </Box>
             <Box>
             {/* If molecule is valid and there is mol data and the number of components is 2, then generate the graph based on the data*/}
-            { !isLoading && validMolecule && Object.keys(molData).length > 0 && componentArrayForm.length == 2 && <Container sx={{ display: 'flex', height: 750}}>{ <Graph molData={molData} componentArray={componentArrayForm} type={type} neighborSearch={true}></Graph> }</Container> } 
+            { !isLoading && validMolecule && Object.keys(molData).length > 0 && <Container sx={{ display: 'flex', height: 750}}>{ <Graph molData={molData} componentArray={componentArrayForm} type={type} neighborSearch={true}></Graph> }</Container> } 
             </Box>
             <Box sx={{ display: 'flex' }}>
             {/* If molecule is valid and there is svg data, then generate the images of the molecules*/}

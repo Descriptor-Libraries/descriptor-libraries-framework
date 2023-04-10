@@ -154,8 +154,8 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
         myPlot.props.data.push(                        
         // Creating the data series for the target of the search using the first element in molData since that is the target
         {
-        x: [molData[0].components[0]],
-        y: [molData[0].components[1]],
+        x: [molData[0].components[xIndex]],
+        y: [molData[0].components[yIndex]],
         text: [encodeURIComponent(molData[0].smiles)],
         hovertemplate: "( %{x}, %{y})",
         hovermode: "closest",
