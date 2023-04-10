@@ -109,9 +109,30 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
     
     let values;
     
-    // Shifting the data by 1, to avoid overwriting the target of the search if we are plotting a neighbor search.
+    // If we are plotting a neighbor search, we need to add the target to the data of the plot.
     if (neighborSearch) {
+
+        myPlot.props.data.push(                        
+            // Creating the data series for the target of the search using the first element in molData since that is the target
+            {
+            x: [molData[0].components[xIndex]],
+            y: [molData[0].components[yIndex]],
+            text: [encodeURIComponent(molData[0].smiles)],
+            hovertemplate: "( %{x}, %{y})",
+            hovermode: "closest",
+            type: 'scatter',
+            mode: 'markers',
+            marker: {color: 'red', size: 12 , 
+                    symbol: "triangle-up",
+                    line: {
+                        width: 2,
+                        color: 'DarkSlateGrey'}},
+            name: 'Target'
+            });
+            
+        // Shifting the data by 1, to avoid overwriting the target of the search if we are plotting a neighbor search.
         values = molData.slice(1);
+
     }
     else {
         values = molData;
@@ -148,27 +169,6 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
             });
         }
     );
-
-    // If we are plotting a neighbor search, we need to add the target to the data of the plot.
-    if (neighborSearch) {
-        myPlot.props.data.push(                        
-        // Creating the data series for the target of the search using the first element in molData since that is the target
-        {
-        x: [molData[0].components[xIndex]],
-        y: [molData[0].components[yIndex]],
-        text: [encodeURIComponent(molData[0].smiles)],
-        hovertemplate: "( %{x}, %{y})",
-        hovermode: "closest",
-        type: 'scatter',
-        mode: 'markers',
-        marker: {color: 'red', size: 12 , 
-                symbol: "triangle-up",
-                line: {
-                    width: 2,
-                    color: 'DarkSlateGrey'}},
-        name: 'Target'
-        });
-    }
 
     return (
         <Container style={{ height: '100%' }}>
