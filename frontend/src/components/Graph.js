@@ -122,14 +122,14 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
             hovermode: "closest",
             type: 'scatter',
             mode: 'markers',
-            marker: {color: 'red', size: 12 , 
+            marker: {color: 'red', size: 20 , 
                     symbol: "triangle-up",
                     line: {
                         width: 2,
                         color: 'DarkSlateGrey'}},
             name: 'Target'
             });
-            
+
         // Shifting the data by 1, to avoid overwriting the target of the search if we are plotting a neighbor search.
         values = molData.slice(1);
 
