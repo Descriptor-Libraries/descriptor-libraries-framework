@@ -86,7 +86,7 @@ function dynamicGrid( svgs ) {
    */
   return (
       <Container>
-      <Grid container spacing={2} sx= {{ mt: 3 }}>
+      <Grid container spacing={2} sx= {{ mt: 6 }}>
       {
       svgs.map((result) => (
       <Grid item xs={12} md={4}>
@@ -293,7 +293,7 @@ export default function NeighborSearchHook () {
             { !isLoading && !validMolecule && Object.keys(molData).length == 0 && <Typography>No results found for Molecule ID.</Typography> } 
             </Box>
             <Box>
-            {/* If molecule is valid and there is mol data and the number of components is 2, then generate the graph based on the data*/}
+            {/* If molecule is valid and there is mol data, then generate the graph based on the data*/}
             { !isLoading && validMolecule && Object.keys(molData).length > 0 && <Container sx={{ display: 'flex', height: 750}}>{ <Graph molData={molData} componentArray={componentArrayForm} type={type} neighborSearch={true}></Graph> }</Container> } 
             </Box>
             <Box sx={{ display: 'flex' }}>
