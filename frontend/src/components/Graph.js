@@ -141,12 +141,12 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
     
     function extractPatterns(molData) {
         let patterns = new Set(molData.filter(obj => obj.hasOwnProperty("pat")).map(obj => obj["pat"]));
-        return patterns;
+        // Convert set to array and sort it.
+        let pattern_array = Array.from(patterns).sort();
+        return pattern_array;
     }
 
-    // Convert set to array and sort it.
-    let pats = Array.from(extractPatterns(molData)).sort();
-
+    let pats = extractPatterns(molData);
     // Fill in data for the graph
     // Loop over all the patterns we have to add them as elements to that data props.
     pats.forEach(function(element, index) {
