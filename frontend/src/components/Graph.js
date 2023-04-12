@@ -144,11 +144,12 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
         return patterns;
     }
 
-    let pats = extractPatterns(molData);
+    // Convert set to array and sort it.
+    let pats = Array.from(extractPatterns(molData)).sort();
 
     // Fill in data for the graph
     // Loop over all the patterns we have to add them as elements to that data props.
-    pats.forEach(function(element) {
+    pats.forEach(function(element, index) {
         myPlot.props.data.push(                        
             // Creating the data series for each pattern
             {
@@ -162,7 +163,7 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
                 marker: {size: 12 ,
                         // Randomly assigning symbols from the designated ones above
                         // This causes the symbols to change on data load, which is not bueno.
-                        symbol: symbols[Math.floor(Math.random() * symbols.length)],
+                        symbol: symbols[index % symbols.length],
                         line: {
                             width: 2,
                             color: 'DarkSlateGrey'}},
