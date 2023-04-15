@@ -31,7 +31,7 @@ const Item = styled(Paper)(({ theme }) => ({
     },
   });
 
-async function NeighborSearch(molecule_id, type, components, limit=48, skip=0) {
+async function NeighborSearch(molecule_id, type, components, limit=48, skip=0, signal) {
   /**
    * Requests neighbor data on the molecule from the backend.
    * @param {number} molecule_id Id of the molecule to query.
@@ -43,7 +43,7 @@ async function NeighborSearch(molecule_id, type, components, limit=48, skip=0) {
    */
     let encoded = encodeURIComponent(components);
 
-    const response =  await fetch(`/api/molecules/${molecule_id}/neighbors/?type=${type}&components=${encoded}&skip=${skip}&limit=${limit}`)
+    const response =  await fetch(`/api/molecules/${molecule_id}/neighbors/?type=${type}&components=${encoded}&skip=${skip}&limit=${limit}`, {signal: signal})
 
     if (!response.ok) {
         throw new Error('Invalid Molecule Id')
@@ -54,7 +54,7 @@ async function NeighborSearch(molecule_id, type, components, limit=48, skip=0) {
     }
 }
 
-async function retrieveSVG( smiles, distance ) {
+async function retrieveSVG(smiles, distance, signal) {
   /**
    * Retrieves an svg for a molecule smiles.
    * @param {string} smiles Molecule smile representation.
@@ -63,7 +63,7 @@ async function retrieveSVG( smiles, distance ) {
    */
   let encoded = encodeURIComponent(smiles);
 
-  const response = await fetch(`depict/cow/svg?smi=${encoded}&w=40&h=40`);
+  const response = await fetch(`depict/cow/svg?smi=${encoded}&w=40&h=40`, {signal: signal});
   
   const svg = await response.text();
   let result = {}
@@ -136,6 +136,7 @@ export default function NeighborSearchHook () {
     const [ componentArrayForm, setComponentArrayForm ] = useState(["1", "2"]);
     const [ updatedParameters, setUpdatedParameters ] = useState(true);
     const [ showGraph, setShowGraph ] = useState(true);
+    const [ searchToggle, setSearchToggle ] = useState(true);
 
     // Plotting functions to show molecules on hover
     function showSVGWindow(svg, event) {
@@ -300,6 +301,7 @@ export default function NeighborSearchHook () {
         setSkip(skip => skip + interval);
         setSearchPage(searchPage => searchPage + 1);
         setIsLoadingMore(true);
+        setSearchToggle(!searchToggle)
     }
 
     function newSearch() {
@@ -313,16 +315,17 @@ export default function NeighborSearchHook () {
         // so that effect will be triggered
         setIsLoading(true);
         setMolData([]);
+        setSearchToggle(!searchToggle);
     }
  
-    function loadNeighbors() {
+    function loadNeighbors(signal) {
       /**
        * Main driver function which loads the neighbors for a molecule requested by the user.
        * 
        */
         const fetchData = async () => {
-            const molecule_data = await NeighborSearch(moleculeid, type, arrayToString(componentArrayForm), interval, skip);
-            const svg_data = await retrieveAllSVGs(molecule_data);
+            const molecule_data = await NeighborSearch(moleculeid, type, arrayToString(componentArrayForm), interval, skip, signal);
+            const svg_data = await retrieveAllSVGs(molecule_data, signal);
 
             return [ molecule_data, svg_data ]
         }
@@ -365,34 +368,27 @@ export default function NeighborSearchHook () {
       setUpdatedParameters(true);
     }, [moleculeid, type, componentArrayForm])
 
-    // This use effect fires when we are loading more data on a previous search
-    useEffect(() => {
-      // This effect runs whenever any of the three states changes
-      // Check if all 3 states have the desired values
-      if (skip >= 15 && searchPage >= 2 && isLoadingMore === true) {
-        // Call the function that requires updated states
-        loadNeighbors();
-      }
-    }, [skip, searchPage, isLoadingMore]);
+    // initial load of data
+    // and load when search changes. 
+    useEffect( ( ) => {
+      const controller = new AbortController();
+      const signal = controller.signal;
 
-    // The states this function looks for are the initial states. Thus it will load the data on its initial load up.
-    // This use effect fires when we are loading in new data on a new search
-    useEffect(() => {
-      // This effect runs whenever any of the 5 states changes
-      // Check if all 5 states have the desired values
-      if (skip === 0 && searchPage === 1 && isLoading === true && svg_results.length === 0 && molData.length === 0) {
-        // Set updated parameters to false, since we are making a new search and would not have updated any parameters.
-        setUpdatedParameters(false);
-        // Call the function that requires updated states
-        loadNeighbors();
+      setUpdatedParameters(false);
+      loadNeighbors(signal);
+
+      return () => {
+        controller.abort();
       }
-    }, [skip, searchPage, isLoading, svg_results, molData]);
+    },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [ searchToggle ]
+    ); 
 
     return (
         <Container maxWidth="lg">
         <h2>Neighbor Search</h2>
         <TextField 
-                  disabled={isLoadingMore || isLoading}
                   style = {{width: 350}}
                   sx={{ m: 0.5}}
                   id="search-outline" 
@@ -400,10 +396,9 @@ export default function NeighborSearchHook () {
                   variant="outlined"
                   value= {moleculeid} 
                   onChange = { event => setSearch( event.target.value ) }
-                  InputProps={{endAdornment: (isLoadingMore || isLoading) ? <CircularProgress/> : <Button onClick={ () => newSearch() } >Search</Button>}}
+                  InputProps={{endAdornment: <Button onClick={ () => newSearch() } >Search</Button>}}
         />
         <TextField
-            disabled={isLoadingMore || isLoading}
             sx={{ m: 0.5 }}
             select
             id="dimension-outline"
@@ -414,18 +409,18 @@ export default function NeighborSearchHook () {
             <MenuItem value={"umap"}>UMAP</MenuItem>
         </TextField>
         {type == "pca" && <FormGroup sx={{position: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
-                          <FormControlLabel disabled={isLoadingMore || isLoading} control={<Checkbox defaultChecked value={"1"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="1" />
-                          <FormControlLabel disabled={isLoadingMore || isLoading} control={<Checkbox defaultChecked value={"2"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="2" />
-                          <FormControlLabel disabled={isLoadingMore || isLoading} control={<Checkbox onChange = {event => buildComponentArray(event.target.checked, "3")}/>} label="3" />
-                          <FormControlLabel disabled={isLoadingMore || isLoading} control={<Checkbox onChange = {event => buildComponentArray(event.target.checked, "4")}/>} label="4" />
+                          <FormControlLabel control={<Checkbox defaultChecked value={"1"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="1" />
+                          <FormControlLabel control={<Checkbox defaultChecked value={"2"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="2" />
+                          <FormControlLabel control={<Checkbox onChange = {event => buildComponentArray(event.target.checked, "3")}/>} label="3" />
+                          <FormControlLabel control={<Checkbox onChange = {event => buildComponentArray(event.target.checked, "4")}/>} label="4" />
                         </FormGroup>
         }
         {type == "umap" && <FormGroup sx={{position: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
-                          <FormControlLabel disabled={isLoadingMore || isLoading} control={<Checkbox defaultChecked value={"1"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="1" />
-                          <FormControlLabel disabled={isLoadingMore || isLoading} control={<Checkbox defaultChecked value={"2"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="2" />
+                          <FormControlLabel control={<Checkbox defaultChecked value={"1"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="1" />
+                          <FormControlLabel control={<Checkbox defaultChecked value={"2"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="2" />
                         </FormGroup>
         }
-        { (isLoadingMore || isLoading) ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <ThemeProvider theme={theme}> <Button disabled={updatedParameters} variant="contained" sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> </ThemeProvider>}
+        { isLoadingMore ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <ThemeProvider theme={theme}> <Button disabled={updatedParameters} variant="contained" sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> </ThemeProvider>}
         <Container sx={{justifyContent: 'center', my: 3}}>
             <Box sx={{ display: 'flex' }}>
             {/* If molecule is not valid and there is no mol data, then state that there are no results for the molecule ID requested*/}
