@@ -396,7 +396,7 @@ export default function NeighborSearchHook () {
                   variant="outlined"
                   value= {moleculeid} 
                   onChange = { event => setSearch( event.target.value ) }
-                  InputProps={{endAdornment: isLoading ? <CircularProgress/> : <Button onClick={ () => newSearch() } >Search</Button>}}
+                  InputProps={{endAdornment: <Button onClick={ () => newSearch() } >Search</Button>}}
         />
         <TextField
             sx={{ m: 0.5 }}
@@ -420,7 +420,7 @@ export default function NeighborSearchHook () {
                           <FormControlLabel control={<Checkbox defaultChecked value={"2"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="2" />
                         </FormGroup>
         }
-        { isLoadingMore ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <ThemeProvider theme={theme}> <Button disabled={updatedParameters} variant="contained" sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> </ThemeProvider>}
+        { (isLoading || isLoadingMore) ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <ThemeProvider theme={theme}> <Button disabled={updatedParameters} variant="contained" sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> </ThemeProvider>}
         <Container sx={{justifyContent: 'center', my: 3}}>
             <Box sx={{ display: 'flex' }}>
             {/* If molecule is not valid and there is no mol data, then state that there are no results for the molecule ID requested*/}
