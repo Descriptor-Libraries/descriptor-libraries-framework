@@ -368,6 +368,12 @@ export default function NeighborSearchHook () {
       setUpdatedParameters(true);
     }, [moleculeid, type, componentArrayForm])
 
+    function _handleKeyDown(event) {
+      if (event.key === "Enter") {
+        newSearch();
+      }
+    }
+
     // initial load of data
     // and load when search changes. 
     useEffect( ( ) => {
@@ -395,6 +401,7 @@ export default function NeighborSearchHook () {
                   label="Enter a Molecule ID to Search" 
                   variant="outlined"
                   value= {moleculeid} 
+                  onKeyDown = { (e) => _handleKeyDown(e) }
                   onChange = { event => setSearch( event.target.value ) }
                   InputProps={{endAdornment: <Button onClick={ () => newSearch() } >Search</Button>}}
         />
