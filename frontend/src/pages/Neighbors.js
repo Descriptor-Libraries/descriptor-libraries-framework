@@ -39,6 +39,7 @@ async function NeighborSearch(molecule_id, type, components, limit=48, skip=0, s
    * @param {string} components String of comma separated integers.
    * @param {number} limit Limit of the search.
    * @param {number} skip How many values to skip.
+   * @param {AbortSignal} signal Abortsignal object.
    * @return {json}  The response json.
    */
     let encoded = encodeURIComponent(components);
@@ -59,6 +60,7 @@ async function retrieveSVG(smiles, distance, signal) {
    * Retrieves an svg for a molecule smiles.
    * @param {string} smiles Molecule smile representation.
    * @param {number} distance Distance between the molecule and the target.
+   * @param {AbortSignal} signal Abortsignal object.
    * @return {dictionary} A dictionary for each item which contains its svg, smiles string and distance from the target molecule.
    */
   let encoded = encodeURIComponent(smiles);
@@ -321,7 +323,7 @@ export default function NeighborSearchHook () {
     function loadNeighbors(signal) {
       /**
        * Main driver function which loads the neighbors for a molecule requested by the user.
-       * 
+       * @param {AbortSignal} signal Abortsignal object.
        */
         const fetchData = async () => {
             const molecule_data = await NeighborSearch(moleculeid, type, arrayToString(componentArrayForm), interval, skip, signal);
