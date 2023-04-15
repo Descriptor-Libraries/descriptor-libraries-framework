@@ -396,7 +396,7 @@ export default function NeighborSearchHook () {
                   variant="outlined"
                   value= {moleculeid} 
                   onChange = { event => setSearch( event.target.value ) }
-                  InputProps={{endAdornment: <Button onClick={ () => newSearch() } >Search</Button>}}
+                  InputProps={{endAdornment: isLoading ? <CircularProgress/> : <Button onClick={ () => newSearch() } >Search</Button>}}
         />
         <TextField
             sx={{ m: 0.5 }}
