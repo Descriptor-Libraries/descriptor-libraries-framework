@@ -8,10 +8,18 @@ import Container from '@mui/material/Container';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import { Switch } from '@mui/material';
-
 import Button from '@mui/material/Button';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import FullScreenDialog from '../components/KetcherPopup';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#ed1c24",
+    }
+  },
+});
 
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -93,7 +101,8 @@ export default function SearchHook () {
     const [ representation, setRepresentation ] = useState("smiles");
     const [ toggleRepresentation, setToggleRepresentation ] = useState(true);
     const [ switchCheck, setSwitchCheck ] = useState(true);
-    const [fromKetcher, setFromKetcher] = useState(false);
+    const [ fromKetcher, setFromKetcher ] = useState(false);
+    const [ updatedParameters, setUpdatedParameters ] = useState(false);
 
 
     // Call back function to get the smiles and SMARTS from ketcher
@@ -194,12 +203,18 @@ export default function SearchHook () {
 
     }
 
+    // If search string changes, then parameters have been updated.
+    useEffect(() => {
+      setUpdatedParameters(true);
+    }, [searchString])
+
     // initial load of data
     // and load when search changes. 
     useEffect( ( ) => {
         const controller = new AbortController();
         const signal = controller.signal;
 
+        setUpdatedParameters(false);
         loadImages(signal);
         
         return () => {
@@ -261,7 +276,7 @@ export default function SearchHook () {
              { !isLoading && validSmiles && Object.keys(svg_results).length > 0 && 
              <Container> 
                 { dynamicGrid(svg_results)  }
-                { isLoadingMore ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <Button variant="contained" style={{backgroundColor: "#ed1c24"}} sx={{ my: 3 }} onClick={ () => loadMore() } disabled={isLoadingMore}>Load More</Button> }
+                { isLoadingMore ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <ThemeProvider theme={theme}><Button disabled={updatedParameters} variant="contained" sx={{ my: 3 }} onClick={ () => loadMore() } >Load More</Button></ThemeProvider> }
             </Container>  }
             { !isLoading && validSmiles && Object.keys(svg_results).length==0 && <Typography>No results found for SMILES string.</Typography> } 
             </Box>
