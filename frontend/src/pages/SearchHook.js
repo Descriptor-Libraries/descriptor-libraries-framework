@@ -210,16 +210,6 @@ export default function SearchHook () {
         [ searchToggle ] 
     );
 
-    // Update searchString if representation changes
-    useEffect(() => {
-        if (representation === "smiles"){
-            setSearch(smiles);
-        }
-        else if (representation === "SMARTS"){
-            setSearch(SMARTS);
-        }
-      }, [representation]);
-
       const _handleKeyDown = useCallback(
         (event) => {
           if (event.key === "Enter") {
