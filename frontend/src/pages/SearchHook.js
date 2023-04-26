@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { styled } from '@mui/material/styles';
 import { TextField, Typography } from "@mui/material";
 import Paper from '@mui/material/Paper';
@@ -7,7 +7,19 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import CircularProgress from '@mui/material/CircularProgress';
 
+import { Switch } from '@mui/material';
 import Button from '@mui/material/Button';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+import FullScreenDialog from '../components/KetcherPopup';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#ed1c24",
+    }
+  },
+});
 
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -17,10 +29,10 @@ const Item = styled(Paper)(({ theme }) => ({
     color: theme.palette.text.secondary,
   }));
 
-async function substructureSearch(substructure, limit=48, skip=0) {
+async function substructureSearch(substructure, limit=48, skip=0, signal) {
     let encoded = encodeURIComponent(substructure);
-
-    const response =  await fetch(`/api/molecules/search/?substructure=${encoded}&skip=${skip}&limit=${limit}`)
+    
+    const response =  await fetch(`/api/molecules/search/?substructure=${encoded}&skip=${skip}&limit=${limit}`, {signal: signal})
 
     if (!response.ok) {
         throw new Error('invalid smiles')
@@ -31,11 +43,11 @@ async function substructureSearch(substructure, limit=48, skip=0) {
     }
 }
 
-async function retrieveSVG( smiles, substructure ) {
+async function retrieveSVG( smiles, substructure, signal ) {
     let encoded = encodeURIComponent(smiles);
     let encodedSub = encodeURIComponent(substructure);
 
-    const response = await fetch(`/depict/cow/svg?smi=${encoded}&sma=${encodedSub}&zoom=1.25&w=50&h=50`);
+    const response = await fetch(`/depict/cow/svg?smi=${encoded}&sma=${encodedSub}&zoom=1.25&w=50&h=50`, {signal: signal});
 
     const svg = await response.text();
     let result = {}
@@ -84,12 +96,63 @@ export default function SearchHook () {
     const [ isLoading, setIsLoading ] = useState(true);
     const [ searchToggle, setSearchToggle ] = useState(true);
     const [ isLoadingMore, setIsLoadingMore ] = useState(false);
+    const [ smiles, setSmiles ] = useState('PC=C');
+    const [ SMARTS, setSMARTS ] = useState('[#15]-[#6]=[#6]');
+    const [ representation, setRepresentation ] = useState("smiles");
+    const [ toggleRepresentation, setToggleRepresentation ] = useState(true);
+    const [ switchCheck, setSwitchCheck ] = useState(true);
+    const [ fromKetcher, setFromKetcher ] = useState(false);
+    const [ updatedParameters, setUpdatedParameters ] = useState(false);
+
+
+    // Call back function to get the smiles and SMARTS from ketcher
+    const ketcherCallBack = (newState) => {
+
+        if (newState[0] != '') {
+          // Set the smiles and SMARTS for the current molecule
+          setSmiles(newState[0]);
+          setSMARTS(newState[1]);
+
+          // This came from ketcher
+          setFromKetcher(true);
+          
+          if (representation === "smiles"){
+              setSearch(newState[0]);
+          }
+          else if (representation === "SMARTS"){
+              setSearch(newState[1]);
+          }
+          setToggleRepresentation(true);
+
+          // Perform search with new structure.
+          newSearch();
+        }
+      };
+      
+    
+    function switchRepresentations(event) {
+        // Switch representations between SMARTS and smiles
+      if (event === true) {
+        setRepresentation("smiles");
+        setSwitchCheck(true);
+        setSearch(smiles);
+      }
+      // Remove label otherwise
+      else {
+        setRepresentation("SMARTS");
+        setSwitchCheck(false);
+        setSearch(SMARTS);
+      }
+
+      newSearch();
+    }
     
     // loadmore
     function loadMore() {
         setSkip(skip => skip + interval);
         setSearchPage( searchPage => searchPage + 1);
         setIsLoadingMore(true);
+        setSearchToggle(!searchToggle)
     }
 
     function newSearch() {
@@ -103,18 +166,18 @@ export default function SearchHook () {
         setSearchToggle(!searchToggle);
     }
  
-    function loadImages() {
+    function loadImages(signal) {
 
         const fetchData = async () => {
-            const molecule_data = await substructureSearch(searchString, interval, skip);
-            const svg_data = await retrieveAllSVGs(molecule_data, searchString);
+            const molecule_data = await substructureSearch(searchString, interval, skip, signal);
+            const svg_data = await retrieveAllSVGs(molecule_data, searchString, signal);
 
             return [ molecule_data, svg_data ]
         }
 
         fetchData()
         .catch( (error) => {
-            console.log(error) 
+            console.log(error)
             setValidSmiles(false);
             setResults([]);
             setSVGResults([])
@@ -140,35 +203,72 @@ export default function SearchHook () {
 
     }
 
-    // initial load of data 
-    useEffect( ( ) => { 
-        loadImages() }, 
+    // If search string changes, then parameters have been updated.
+    useEffect(() => {
+      setUpdatedParameters(true);
+    }, [searchString])
 
+    // initial load of data
+    // and load when search changes. 
+    useEffect( ( ) => {
+        const controller = new AbortController();
+        const signal = controller.signal;
+
+        setUpdatedParameters(false);
+        loadImages(signal);
+        
+        return () => {
+          controller.abort();
+        }
+      },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [ searchPage, searchToggle ] 
+        [ searchToggle ] 
     );
 
-    function _handleKeyDown(event) {
-        if (event.key === "Enter") {
-          loadImages();
-        }
-      }
+      const _handleKeyDown = useCallback(
+        (event) => {
+          if (event.key === "Enter") {
+            setFromKetcher(false);
+            newSearch();
+          }
+        },
+        [newSearch, setFromKetcher]
+      );
+
+      const searchButton = useCallback(() => {
+        setFromKetcher(false);
+        newSearch();
+      }, [newSearch, setFromKetcher]);
 
     return (
         <Container maxWidth="lg">
         <h2>Substructure Search</h2>
+        <FullScreenDialog ketcherCallBack={ketcherCallBack} />
+
         <TextField id="search-outline" 
-                  label="Enter a SMILES or SMARTS String to Search" 
+                  label="Search for SMILES or SMARTS String" 
                   variant="outlined"
-                  defaultValue= {searchString} 
+                  value= {searchString} 
                   onChange = { event => setSearch( event.target.value ) }
                   onKeyDown = { (e) => _handleKeyDown(e) }
-                  InputProps={{endAdornment: <Button onClick={ () => { newSearch() } } 
+                  InputProps={{endAdornment: <Button onClick={ () => { searchButton() } } 
                   >
                     Search
                     </Button>}}
                     />
-
+        { toggleRepresentation &&
+        <Grid component="label" container alignItems="center" spacing={1} sx={{position: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
+            <Grid item>SMARTS</Grid>
+            <Grid item>
+                <Switch
+                checked={ switchCheck }
+                onChange={ event => switchRepresentations(event.target.checked)}
+                disabled={!fromKetcher}
+                />
+            </Grid>
+            <Grid item>SMILES</Grid>
+        </Grid>
+        }
         <Container sx={{display: 'flex', justifyContent: 'center', my: 3}}>
             <Box sx={{ display: 'flex' }}>
              { isLoading && <CircularProgress sx={{ color: "#ed1c24" }} /> }
@@ -176,13 +276,11 @@ export default function SearchHook () {
              { !isLoading && validSmiles && Object.keys(svg_results).length > 0 && 
              <Container> 
                 { dynamicGrid(svg_results)  }
-                { isLoadingMore ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <Button variant="contained" style={{backgroundColor: "#ed1c24"}} sx={{ my: 3 }} onClick={ () => loadMore() }>Load More</Button> }
+                { isLoadingMore ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <ThemeProvider theme={theme}><Button disabled={updatedParameters} variant="contained" sx={{ my: 3 }} onClick={ () => loadMore() } >Load More</Button></ThemeProvider> }
             </Container>  }
             { !isLoading && validSmiles && Object.keys(svg_results).length==0 && <Typography>No results found for SMILES string.</Typography> } 
             </Box>
         </Container>
-
-            
 
         </Container>
     )

@@ -46,39 +46,6 @@ def valid_smiles(smiles):
     return smiles
 
 
-def valid_smarts(smarts):
-    """Check to see if a SMARTS string is valid.
-
-    Converts the SMARTS string to an rdkit molecule to see if it is valid, then turns it back into a SMART string to return an rdkit standardized
-    SMARTS.
-
-    Parameters
-    ----------
-    smarts : str
-        smarts string.
-
-    Returns
-    -------
-    smarts : str
-        A smiles string generated from an rdkit  molecule.
-
-    Raises
-    ------
-    HTTPException
-        When an rdkit molecule cannot be created from the smarts string.
-    HTTPException
-        When a smile string cannot be created from an rdkit molecule.
-    """
-    mol = Chem.MolFromSmarts(smarts)
-    if mol is None:
-        raise HTTPException(status_code=400, detail="Invalid Smiles")
-    smarts = Chem.MolToSmiles(mol)
-    if smarts is None:
-        raise HTTPException(status_code=400, detail="Invalid Smiles!")
-
-    return smarts
-
-
 @router.get("/umap", response_model=List[schemas.MoleculeSimple])
 def get_molecule_umap(
     limit: int = 1000,
@@ -166,16 +133,7 @@ def search_molecules(
     db: Session = Depends(deps.get_db),
 ):
     # Check if the substructure provided is valid
-    try:
-        valid_smiles(substructure)
-    except HTTPException:
-        try:
-            valid_smarts(substructure)
-        except HTTPException:
-            raise HTTPException(
-                status_code=400,
-                detail="The search string is not a valid SMILES or SMARTS string.",
-            )
+    valid_smiles(substructure)
 
     # The original query is not doing a substructure search at all. It is doing string
     # comparisons between the substructure and the molecule smiles string.
@@ -231,6 +189,10 @@ def search_neighbors(
     # Check to see if the molecule_id is within range.
     if molecule_id > max_molecule_id:
         raise HTTPException(status_code=404, detail=f"Molecule with ID supplied not found, the maximum ID is {max_molecule_id}")
+    
+    # Check to see if the molecule_id is within range.
+    if molecule_id <= 0:
+        raise HTTPException(status_code=500)
     
     # Check for valid neighbor type.
     if type not in ["pca", "umap"]:
@@ -292,7 +254,7 @@ def search_neighbors(
         (SELECT {type} FROM molecule WHERE molecule_id=:molecule_id) as p1, 
         cube_subset(molecule.{type}, {array_substitute_two}) as p2
     ORDER BY 
-        dist
+        dist, molecule_id
     OFFSET 
         :offset 
     LIMIT 
@@ -394,10 +356,10 @@ def get_molecule_dimensions(
     FROM 
         molecule
     {where_clause}
+    ORDER BY molecule_id
     OFFSET 
         :offset 
-    LIMIT 
-        :limit
+    FETCH FIRST :limit ROWS ONLY
     """
     sql = text(query)
 

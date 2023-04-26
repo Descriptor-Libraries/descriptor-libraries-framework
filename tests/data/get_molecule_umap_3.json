@@ -1,0 +1,72 @@
+[
+    {
+        "molecule_id": 1,
+        "umap1": 8.401494026184082,
+        "umap2": 4.721144199371338,
+        "pat": "pc3",
+        "smiles": "CC(C)c1cc(C(C)C)c(-c2ccccc2P(C2CCCCC2)C2CCCCC2)c(C(C)C)c1"
+    },
+    {
+        "molecule_id": 2,
+        "umap1": 8.43511962890625,
+        "umap2": 5.078856468200684,
+        "pat": "pc3",
+        "smiles": "CN(C)c1cccc(N(C)C)c1-c1ccccc1P(C1CCCCC1)C1CCCCC1"
+    },
+    {
+        "molecule_id": 3,
+        "umap1": 8.529546737670898,
+        "umap2": 5.478218078613281,
+        "pat": "pc3",
+        "smiles": "COc1cccc(OC)c1-c1ccccc1P(C1CCCCC1)C1CCCCC1"
+    },
+    {
+        "molecule_id": 4,
+        "umap1": 8.374300003051758,
+        "umap2": 4.649304866790772,
+        "pat": "pc3",
+        "smiles": "CC(C)Oc1cccc(OC(C)C)c1-c1ccccc1P(C1CCCCC1)C1CCCCC1"
+    },
+    {
+        "molecule_id": 5,
+        "umap1": 8.018644332885742,
+        "umap2": 5.598455429077148,
+        "pat": "pc3",
+        "smiles": "c1ccc(-c2ccccc2P(C2CCCCC2)C2CCCCC2)cc1"
+    },
+    {
+        "molecule_id": 6,
+        "umap1": 4.234940528869629,
+        "umap2": 5.697756290435791,
+        "pat": "pc3",
+        "smiles": "C1C2CC3CC1CC(P(C14CC5CC(CC(C5)C1)C4)C14CC5CC(CC(C5)C1)C4)(C2)C3"
+    },
+    {
+        "molecule_id": 7,
+        "umap1": 8.470039367675781,
+        "umap2": 3.6782431602478023,
+        "pat": "pc3",
+        "smiles": "COc1cccc(OC)c1-c1ccccc1P(c1ccccc1)c1ccccc1"
+    },
+    {
+        "molecule_id": 8,
+        "umap1": 3.598444938659668,
+        "umap2": 6.260385513305664,
+        "pat": "pc3",
+        "smiles": "CC(C)(C)P(C(C)(C)C)C(C)(C)C"
+    },
+    {
+        "molecule_id": 9,
+        "umap1": 6.293145656585693,
+        "umap2": 8.905426979064941,
+        "pat": "pc3",
+        "smiles": "Cc1ccccc1P(c1ccccc1C)c1ccccc1C"
+    },
+    {
+        "molecule_id": 10,
+        "umap1": 4.039807319641113,
+        "umap2": 6.719201564788818,
+        "pat": "pc3",
+        "smiles": "CCCCP(C12CC3CC(CC(C3)C1)C2)C12CC3CC(CC(C3)C1)C2"
+    }
+]

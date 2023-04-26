@@ -7,6 +7,7 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import CircularProgress from '@mui/material/CircularProgress';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
@@ -24,7 +25,15 @@ const Item = styled(Paper)(({ theme }) => ({
     color: theme.palette.text.secondary,
   }));
 
-async function NeighborSearch(molecule_id, type, components, limit=48, skip=0) {
+  const theme = createTheme({
+    palette: {
+      primary: {
+        main: "#ed1c24",
+      }
+    },
+  });
+
+async function NeighborSearch(molecule_id, type, components, limit=48, skip=0, signal) {
   /**
    * Requests neighbor data on the molecule from the backend.
    * @param {number} molecule_id Id of the molecule to query.
@@ -32,11 +41,12 @@ async function NeighborSearch(molecule_id, type, components, limit=48, skip=0) {
    * @param {string} components String of comma separated integers.
    * @param {number} limit Limit of the search.
    * @param {number} skip How many values to skip.
+   * @param {AbortSignal} signal Abortsignal object.
    * @return {json}  The response json.
    */
     let encoded = encodeURIComponent(components);
 
-    const response =  await fetch(`/api/molecules/${molecule_id}/neighbors/?type=${type}&components=${encoded}&skip=${skip}&limit=${limit}`)
+    const response =  await fetch(`/api/molecules/${molecule_id}/neighbors/?type=${type}&components=${encoded}&skip=${skip}&limit=${limit}`, {signal: signal})
 
     if (!response.ok) {
         throw new Error('Invalid Molecule Id')
@@ -47,16 +57,17 @@ async function NeighborSearch(molecule_id, type, components, limit=48, skip=0) {
     }
 }
 
-async function retrieveSVG( smiles, distance ) {
+async function retrieveSVG(smiles, distance, signal) {
   /**
    * Retrieves an svg for a molecule smiles.
    * @param {string} smiles Molecule smile representation.
    * @param {number} distance Distance between the molecule and the target.
+   * @param {AbortSignal} signal Abortsignal object.
    * @return {dictionary} A dictionary for each item which contains its svg, smiles string and distance from the target molecule.
    */
   let encoded = encodeURIComponent(smiles);
 
-  const response = await fetch(`depict/cow/svg?smi=${encoded}&w=40&h=40`);
+  const response = await fetch(`depict/cow/svg?smi=${encoded}&w=40&h=40`, {signal: signal});
   
   const svg = await response.text();
   let result = {}
@@ -124,10 +135,12 @@ export default function NeighborSearchHook () {
     const [ svg_results, setSVGResults ] = useState([])
     const [ searchPage, setSearchPage ] = useState(1);
     const [ isLoading, setIsLoading ] = useState(true);
-    const [ searchToggle, setSearchToggle ] = useState(true);
     const [ isLoadingMore, setIsLoadingMore ] = useState(false);
     const [ molData, setMolData] = useState([]);
     const [ componentArrayForm, setComponentArrayForm ] = useState(["1", "2"]);
+    const [ updatedParameters, setUpdatedParameters ] = useState(true);
+    const [ showGraph, setShowGraph ] = useState(true);
+    const [ searchToggle, setSearchToggle ] = useState(true);
 
     function buildComponentArray(event, label){
       /**
@@ -168,9 +181,9 @@ export default function NeighborSearchHook () {
        * Loads more neighbors into the UI. 
        */
         setSkip(skip => skip + interval);
-        setSearchPage( searchPage => searchPage + 1);
+        setSearchPage(searchPage => searchPage + 1);
         setIsLoadingMore(true);
-        loadNeighbors();
+        setSearchToggle(!searchToggle)
     }
 
     function newSearch() {
@@ -183,19 +196,18 @@ export default function NeighborSearchHook () {
         // Just need to toggle this to make sure it toggles
         // so that effect will be triggered
         setIsLoading(true);
-        setSearchToggle(!searchToggle);
         setMolData([]);
+        setSearchToggle(!searchToggle);
     }
  
-    function loadNeighbors() {
+    function loadNeighbors(signal) {
       /**
        * Main driver function which loads the neighbors for a molecule requested by the user.
-       * 
+       * @param {AbortSignal} signal Abortsignal object.
        */
-
         const fetchData = async () => {
-            const molecule_data = await NeighborSearch(moleculeid, type, arrayToString(componentArrayForm), interval, skip);
-            const svg_data = await retrieveAllSVGs(molecule_data);
+            const molecule_data = await NeighborSearch(moleculeid, type, arrayToString(componentArrayForm), interval, skip, signal);
+            const svg_data = await retrieveAllSVGs(molecule_data, signal);
 
             return [ molecule_data, svg_data ]
         }
@@ -224,32 +236,42 @@ export default function NeighborSearchHook () {
             setIsLoadingMore(false);
             setValidMolecule(true);
 
+            if (componentArrayForm.length == 2){
+              setShowGraph(true);
+            }
+            else {
+              setShowGraph(false);
+            }
           })
-
     }
 
-    // initial load of data 
-    useEffect( ( ) => { 
-        loadNeighbors() }, 
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [ searchPage, searchToggle ] 
-    );
-    
+    // If any parameters change, we must set updatedParameters to true.
     useEffect(() => {
-      newSearch();
-      loadNeighbors;
-    }, [type]);
+      setUpdatedParameters(true);
+    }, [moleculeid, type, componentArrayForm])
 
-    useEffect(() => {
-      newSearch();
-      loadNeighbors;
-    }, [componentArrayForm]);
+    function _handleKeyDown(event) {
+      if (event.key === "Enter") {
+        newSearch();
+      }
+    }
 
-    useEffect(() => {
-      newSearch();
-      loadNeighbors;
-    }, [moleculeid]);
+    // initial load of data
+    // and load when search changes. 
+    useEffect( ( ) => {
+      const controller = new AbortController();
+      const signal = controller.signal;
+
+      setUpdatedParameters(false);
+      loadNeighbors(signal);
+
+      return () => {
+        controller.abort();
+      }
+    },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [ searchToggle ]
+    ); 
 
     return (
         <Container maxWidth="lg">
@@ -260,16 +282,17 @@ export default function NeighborSearchHook () {
                   id="search-outline" 
                   label="Enter a Molecule ID to Search" 
                   variant="outlined"
-                  defaultValue= {moleculeid} 
+                  value= {moleculeid} 
+                  onKeyDown = { (e) => _handleKeyDown(e) }
                   onChange = { event => setSearch( event.target.value ) }
+                  InputProps={{endAdornment: <Button onClick={ () => newSearch() } >Search</Button>}}
         />
         <TextField
             sx={{ m: 0.5 }}
             select
             id="dimension-outline"
             value={type}
-            // Need to clear MolData and SVGResults here. This is okay because when we switch type we need to do a new search right after.
-            onChange={ function(event) {setType(event.target.value); setComponentArrayForm(["1", "2"]); setMolData([]); setSVGResults([]) }}
+            onChange={ function(event) {setType(event.target.value); setComponentArrayForm(["1", "2"]);}}
         >
             <MenuItem value={"pca"}>PCA</MenuItem>
             <MenuItem value={"umap"}>UMAP</MenuItem>
@@ -286,7 +309,7 @@ export default function NeighborSearchHook () {
                           <FormControlLabel control={<Checkbox defaultChecked value={"2"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="2" />
                         </FormGroup>
         }
-        { isLoadingMore ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <Button variant="contained" style={{backgroundColor: "#ed1c24"}} sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> }
+        { (isLoading || isLoadingMore) ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <ThemeProvider theme={theme}> <Button disabled={updatedParameters} variant="contained" sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> </ThemeProvider>}
         <Container sx={{justifyContent: 'center', my: 3}}>
             <Box sx={{ display: 'flex' }}>
             {/* If molecule is not valid and there is no mol data, then state that there are no results for the molecule ID requested*/}
@@ -309,14 +332,7 @@ export default function NeighborSearchHook () {
             {isLoadingMore ? (
               <CircularProgress sx={{ color: "#ed1c24" }} />
             ) : (
-              <Button
-                variant="contained"
-                style={{ backgroundColor: "#ed1c24" }}
-                sx={{ m: 0.5 }}
-                onClick={() => loadMore()}
-              >
-                Load More
-              </Button>
+              <ThemeProvider theme={theme}> <Button disabled={updatedParameters} variant="contained" sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> </ThemeProvider>
             )}
           </Box>
           }
