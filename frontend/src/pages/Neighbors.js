@@ -15,6 +15,8 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 
+import Graph from '../components/Graph'
+
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
     ...theme.typography.body2,
@@ -95,7 +97,7 @@ function dynamicGrid( svgs ) {
    */
   return (
       <Container>
-      <Grid container spacing={2} sx= {{ mt: 3 }}>
+      <Grid container spacing={2} sx= {{ mt: 6 }}>
       {
       svgs.map((result) => (
       <Grid item xs={12} md={4}>
@@ -139,128 +141,6 @@ export default function NeighborSearchHook () {
     const [ updatedParameters, setUpdatedParameters ] = useState(true);
     const [ showGraph, setShowGraph ] = useState(true);
     const [ searchToggle, setSearchToggle ] = useState(true);
-
-    // Plotting functions to show molecules on hover
-    function showSVGWindow(svg, event) {
-      /**
-       * Creates SVG window on the molecule element when hovering of a point on the plotly graph.
-       * @param {string} svg Svg of the molecule.
-       * @param {event} event Hover event when hovering over a point on the plotly graph.
-       */
-
-        // remove in case existing
-        if (document.getElementById("molecule")) {
-          document.getElementById("molecule").remove()
-        }
-      
-        let mol = document.createElement("g")
-        mol.setAttribute("id", "molecule")
-        
-        let plotly_container = document.getElementsByClassName("plotly")
-        mol.innerHTML = svg;
-        
-        let xpos = event.event.clientX - 160;
-        let ypos = event.event.clientY - 160;
-      
-        plotly_container[0].appendChild(mol);
-        mol.style.position = "fixed";
-        mol.style.left = `${xpos}px`;
-        mol.style.top = `${ypos}px`;
-      
-    }
-  
-    function showSVG(event) {
-      /**
-       * Requests svg data for the molecule you are hovering on.
-       * @param {event} event Hover even when hovering over a point on the plotly graph.
-       */
-      fetch(`depict/cow/svg?smi=${event.points[0].text}&w=40&h=40`).then(response => 
-          response.text() ).then( body => showSVGWindow(body, event) );
-    }
-    
-    function hideSVG() {
-      /**
-       * Removes molecule element which holds its SVG, when you are no longer hovering.
-       */
-      if (document.getElementById("molecule")) {
-          document.getElementById("molecule").remove()
-      }
-    }
-
-    function Graph(){
-        /**
-         * Generates plotly react graph. The target molecule is a red triangle facing up while the neighbors are grey triangles facing down.
-         * The x and y labels are mapped to the axis dictionary to write pc1 instead of pca1.
-         */
-        // Shifting the data by 1, to avoid overwriting the target of the search
-        let neighbors = molData.slice(1);
-        let myPlot = <Plot onHover={ (event) => showSVG(event) } 
-        onUnhover={ (event)=> hideSVG(event) } 
-        style={{'width': '100%', 'height': '100%' }}
-        useResizeHandler={true}
-        data={[
-            // Creating the data series for the target of the search
-            {
-            x: [molData[0].components[0]],
-            y: [molData[0].components[1]],
-            text: [encodeURIComponent(molData[0].smiles)],
-            hovertemplate: "( %{x}, %{y})",
-            hovermode: "closest",
-            type: 'scatter',
-            mode: 'markers',
-            marker: {color: 'red', size: 12 , 
-                    symbol: "triangle-up",
-                    line: {
-                        width: 2,
-                        color: 'DarkSlateGrey'}},
-            name: 'Target'
-            },
-            // Creating the data series for the neighbors
-          {
-            x: neighbors.map( row => { return row.components[0] }),
-            y: neighbors.map( row => { return row.components[1] }),
-            text: neighbors.map( row => { return encodeURIComponent(row.smiles) }),
-            hovertemplate: "( %{x}, %{y})",
-            hovermode: "closest",
-            type: 'scatter',
-            mode: 'markers',
-            marker: {color: 'SlateGrey', size: 12 ,
-                    symbol: 'triangle-down', 
-                    line: {
-                        width: 2,
-                        color: 'DarkSlateGrey'}},
-            name: 'Neighbor'
-          }
-        ]}
-        layout={ { 
-          autosize: true,
-          useResizeHandler: true,
-          style: {width: '100%', height: '100%'},
-          xaxis: {
-            title: {
-              text: axis_dict[molData[0].type + componentArrayForm[0]],
-              font: {
-                size: 18,
-                color: '#7f7f7f'
-              }
-          }
-        },
-    
-        yaxis: {
-          title: {
-            text: axis_dict[molData[0].type + componentArrayForm[1]],
-            font: {
-              size: 18,
-              color: '#7f7f7f'
-            }
-        }
-      }
-        } }
-      />
-    return (
-        myPlot
-      );
-    }
 
     function buildComponentArray(event, label){
       /**
@@ -436,8 +316,8 @@ export default function NeighborSearchHook () {
             { !isLoading && !validMolecule && Object.keys(molData).length == 0 && <Typography>No results found for Molecule ID.</Typography> } 
             </Box>
             <Box>
-            {/* If molecule is valid and showGraph is true, then generate the graph based on the data*/}
-            { !isLoading && validMolecule && Object.keys(molData).length > 0 && showGraph && <Container sx={{ display: 'flex', height: 750}}>{ Graph() }</Container> } 
+            {/* If molecule is valid and there is mol data, then generate the graph based on the data*/}
+            { !isLoading && validMolecule && Object.keys(molData).length > 0 && componentArrayForm.length > 1 && <Container sx={{ display: 'flex', height: 750}}>{ <Graph molData={molData} componentArray={componentArrayForm} type={type} neighborSearch={true}></Graph> }</Container> } 
             </Box>
             <Box sx={{ display: 'flex' }}>
             {/* If molecule is valid and there is svg data, then generate the images of the molecules*/}
