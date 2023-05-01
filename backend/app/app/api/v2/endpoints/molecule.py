@@ -287,7 +287,7 @@ def get_molecule_dimensions(
     type = type.lower()
 
     query = """"""
-    where_clause = ""
+    where_clause = f"WHERE {type} IS NOT NULL"
 
     # Check for valid neighbor type.
     if type not in ["pca", "umap"]:
@@ -305,7 +305,7 @@ def get_molecule_dimensions(
             raise HTTPException(status_code=400, detail="Invalid category type.")
         else:
             # Create where clause
-            where_clause = "WHERE pat = :category"
+            where_clause = "AND pat = :category"
 
     # Set defaults for components
     if type == "pca" and components is None:

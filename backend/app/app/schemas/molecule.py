@@ -25,7 +25,7 @@ class MoleculeComponents(BaseModel):
     molecule_id: int
     pat: Optional[str]
     smiles: str
-    components: list[float]
+    components: Optional[list[float]]
 
 class MoleculeNeighbors(MoleculeComponents):
     dist: Optional[float]
