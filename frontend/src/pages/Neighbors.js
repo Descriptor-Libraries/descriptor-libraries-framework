@@ -1,9 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Plot from 'react-plotly.js';
-import { styled } from '@mui/material/styles';
 import { TextField, Typography } from "@mui/material";
-import Paper from '@mui/material/Paper';
-import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -17,21 +13,8 @@ import Checkbox from '@mui/material/Checkbox';
 
 import Graph from '../components/Graph'
 
-const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-    ...theme.typography.body2,
-    padding: theme.spacing(1),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-  }));
+import { retrieveAllSVGs, dynamicGrid, theme } from '../common/MoleculeUtils';
 
-  const theme = createTheme({
-    palette: {
-      primary: {
-        main: "#ed1c24",
-      }
-    },
-  });
 
 async function NeighborSearch(molecule_id, type, components, limit=48, skip=0, signal) {
   /**
@@ -55,68 +38,6 @@ async function NeighborSearch(molecule_id, type, components, limit=48, skip=0, s
     else {
         return await response.json()
     }
-}
-
-async function retrieveSVG(smiles, distance, signal) {
-  /**
-   * Retrieves an svg for a molecule smiles.
-   * @param {string} smiles Molecule smile representation.
-   * @param {number} distance Distance between the molecule and the target.
-   * @param {AbortSignal} signal Abortsignal object.
-   * @return {dictionary} A dictionary for each item which contains its svg, smiles string and distance from the target molecule.
-   */
-  let encoded = encodeURIComponent(smiles);
-
-  const response = await fetch(`depict/cow/svg?smi=${encoded}&w=40&h=40`, {signal: signal});
-  
-  const svg = await response.text();
-  let result = {}
-  result["svg"] = svg;
-  result["smiles"] = smiles;
-  result["distance"] = distance;
-  return result
-}
-
-async function retrieveAllSVGs( items ) {
-  /**
-   * Retrieves all SVGs for the neighbor molecules.
-   * @param {json} items Json containing all the molecule data returned from the neighbor search.
-   * @return {json} Json containing the svg, smiles and distance for each neighbor.
-   */
-  return await Promise.all( items.map( (item) => { 
-      return retrieveSVG(item.smiles, item.dist)
-   } ) )
-}
-
-function dynamicGrid( svgs ) {
-  /**
-   * Generates a Grid filled with the svgs for the molecules.
-   * @param {json} svgs Json containing the svg, smiles, and distance for each neighbor.
-   * @return {jsx} The front end JSX that will generate the HTML users will interact with. It is a grid of items (described above) filled with the 
-   * svg, smiles and distance of the molecule.
-   */
-  return (
-      <Container>
-      <Grid container spacing={2} sx= {{ mt: 6 }}>
-      {
-      svgs.map((result) => (
-      <Grid item xs={12} md={4}>
-          {result.distance == 0 ? <Item sx={{border: 3, borderColor: '#ed1c24'}}>
-          <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(result.svg)}`} />
-          <Typography sx={{ wordBreak: "break-word" }}> <strong>Smiles: </strong> { result.smiles }</Typography>
-          </Item> :
-          <Item>
-          <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(result.svg)}`} />
-          <Typography sx={{ wordBreak: "break-word" }}> <strong>Smiles: </strong> { result.smiles }</Typography>
-          <Typography sx={{ wordBreak: "break-word" }}> <strong>Distance: </strong> { result.distance.toExponential(2) }</Typography>
-          </Item>} 
-      </Grid>
-      ))
-      }
-      
-  </Grid>
-  </Container>
-  )
 }
 
 export default function NeighborSearchHook () {
