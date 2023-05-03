@@ -1,7 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { styled } from '@mui/material/styles';
 import { TextField, Typography } from "@mui/material";
-import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -13,75 +11,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import FullScreenDialog from '../components/KetcherPopup';
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#ed1c24",
-    }
-  },
-});
-
-const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-    ...theme.typography.body2,
-    padding: theme.spacing(1),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-  }));
-
-async function substructureSearch(substructure, limit=48, skip=0, signal) {
-    let encoded = encodeURIComponent(substructure);
-    
-    const response =  await fetch(`/api/molecules/search/?substructure=${encoded}&skip=${skip}&limit=${limit}`, {signal: signal})
-
-    if (!response.ok) {
-        throw new Error('invalid smiles')
-    }
-
-    else {
-        return await response.json()
-    }
-}
-
-async function retrieveSVG( smiles, substructure, signal ) {
-    let encoded = encodeURIComponent(smiles);
-    let encodedSub = encodeURIComponent(substructure);
-
-    const response = await fetch(`/depict/cow/svg?smi=${encoded}&sma=${encodedSub}&zoom=1.25&w=50&h=50`, {signal: signal});
-
-    const svg = await response.text();
-    let result = {}
-    result["svg"] = svg;
-    result["smiles"] = smiles;
-    return result
-}
-
-async function retrieveAllSVGs( items, substructure ) {
-    return await Promise.all( items.map( (item) => { 
-        return retrieveSVG(item.smiles, substructure)
-     } ) )
-}
-
-function dynamicGrid( svgs ) {
-
-    return (
-        <Container>
-        <Grid container spacing={2} sx= {{ mt: 3 }}>
-        {
-        svgs.map((result) => (
-        <Grid item xs={12} md={4}>
-            <Item>
-            <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(result.svg)}`} />
-            <Typography sx={{ wordBreak: "break-word" }}>{ result.smiles }</Typography>
-            </Item> 
-        </Grid>
-        ))
-        }
-        
-    </Grid>
-    </Container>
-    )
-}
+import { substructureSearch, retrieveAllSVGs, dynamicGrid, theme } from '../common/MoleculeUtils';
 
 export default function SearchHook () {
 
