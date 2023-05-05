@@ -41,7 +41,7 @@ def valid_smiles(smiles):
         raise HTTPException(status_code=400, detail="Invalid Smiles")
     smiles = Chem.MolToSmiles(mol)
     if smiles is None:
-        raise HTTPException(status_code=400, detail="Invalid Smiles!")
+        raise HTTPException(status_code=400, detail="Invalid Smiles")
 
     return smiles
 
@@ -305,7 +305,7 @@ def get_molecule_dimensions(
             raise HTTPException(status_code=400, detail="Invalid category type.")
         else:
             # Create where clause
-            where_clause = "AND pat = :category"
+            where_clause += " AND pat = :category"
 
     # Set defaults for components
     if type == "pca" and components is None:
