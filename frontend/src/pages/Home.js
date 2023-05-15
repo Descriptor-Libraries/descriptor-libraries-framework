@@ -1,12 +1,14 @@
-import Graph from "../components/Graph"
 import React, { useEffect, useState } from 'react';
-import { Container } from "@mui/material";
-import { Typography } from "@mui/material";
+import { Link } from "react-router-dom";
 
-import Box from '@mui/material/Box';
-
+import { Container, Typography, Box, TextField, Grid, Card, CardContent, IconButton } from "@mui/material";
 import OriginalKraken from '../common/OriginalKraken';
+import Graph from "../components/Graph";
 
+import SearchIcon from '@mui/icons-material/Search';
+import BubbleChartIcon from '@mui/icons-material/BubbleChart';
+import DownloadIcon from '@mui/icons-material/Download';
+import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 
 function Home() {
    const [ molData, setMolData ] = useState([]);
@@ -52,24 +54,93 @@ function Home() {
             setMolData(items);   
       })
       }
-   
+
       useEffect( ( ) => { 
       loadData() },  
       [ type ] 
    );
+   useEffect(() => {
+      loadData()
+   }, [type]);
 
-   return (
-      <Container maxWidth="xl" sx={{display: 'flex', flexDirection: "column", height: 850, alignItems: 'center'}}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-         <OriginalKraken sx={{ display: { xs: 'none', md: 'flex' }, mr: 3, fontSize: '160px' }} />
-         <Typography variant="h2">
-            KRAKEN
+  return (
+   <>
+   <Box sx={{ backgroundColor: "#ed1c24", display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-around', padding: 2, height: '35vh' }}>  
+   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+         <OriginalKraken sx={{ color: 'white', fontSize: '160px' }} />
+         <Typography variant="h2" color="white">
+           KRAKEN
          </Typography>
-      </Box>
-      <Graph molData={molData} componentArray={components} type={type} neighborSearch={false}></Graph>
-      </Container>
+       </Box>
+       <Typography variant="h5" color="white" textAlign="center">
+         <b>K</b>olossal vi<b>R</b>tual d<b>A</b>tabase
+                for mole<b>K</b>ular d<b>E</b>scriptors of orga<b>N</b>ophosphorus
+                ligands.
+       </Typography>
+       <Grid container justifyContent="center" spacing={3} sx={{ mb: 1 }}>
+          <Grid item>
+            <Link to="/search">
+              <IconButton color="inherit">
+                <SearchIcon sx={{ color: 'white', fontSize: 40 }} />
+              </IconButton>
+            </Link>
+            <Typography color="white" textAlign="center">
+              Substructure Search
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Link to="/neighbors">
+              <IconButton color="inherit">
+                <BubbleChartIcon sx={{ color: 'white', fontSize: 40 }} />
+              </IconButton>
+            </Link>
+            <Typography color="white" textAlign="center">
+              Neighbor Search
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Link to="/download">
+              <IconButton color="inherit">
+                <DownloadIcon sx={{ color: 'white', fontSize: 40 }} />
+              </IconButton>
+            </Link>
+            <Typography color="white" textAlign="center">
+              Download
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Link to="/docs/" reloadDocument>
+              <IconButton color="inherit">
+                <AutoStoriesIcon sx={{ color: 'white', fontSize: 40 }} />
+              </IconButton>
+            </Link>
+            <Typography color="white" textAlign="center">
+              Documentation
+            </Typography>
+          </Grid>
+        </Grid>
+     </Box>
 
-   )
+    <Container maxWidth="xl" sx={{ display: 'flex', flexDirection: "column", alignItems: 'center' }}>
+      <Grid container spacing={2} sx={{ mt: 3 }}>
+        {/* Add your summary statistics cards here */}
+        <Grid item xs={12} md={6} lg={3}>
+          <Card>
+            <CardContent>
+              {/* Statistics go here */}
+              <Typography variant="h5">Stats 1</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        {/* Repeat for other cards */}
+      </Grid>
+      <Box sx={{ width: '100%', mt: 3 }}>
+        <Graph molData={molData} componentArray={components} type={type} neighborSearch={false}></Graph>
+      </Box>
+    </Container>
+
+    </>
+  );
 }
 
 export default Home;
