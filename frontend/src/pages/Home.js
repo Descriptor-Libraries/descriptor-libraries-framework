@@ -3,6 +3,11 @@ import React, { useEffect, useState } from 'react';
 import { Container } from "@mui/material";
 import { Typography } from "@mui/material";
 
+import Box from '@mui/material/Box';
+
+import OriginalKraken from '../common/OriginalKraken';
+
+
 function Home() {
    const [ molData, setMolData ] = useState([]);
    const [ components, setComponents ] = useState(["1", "2"]);
@@ -55,11 +60,15 @@ function Home() {
 
    return (
       <Container maxWidth="xl" sx={{display: 'flex', flexDirection: "column", height: 850, alignItems: 'center'}}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+         <OriginalKraken sx={{ display: { xs: 'none', md: 'flex' }, mr: 3, fontSize: '160px' }} />
          <Typography variant="h2">
-         Kraken Webapp
+            KRAKEN
          </Typography>
-         {<Graph molData={molData} componentArray={components} type={type} neighborSearch={false}></Graph>}
+      </Box>
+      <Graph molData={molData} componentArray={components} type={type} neighborSearch={false}></Graph>
       </Container>
+
    )
 }
 
