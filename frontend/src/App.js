@@ -1,5 +1,5 @@
 import './App.css';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router, useLocation } from 'react-router-dom';
 
 import ResponsiveAppBar from './common/Navbar';
 import AppRoutes from './common/Routes';
@@ -13,24 +13,34 @@ import NeighborSearch  from './pages/Neighbors';
 
 const pages = {
   'Home': <Home />, 
-  'About': <About />, 
   'Search': <Search />,
   'Neighbors': <NeighborSearch/>, 
   'Download': <Download />,
 };
+
+function Content() {
+  const location = useLocation();
+  return (
+    <div>
+      {location.pathname !== "/" && location.pathname !== "/home" && <ResponsiveAppBar pages={pages} />}
+      <AppRoutes pages={pages} />
+    </div>
+  );
+}
+
 
 function App() {
   return (
     <div className="App">
       <Router>
         <header className="kraken-webapp">
-          <ResponsiveAppBar pages={pages} />
+          <Content />
         </header>
-        <AppRoutes pages={pages} />
         <Footer />
       </Router>
     </div>
   );
 }
+
 
 export default App;
