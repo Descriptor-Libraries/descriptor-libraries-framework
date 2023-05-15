@@ -51,10 +51,14 @@ function dynamicGrid( svgs ) {
         {
         svgs.map((result) => (
         <Grid item xs={12} md={4}>
-            {result.distance == 0 ? <Item sx={{border: 3, borderColor: '#ed1c24'}}>
+            {result.distance == 0 ? 
+            // True condition - render Item with border if distance is 0.
+            <Item sx={{border: 3, borderColor: '#ed1c24'}}>
             <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(result.svg)}`} />
             <Typography sx={{ wordBreak: "break-word" }}> <strong>Smiles: </strong> { result.smiles }</Typography>
-            </Item> :
+            </Item> 
+            // False condition - render Item without border if distance is not 0.
+            :
             <Item>
             <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(result.svg)}`} />
             <Typography sx={{ wordBreak: "break-word" }}> <strong>Smiles: </strong> { result.smiles }</Typography>
