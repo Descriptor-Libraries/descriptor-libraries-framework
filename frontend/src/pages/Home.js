@@ -116,18 +116,27 @@ function Home() {
 
   return (
    <>
-   <Box sx={{ backgroundColor: "#ed1c24", display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-around', padding: 2, height: '35vh' }}>  
-   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-         <OriginalKraken sx={{ color: 'white', fontSize: '160px' }} />
-         <Typography variant="h2" color="white">
-           KRAKEN
-         </Typography>
-       </Box>
-       <Typography variant="h5" color="white" textAlign="center">
-         <b>K</b>olossal vi<b>R</b>tual d<b>A</b>tabase
-                for mole<b>K</b>ular d<b>E</b>scriptors of orga<b>N</b>ophosphorus
-                ligands.
-       </Typography>
+   <Box sx={{ backgroundColor: "#ed1c24", display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-around', padding: 2, height: !isMobile && '35vh' }}>  
+   <Box 
+        sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 2,
+            flexDirection: isMobile ? 'column' : 'row',
+        }}
+    >
+        <OriginalKraken sx={{ color: 'white', fontSize: isMobile ? '120px' : '160px' }} />
+        <Typography variant={ isMobile ? "h4" :"h2"} color="white">
+            KRAKEN
+        </Typography>
+    </Box>
+      {
+        <Typography variant={ isMobile ? "subtitle1" :"h5"} color="white" textAlign="center">
+          <b>K</b>olossal vi<b>R</b>tual d<b>A</b>tabase
+                  for mole<b>K</b>ular d<b>E</b>scriptors of orga<b>N</b>ophosphorus
+                  ligands.
+        </Typography>
+      }
        <Grid container justifyContent="center" spacing={3} sx={{ mb: 1 }}>
           <Grid item>
             <Link to="/search">
