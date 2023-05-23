@@ -49,6 +49,22 @@ function Home() {
    const [ molData, setMolData ] = useState([]);
    const [ components, setComponents ] = useState(["1", "2"]);
    const [ type, setType ] = useState("umap");
+   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+   useEffect(() => {
+    function checkMobile() {
+      setIsMobile(window.innerWidth < 768);
+    }
+
+    // Set isMobile at the start in case it's not the initial render
+    checkMobile();
+
+    window.addEventListener('resize', checkMobile);
+
+    // Cleanup the listener when the component is unmounted
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []); // Empty array means this effect runs once on mount and cleanup on unmount
+
 
    async function umap(type, components, limit=1000) {
       /**
@@ -163,7 +179,7 @@ function Home() {
             ))}
       </Grid>
       <Box sx={{ width: '100%', mt: 3 }}>
-        <Graph molData={molData} componentArray={components} type={type} neighborSearch={false}></Graph>
+        {!isMobile && <Graph molData={molData} componentArray={components} type={type} neighborSearch={false}></Graph>}
       </Box>
     </Container>
 
