@@ -10,7 +10,7 @@ import "../assets/custom.css";
 
 function Footer() {
     return (
-    <><Box class="footer">
+    <><Box className="footer">
         <Divider />
         <Grid container spacing={2}>
             <Grid item xs={2}>
@@ -29,7 +29,7 @@ function Footer() {
             </Grid>
             <Grid item xs={2}>
                 <a href="https://molssi.org/" target="_blank" title="Go to MolSSI in a new tab">
-                    <img src={molssi_logo} alt="Go to molssi.org" class="footer_logo"/>
+                    <img src={molssi_logo} alt="Go to molssi.org" className="footer_logo"/>
                 </a>
             </Grid>
         </Grid>

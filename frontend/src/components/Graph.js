@@ -185,8 +185,9 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
                 onChange={ function(event) {setXIndex(parseInt(event.target.value));}}
             >
                 {componentArray.map((item, index) => (
-                    <MenuItem value={index}>{axis_dict[type + item]}</MenuItem>
+                    <MenuItem key={index} value={index}>{axis_dict[type + item]}</MenuItem>
                 ))}
+
             </TextField>
             <TextField
                 id="dimension-outline"
@@ -198,7 +199,7 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
                 onChange={ function(event) {setYIndex(parseInt(event.target.value));}}
             >
                 {componentArray.map((item, index) => (
-                    <MenuItem value={index}>{axis_dict[type + item]}</MenuItem>
+                    <MenuItem key={index} value={index}>{axis_dict[type + item]}</MenuItem>
                 ))}
             </TextField>
       </Container>
