@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from "react-router-dom";
 
-import { Container, Typography, Box, TextField, Grid, Card, CardContent, IconButton } from "@mui/material";
+import { Container, Typography, Box, Grid, IconButton } from "@mui/material";
+
 import OriginalKraken from '../common/OriginalKraken';
 import Graph from "../components/Graph";
 
@@ -9,6 +10,40 @@ import SearchIcon from '@mui/icons-material/Search';
 import BubbleChartIcon from '@mui/icons-material/BubbleChart';
 import DownloadIcon from '@mui/icons-material/Download';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
+import StatCard from '../components/SummaryCard';
+
+const stats = [
+  {
+    "number": "1,558",
+    "description": "DFT Calculated Ligands"
+  },
+
+  {
+    "number": "300,000+",
+    "description": "ML calculated Ligands"
+  },
+
+  {
+    "number": "576",
+    "description": "unique substituents"
+  },
+  
+  {
+    "number": "190",
+    "description": "DFT-level descriptors"
+  },
+
+  {
+    "number": "21,437",
+    "description": "unique molecules"
+  },
+
+  {
+    "number": "13.8",
+    "description": "average conformers per ligand"
+  }, 
+  
+]
 
 function Home() {
    const [ molData, setMolData ] = useState([]);
@@ -121,18 +156,11 @@ function Home() {
         </Grid>
      </Box>
 
-    <Container maxWidth="xl" sx={{ display: 'flex', flexDirection: "column", alignItems: 'center' }}>
+    <Container maxWidth="xl" sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
       <Grid container spacing={2} sx={{ mt: 3 }}>
-        {/* Add your summary statistics cards here */}
-        <Grid item xs={12} md={6} lg={3}>
-          <Card>
-            <CardContent>
-              {/* Statistics go here */}
-              <Typography variant="h5">Stats 1</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        {/* Repeat for other cards */}
+            {stats.map((stat, index) => (
+              <StatCard key={index} number={stat.number} caption={stat.description} size={150} />
+            ))}
       </Grid>
       <Box sx={{ width: '100%', mt: 3 }}>
         <Graph molData={molData} componentArray={components} type={type} neighborSearch={false}></Graph>
