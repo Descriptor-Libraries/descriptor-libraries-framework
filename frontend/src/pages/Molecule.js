@@ -1,17 +1,37 @@
 import Graph from "../components/Graph"
 import React, { useEffect, useState } from 'react';
-import { Container } from "@mui/material";
+import { Box, Container } from "@mui/material";
+import Typography from '@mui/material/Typography';
 import { retrieveSVG } from "../common/MoleculeUtils";
 
 export default function MoleculeInfo() {
    const [ molData, setMolData ] = useState([]);
+   const [ neighborData, setNeighborData ] = useState([]);
    const [ components, setComponents ] = useState(["1", "2"]);
    const [ type, setType ] = useState("umap");
    const [ svg, setSvg ] = useState({});
 
+   async function molecule(molecule_id, signal) {
+      /**
+       * Requests general umap or pca data from the backend.
+       * @param {number} molecule_id Id of the molecule to search on.
+       * @param {AbortSignal} signal Abortsignal object.
+       */
+         const response =  await fetch(`/api/molecules/${molecule_id}`, {signal: signal})
+      
+         if (!response.ok) {
+            throw new Error('Invalid Molecule Id')
+         }
+      
+         else {
+            return await response.json()
+         }
+   }
+
    async function dimensionality(molecule_id, type, components, signal, limit=10) {
       /**
        * Requests general umap or pca data from the backend.
+       * @param {number} molecule_id Id of the molecule to search on.
        * @param {string} type Type of dimensionality reduction. Can be one of PCA or UMAP.
        * @param {string} components String of comma separated integers.
        * @param {AbortSignal} signal Abortsignal object.
@@ -37,9 +57,10 @@ export default function MoleculeInfo() {
        * @param {AbortSignal} signal Abortsignal object.
        */
          const fetchData = async () => {
-            const molecule_data = await dimensionality(1, type, components, signal);
-            const svg_data = await retrieveSVG(molecule_data[0].smiles, signal);
-            return [ molecule_data, svg_data ]
+            const molecule_data = await molecule(1, signal);
+            const neighbor_data = await dimensionality(1, type, components, signal);
+            const svg_data = await retrieveSVG(molecule_data.smiles, signal);
+            return [ molecule_data, neighbor_data, svg_data ]
          }
 
          fetchData()
@@ -48,7 +69,8 @@ export default function MoleculeInfo() {
          })
          .then( (items )=> {
             setMolData(items[0]);
-            setSvg(items[1]);
+            setNeighborData(items[1]);
+            setSvg(items[2]);
       })
       }
    
@@ -71,8 +93,12 @@ export default function MoleculeInfo() {
 
    return (
       <Container maxWidth="xl" sx={{display: 'flex', flexDirection: "column", height: 850, alignItems: 'center'}}>
-         {Object.keys(svg).length > 0 && <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(svg.svg)}`} />}
-         {Object.keys(molData).length > 0 && <Graph molData={molData} componentArray={components} type={type} neighborSearch={true}></Graph>}
+         {Object.keys(svg).length > 0 && <Box sx={{ my: 3 }} component="img" alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(svg.svg)}`}></Box>}
+         {Object.keys(molData).length > 0 && <Box sx={{ my: 3 }}>
+            <Typography> Smiles: {molData.smiles} </Typography>
+            <Typography> Molecular Weight: {molData.molecular_weight.toExponential(2)} </Typography>
+         </Box>}
+         {Object.keys(neighborData).length > 0 && <Graph molData={neighborData} componentArray={components} type={type} neighborSearch={true}></Graph>}
       </Container>
    )
 }
