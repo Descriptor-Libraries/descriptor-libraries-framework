@@ -96,7 +96,7 @@ export default function MoleculeInfo() {
          {Object.keys(svg).length > 0 && <Box sx={{ my: 3 }} component="img" alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(svg.svg)}`}></Box>}
          {Object.keys(molData).length > 0 && <Box sx={{ my: 3 }}>
             <Typography> Smiles: {molData.smiles} </Typography>
-            <Typography> Molecular Weight: {molData.molecular_weight.toExponential(2)} </Typography>
+            <Typography> Molecular Weight: {molData.molecular_weight.toFixed(2)} </Typography>
          </Box>}
          {Object.keys(neighborData).length > 0 && <Graph molData={neighborData} componentArray={components} type={type} neighborSearch={true}></Graph>}
       </Container>
