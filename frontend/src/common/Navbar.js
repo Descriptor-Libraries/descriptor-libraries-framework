@@ -16,6 +16,7 @@ import Contact from '../pages/Contact'
 import Download from '../pages/Download'
 import Search  from '../pages/SearchHook';
 import NeighborSearch  from '../pages/Neighbors';
+import Molecule from '../pages/Molecule';
 
 import '../assets/custom.css'
 
@@ -33,6 +34,7 @@ const pages ={
               'About': <About />, 
               'Search': <Search />,
               'Neighbors': <NeighborSearch/>, 
+              'Molecule': <Molecule/>,
               'Download': <Download />,
               'Contact': <Contact />
             };

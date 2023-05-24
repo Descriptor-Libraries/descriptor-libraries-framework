@@ -1,9 +1,8 @@
 import Graph from "../components/Graph"
 import React, { useEffect, useState } from 'react';
 import { Container } from "@mui/material";
-import { Typography } from "@mui/material";
 
-function Molecule() {
+export default function Molecule() {
    const [ molData, setMolData ] = useState([]);
    const [ components, setComponents ] = useState(["1", "2"]);
    const [ type, setType ] = useState("umap");
@@ -30,13 +29,13 @@ function Molecule() {
          }
    }
 
-   function loadData() {
+   function loadData(signal) {
       /**
-       * Main driver function which loads the data.
-       * 
+       * Main driver function which loads the neighbors for a molecule requested by the user.
+       * @param {AbortSignal} signal Abortsignal object.
        */
          const fetchData = async () => {
-            const molecule_data = await dimensionality(type, components);
+            const molecule_data = await dimensionality(1, type, components, signal);
             return molecule_data
          }
 
@@ -49,19 +48,26 @@ function Molecule() {
       })
       }
    
-      useEffect( ( ) => { 
-      loadData() },  
-      [ type ] 
-   );
+      // initial load of data
+      // and load when search changes. 
+      useEffect( ( ) => {
+         const controller = new AbortController();
+         const signal = controller.signal;
+
+         // setUpdatedParameters(false);
+         loadData(signal);
+
+         return () => {
+         controller.abort();
+         }
+      },
+         // eslint-disable-next-line react-hooks/exhaustive-deps
+         [ type ]
+      );
 
    return (
       <Container maxWidth="xl" sx={{display: 'flex', flexDirection: "column", height: 850, alignItems: 'center'}}>
-         <Typography variant="h2">
-         Kraken Webapp
-         </Typography>
          {<Graph molData={molData} componentArray={components} type={type} neighborSearch={false}></Graph>}
       </Container>
    )
 }
-
-export default Molecule;
