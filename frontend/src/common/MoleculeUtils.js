@@ -124,4 +124,4 @@ async function retrieveSVG(smiles, substructure = undefined, distance = undefine
   
 
 
-export { retrieveAllSVGs, dynamicGrid, substructureSearch, theme };
+export { retrieveSVG, retrieveAllSVGs, dynamicGrid, substructureSearch, theme };

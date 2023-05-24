@@ -1,11 +1,13 @@
 import Graph from "../components/Graph"
 import React, { useEffect, useState } from 'react';
 import { Container } from "@mui/material";
+import { retrieveSVG } from "../common/MoleculeUtils";
 
-export default function Molecule() {
+export default function MoleculeInfo() {
    const [ molData, setMolData ] = useState([]);
    const [ components, setComponents ] = useState(["1", "2"]);
    const [ type, setType ] = useState("umap");
+   const [ svg, setSvg ] = useState({});
 
    async function dimensionality(molecule_id, type, components, signal, limit=10) {
       /**
@@ -18,7 +20,7 @@ export default function Molecule() {
        */
          let encoded = encodeURIComponent(components);
 
-         const response =  await fetch(`/api/molecules/${molecule_id}/neighbors/?type=${type}&components=${encoded}&limit=${limit}`, {signal: signal})
+         const response =  await fetch(`/api/molecules/${molecule_id}/neighbors/?type=${type}&components=${encoded}&skip=0&limit=${limit}`, {signal: signal})
       
          if (!response.ok) {
             throw new Error('Invalid Molecule Id')
@@ -36,15 +38,17 @@ export default function Molecule() {
        */
          const fetchData = async () => {
             const molecule_data = await dimensionality(1, type, components, signal);
-            return molecule_data
+            const svg_data = await retrieveSVG(molecule_data[0].smiles, signal);
+            return [ molecule_data, svg_data ]
          }
 
          fetchData()
          .catch( (error) => {
-            console.log(error) 
+            console.log(error);
          })
-         .then( (items )=> {   
-            setMolData(items);   
+         .then( (items )=> {
+            setMolData(items[0]);
+            setSvg(items[1]);
       })
       }
    
@@ -67,7 +71,8 @@ export default function Molecule() {
 
    return (
       <Container maxWidth="xl" sx={{display: 'flex', flexDirection: "column", height: 850, alignItems: 'center'}}>
-         {<Graph molData={molData} componentArray={components} type={type} neighborSearch={false}></Graph>}
+         {Object.keys(svg).length > 0 && <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(svg.svg)}`} />}
+         {Object.keys(molData).length > 0 && <Graph molData={molData} componentArray={components} type={type} neighborSearch={true}></Graph>}
       </Container>
    )
 }

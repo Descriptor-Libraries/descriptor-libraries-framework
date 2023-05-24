@@ -16,7 +16,7 @@ import Contact from '../pages/Contact'
 import Download from '../pages/Download'
 import Search  from '../pages/SearchHook';
 import NeighborSearch  from '../pages/Neighbors';
-import Molecule from '../pages/Molecule';
+import MoleculeInfo from '../pages/Molecule';
 
 import '../assets/custom.css'
 
@@ -34,9 +34,9 @@ const pages ={
               'About': <About />, 
               'Search': <Search />,
               'Neighbors': <NeighborSearch/>, 
-              'Molecule': <Molecule/>,
               'Download': <Download />,
-              'Contact': <Contact />
+              'Contact': <Contact />,
+              'Molecule': <MoleculeInfo/>
             };
 
 const ResponsiveAppBar = () => {
@@ -135,7 +135,7 @@ const ResponsiveAppBar = () => {
                     <Button
                     key={page}
                     onClick={handleCloseNavMenu}
-                    sx={{ my: 2, color: 'white', display: 'block' }}
+                    sx={{ my: 2, color: 'black', display: 'block' }}
                   >
                     {page}
                   </Button>

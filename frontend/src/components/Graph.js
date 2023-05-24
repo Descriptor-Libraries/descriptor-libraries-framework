@@ -7,7 +7,6 @@ import MenuItem from '@mui/material/MenuItem';
 
 
 export default function Graph({ molData, componentArray, type, neighborSearch }){
-
     // Set the x and y indices to the first 2 values in the component array.
     const [ xIndex, setXIndex ] = useState(0);
     const [ yIndex, setYIndex ] = useState(1);
