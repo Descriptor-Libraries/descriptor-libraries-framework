@@ -10,36 +10,11 @@ import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 
-<<<<<<< HEAD
-import Home from '../pages/Home'
-import About from '../pages/About'
-import Contact from '../pages/Contact'
-import Download from '../pages/Download'
-import Search  from '../pages/SearchHook';
-import NeighborSearch  from '../pages/Neighbors';
-import MoleculeInfo from '../pages/Molecule';
-
-=======
->>>>>>> update
 import '../assets/custom.css'
 
 import { Link } from 'react-router-dom'
 
 import OriginalKraken from './OriginalKraken';
-
-<<<<<<< HEAD
-const pages ={
-              'Home': <Home />, 
-              'About': <About />, 
-              'Search': <Search />,
-              'Neighbors': <NeighborSearch/>, 
-              'Download': <Download />,
-              'Contact': <Contact />,
-              'Molecule': <MoleculeInfo/>
-            };
-=======
->>>>>>> update
-
 
 const ResponsiveAppBar = ({pages}) => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
