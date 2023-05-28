@@ -172,7 +172,7 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
     );
 
     return (
-        <Container style={{ height: '100%' }}>
+        <Container>
         <Container sx={{display: 'flex', flexDirection: "row", justifyContent: 'center'}}>
             <TextField
                 id="dimension-outline"

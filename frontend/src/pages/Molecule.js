@@ -1,7 +1,7 @@
 import Graph from "../components/Graph"
 import React, { useEffect, useState } from 'react';
 import { useParams } from "react-router-dom";
-import { Box, Container } from "@mui/material";
+import { Box, Grid, Item } from "@mui/material";
 import Typography from '@mui/material/Typography';
 import { retrieveSVG } from "../common/MoleculeUtils";
 
@@ -94,13 +94,27 @@ export default function MoleculeInfo() {
       );
 
    return (
-      <Container maxWidth="xl" sx={{display: 'flex', flexDirection: "column", height: 850, alignItems: 'center'}}>
-         {Object.keys(svg).length > 0 && <Box sx={{ my: 3 }} component="img" alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(svg.svg)}`}></Box>}
-         {Object.keys(molData).length > 0 && <Box sx={{ my: 3 }}>
-            <Typography> Smiles: {molData.smiles} </Typography>
-            <Typography> Molecular Weight: {molData.molecular_weight.toFixed(2)} </Typography>
-         </Box>}
-         {Object.keys(neighborData).length > 0 && <Graph molData={neighborData} componentArray={components} type={type} neighborSearch={true}></Graph>}
-      </Container>
+      <Grid container rowSpacing={1}>
+         <Grid item xs={6}>
+               {Object.keys(svg).length > 0 && <Box sx={{ my: 3 }} component="img" alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(svg.svg)}`}></Box>}
+               {Object.keys(molData).length > 0 && <Box sx={{ my: 3 }}>
+                  <Typography> Smiles: {molData.smiles} </Typography>
+                  <Typography> Molecular Weight: {molData.molecular_weight.toFixed(2)} </Typography>
+               </Box>}
+         </Grid>
+         <Grid item xs={6}>
+            Table of Information
+         </Grid>
+         <Grid item xs={6}>
+            Conformer Structures
+         </Grid>
+         <Grid item xs={6}>
+               {Object.keys(neighborData).length > 0 && <Graph molData={neighborData} componentArray={components} type={type} neighborSearch={true}></Graph>}
+         </Grid>
+      </Grid>
+      // <Container maxWidth="xl" sx={{display: 'flex', flexDirection: "column", height: 850, alignItems: 'center'}}>
+         
+         
+      // </Container>
    )
 }

@@ -35,8 +35,8 @@ function App() {
       <Router>
         <header className="kraken-webapp">
           <Content />
+          <MolRoutes/>
         </header>
-        <MolRoutes/>
         <Footer />
       </Router>
     </div>
