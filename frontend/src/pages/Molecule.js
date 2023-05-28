@@ -1,10 +1,12 @@
 import Graph from "../components/Graph"
 import React, { useEffect, useState } from 'react';
+import { useParams } from "react-router-dom";
 import { Box, Container } from "@mui/material";
 import Typography from '@mui/material/Typography';
 import { retrieveSVG } from "../common/MoleculeUtils";
 
 export default function MoleculeInfo() {
+   const params = useParams();
    const [ molData, setMolData ] = useState([]);
    const [ neighborData, setNeighborData ] = useState([]);
    const [ components, setComponents ] = useState(["1", "2"]);
@@ -51,14 +53,14 @@ export default function MoleculeInfo() {
          }
    }
 
-   function loadData(signal) {
+   function loadData(signal, molid) {
       /**
        * Main driver function which loads the neighbors for a molecule requested by the user.
        * @param {AbortSignal} signal Abortsignal object.
        */
          const fetchData = async () => {
-            const molecule_data = await molecule(1, signal);
-            const neighbor_data = await dimensionality(1, type, components, signal);
+            const molecule_data = await molecule(molid, signal);
+            const neighbor_data = await dimensionality(molid, type, components, signal);
             const svg_data = await retrieveSVG(molecule_data.smiles, signal);
             return [ molecule_data, neighbor_data, svg_data ]
          }
@@ -81,14 +83,14 @@ export default function MoleculeInfo() {
          const signal = controller.signal;
 
          // setUpdatedParameters(false);
-         loadData(signal);
+         loadData(signal, params.molid);
 
          return () => {
          controller.abort();
          }
       },
          // eslint-disable-next-line react-hooks/exhaustive-deps
-         [ type ]
+         [ params ]
       );
 
    return (

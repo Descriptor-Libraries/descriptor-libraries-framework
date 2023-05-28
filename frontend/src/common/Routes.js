@@ -1,8 +1,9 @@
 
 import { Route, Routes } from 'react-router-dom';
+import MoleculeInfo from '../pages/Molecule';
 
 
-  const AppRoutes = ({ pages }) => (
+  export const AppRoutes = ({ pages }) => (
     <Routes>
       <Route path='/' element={pages['Home']}></Route>
       {Object.keys(pages).map((page, index) => (
@@ -11,4 +12,10 @@ import { Route, Routes } from 'react-router-dom';
     </Routes>
   );
 
-  export default AppRoutes;
+  export const MolRoutes = () => {
+    return (
+      <Routes>
+        <Route path="molecule/:molid" element={<MoleculeInfo />} />
+      </Routes>
+    )
+  }
