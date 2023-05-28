@@ -10,6 +10,7 @@ import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 
+<<<<<<< HEAD
 import Home from '../pages/Home'
 import About from '../pages/About'
 import Contact from '../pages/Contact'
@@ -18,17 +19,15 @@ import Search  from '../pages/SearchHook';
 import NeighborSearch  from '../pages/Neighbors';
 import MoleculeInfo from '../pages/Molecule';
 
+=======
+>>>>>>> update
 import '../assets/custom.css'
 
-import {
-  BrowserRouter as Router, 
-  Routes,
-  Route,
-  Link
-} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 import OriginalKraken from './OriginalKraken';
 
+<<<<<<< HEAD
 const pages ={
               'Home': <Home />, 
               'About': <About />, 
@@ -38,8 +37,11 @@ const pages ={
               'Contact': <Contact />,
               'Molecule': <MoleculeInfo/>
             };
+=======
+>>>>>>> update
 
-const ResponsiveAppBar = () => {
+
+const ResponsiveAppBar = ({pages}) => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
 
   const handleOpenNavMenu = (event) => {
@@ -51,7 +53,6 @@ const ResponsiveAppBar = () => {
   };
 
   return (
-    <Router>
       <AppBar position="static" style={{backgroundColor: "#ed1c24"}} sx={{mb: 2}} >
         <Container maxWidth="xl">
           <Toolbar disableGutters>
@@ -59,10 +60,9 @@ const ResponsiveAppBar = () => {
             <Typography
               variant="h6"
               noWrap
-              component="a"
-              href="/"
-              sx={{
-                mr: 2,
+              component={Link}
+              to="/"
+              sx={{ 
                 display: { xs: 'none', md: 'flex' },
                 fontFamily: 'monospace',
                 fontWeight: 700,
@@ -114,8 +114,8 @@ const ResponsiveAppBar = () => {
             <Typography
               variant="h5"
               noWrap
-              component="a"
-              href=""
+              component={Link}
+              to="/"
               sx={{
                 mr: 2,
                 display: { xs: 'flex', md: 'none' },
@@ -154,18 +154,6 @@ const ResponsiveAppBar = () => {
           </Toolbar>
         </Container>
       </AppBar>
-      
-      <div class="content">
-        <Routes>
-          <Route path='/' element={[pages['Home']]}></Route>
-          {Object.keys(pages).map((page) => (
-            <Route path={page} element={pages[page]} >
-            </Route>
-          )) }
-        </Routes>
-      </div>
-
-    </Router>
   );
 };
 export default ResponsiveAppBar;
