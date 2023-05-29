@@ -2,7 +2,7 @@ import Graph from "../components/Graph"
 import React, { useEffect, useState } from 'react';
 import { useParams } from "react-router-dom";
 import { Box, Grid, Container } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridFooterContainer, GridFooter } from "@mui/x-data-grid";
 import Typography from '@mui/material/Typography';
 import { retrieveSVG } from "../common/MoleculeUtils";
 
@@ -82,6 +82,18 @@ export default function MoleculeInfo() {
          }
          rows.push(newObj);
       }
+
+      function CustomFooter () {
+         return (
+           <GridFooterContainer>
+             <Typography sx= {{mx: 1, color: 'gray'}}> ML Data </Typography>
+             <GridFooter sx={{
+               border: 'none', // To delete double border.
+               }} />
+           </GridFooterContainer>
+         );
+       }
+
       return (
          <Box
             sx={{
@@ -96,6 +108,7 @@ export default function MoleculeInfo() {
                disableColumnMenu
                rows={rows}
                columns={columns}
+               components={{Footer: CustomFooter}}
                initialState={{
                   pagination: {
                      paginationModel: { page: 0, pageSize: 4 },
