@@ -61,13 +61,13 @@ export default function MoleculeInfo() {
       let keys = Object.keys(data);
       let properties = Object.keys(data["max_data"])
 
-      columns.push({field: "id", flex: 1});
+      columns.push({field: "id", flex: 1, headerClassName: "super-app-theme--header"});
       
       // Loop through all the keys and create columns and rows. Avoid boltzmann_averaged_data since it does not have the same keys as the rest.
       for (const element of keys) {
          if (element != "boltzmann_averaged_data")
          {
-            columns.push({field: element, flex: 0.75});
+            columns.push({field: element, flex: 0.75, headerClassName: "super-app-theme--header"});
          }
       }
 
@@ -83,16 +83,26 @@ export default function MoleculeInfo() {
          rows.push(newObj);
       }
       return (
-         <DataGrid
-            disableColumnMenu
-            rows={rows}
-            columns={columns}
-            initialState={{
-               pagination: {
-                  paginationModel: { page: 0, pageSize: 4 },
-               },
+         <Box
+            sx={{
+            width: '100%',
+            '& .super-app-theme--header': {
+               backgroundColor: 'rgba(237, 28, 36)',
+               color: 'white',
+            },
             }}
-         />
+         >
+            <DataGrid
+               disableColumnMenu
+               rows={rows}
+               columns={columns}
+               initialState={{
+                  pagination: {
+                     paginationModel: { page: 0, pageSize: 4 },
+                  },
+               }}
+            />
+         </Box>
       )
    }
 
@@ -117,24 +127,24 @@ export default function MoleculeInfo() {
             setNeighborData(items[1]);
             setSvg(items[2]);
       })
-      }
+   }
    
-      // initial load of data
-      // and load when search changes. 
-      useEffect( ( ) => {
-         const controller = new AbortController();
-         const signal = controller.signal;
+   // initial load of data
+   // and load when search changes. 
+   useEffect( ( ) => {
+      const controller = new AbortController();
+      const signal = controller.signal;
 
-         // setUpdatedParameters(false);
-         loadData(signal, params.molid);
+      // setUpdatedParameters(false);
+      loadData(signal, params.molid);
 
-         return () => {
-         controller.abort();
-         }
-      },
-         // eslint-disable-next-line react-hooks/exhaustive-deps
-         [ params ]
-      );
+      return () => {
+      controller.abort();
+      }
+   },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [ params ]
+   );
 
    return (
       <Container maxWidth="xl" sx={{display: 'flex', height: 850, alignItems: 'center'}}>
