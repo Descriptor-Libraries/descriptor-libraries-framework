@@ -1,7 +1,8 @@
 import Graph from "../components/Graph"
 import React, { useEffect, useState } from 'react';
 import { useParams } from "react-router-dom";
-import { Box, Grid, Item } from "@mui/material";
+import { Box, Grid, Container } from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
 import Typography from '@mui/material/Typography';
 import { retrieveSVG } from "../common/MoleculeUtils";
 
@@ -53,6 +54,48 @@ export default function MoleculeInfo() {
          }
    }
 
+   function Table(data) {
+      let columns = [];
+      let rows = [];
+
+      let keys = Object.keys(data);
+      let properties = Object.keys(data["max_data"])
+
+      columns.push({field: "id", flex: 1});
+      
+      // Loop through all the keys and create columns and rows. Avoid boltzmann_averaged_data since it does not have the same keys as the rest.
+      for (const element of keys) {
+         if (element != "boltzmann_averaged_data")
+         {
+            columns.push({field: element, flex: 0.75});
+         }
+      }
+
+      // Make the rows of the table
+      for (const property of properties) {
+         let newObj = {id: property};
+         for (const element of keys) {
+            if (element != "boltzmann_averaged_data")
+            {
+               newObj[element] = data[element][property];
+            }
+         }
+         rows.push(newObj);
+      }
+      return (
+         <DataGrid
+            disableColumnMenu
+            rows={rows}
+            columns={columns}
+            initialState={{
+               pagination: {
+                  paginationModel: { page: 0, pageSize: 4 },
+               },
+            }}
+         />
+      )
+   }
+
    function loadData(signal, molid) {
       /**
        * Main driver function which loads the neighbors for a molecule requested by the user.
@@ -94,27 +137,25 @@ export default function MoleculeInfo() {
       );
 
    return (
-      <Grid container rowSpacing={1}>
-         <Grid item xs={6}>
-               {Object.keys(svg).length > 0 && <Box sx={{ my: 3 }} component="img" alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(svg.svg)}`}></Box>}
-               {Object.keys(molData).length > 0 && <Box sx={{ my: 3 }}>
-                  <Typography> Smiles: {molData.smiles} </Typography>
-                  <Typography> Molecular Weight: {molData.molecular_weight.toFixed(2)} </Typography>
-               </Box>}
+      <Container maxWidth="xl" sx={{display: 'flex', height: 850, alignItems: 'center'}}>
+         <Grid container rowSpacing={1} maxWidth="xl" sx={{alignItems: 'center'}}>
+            <Grid item xs={6}>
+                  {Object.keys(svg).length > 0 && <Box sx={{ my: 3 }} component="img" alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(svg.svg)}`}></Box>}
+                  {Object.keys(molData).length > 0 && <Box sx={{ my: 3 }}>
+                     <Typography> Smiles: {molData.smiles} </Typography>
+                     <Typography> Molecular Weight: {molData.molecular_weight.toFixed(2)} </Typography>
+                  </Box>}
+            </Grid>
+            <Grid item xs={6}>
+               {Object.keys(molData).length > 0 && Table(molData.ml_data)}
+            </Grid>
+            <Grid item xs={6}>
+               Conformer Structures
+            </Grid>
+            <Grid item xs={6}>
+                  {Object.keys(neighborData).length > 0 && <Graph molData={neighborData} componentArray={components} type={type} neighborSearch={true}></Graph>}
+            </Grid>
          </Grid>
-         <Grid item xs={6}>
-            Table of Information
-         </Grid>
-         <Grid item xs={6}>
-            Conformer Structures
-         </Grid>
-         <Grid item xs={6}>
-               {Object.keys(neighborData).length > 0 && <Graph molData={neighborData} componentArray={components} type={type} neighborSearch={true}></Graph>}
-         </Grid>
-      </Grid>
-      // <Container maxWidth="xl" sx={{display: 'flex', flexDirection: "column", height: 850, alignItems: 'center'}}>
-         
-         
-      // </Container>
+      </Container>
    )
 }
