@@ -374,3 +374,12 @@ def get_molecule_dimensions(
         )
 
     return results
+
+@router.get("/identifiers/", response_model=List[schemas.MoleculeIdentifiers])
+def get_identifiers(smiles: str):
+    # Check to see if the smiles is valid
+    smiles = valid_smiles(smiles)
+    mol = Chem.MolFromSmiles(smiles)
+    InChI = Chem.MolToInchi(mol)
+    InChIKey = Chem.MolToInchiKey(mol)
+    return [{'smiles': smiles, 'InChI': InChI, 'InChIKey': InChIKey}]

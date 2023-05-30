@@ -30,3 +30,7 @@ class MoleculeComponents(BaseModel):
 class MoleculeNeighbors(MoleculeComponents):
     dist: Optional[float]
 
+class MoleculeIdentifiers(BaseModel):
+    smiles: str
+    InChI: str
+    InChIKey: str
