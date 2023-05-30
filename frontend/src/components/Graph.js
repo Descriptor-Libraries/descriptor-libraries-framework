@@ -57,7 +57,7 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
      * Requests svg data for the molecule you are hovering on.
      * @param {event} event Hover even when hovering over a point on the plotly graph.
      */
-    fetch(`depict/cow/svg?smi=${event.points[0].text}&w=40&h=40`).then(response => 
+    fetch(`/depict/cow/svg?smi=${event.points[0].text}&w=40&h=40`).then(response => 
         response.text() ).then( body => showSVGWindow(body, event) );
     }
     
