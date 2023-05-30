@@ -54,6 +54,26 @@ export default function MoleculeInfo() {
          }
    }
 
+   async function identifiers(smiles, signal) {
+      /**
+       * Requests general umap or pca data from the backend.
+       * @param {string} smiles Smiles of the molecule.
+       * @param {AbortSignal} signal Abortsignal object.
+       * @return {json}  The response json.
+       */
+         let encoded = encodeURIComponent(smiles);
+
+         const response =  await fetch(`/api/molecules/identifiers/?smiles=${encoded}`, {signal: signal})
+      
+         if (!response.ok) {
+            throw new Error('Invalid Molecule Smiles')
+         }
+      
+         else {
+            return await response.json()
+         }
+   }
+
    function Table(data) {
       let columns = [];
       let rows = [];
@@ -128,7 +148,8 @@ export default function MoleculeInfo() {
             const molecule_data = await molecule(molid, signal);
             const neighbor_data = await dimensionality(molid, type, components, signal);
             const svg_data = await retrieveSVG(molecule_data.smiles, signal);
-            return [ molecule_data, neighbor_data, svg_data ]
+            const identifier_data = await identifiers(molecule_data.smiles, signal);
+            return [ molecule_data, neighbor_data, svg_data, identifier_data ]
          }
 
          fetchData()
