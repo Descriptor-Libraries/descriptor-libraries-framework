@@ -9,13 +9,6 @@ import MoleculeInfo from '../pages/Molecule';
       {Object.keys(pages).map((page, index) => (
         <Route key={index} path={`/${page.toLowerCase()}`} element={pages[page]} />
       ))}
+      <Route path="molecule/:molid" element={<MoleculeInfo />} />
     </Routes>
   );
-
-  export const MolRoutes = () => {
-    return (
-      <Routes>
-        <Route path="molecule/:molid" element={<MoleculeInfo />} />
-      </Routes>
-    )
-  }
