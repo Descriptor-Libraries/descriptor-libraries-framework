@@ -172,10 +172,7 @@ export default function MoleculeInfo() {
             <Grid item xs={6}>
                {Object.keys(molData).length > 0 && Table(molData.ml_data)}
             </Grid>
-            <Grid item xs={6}>
-               Conformer Structures
-            </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12}>
                   {Object.keys(neighborData).length > 0 && <Graph molData={neighborData} componentArray={components} type={type} neighborSearch={true}></Graph>}
             </Grid>
          </Grid>
