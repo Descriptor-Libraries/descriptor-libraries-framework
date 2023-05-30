@@ -10,6 +10,7 @@ export default function MoleculeInfo() {
    const params = useParams();
    const [ molData, setMolData ] = useState([]);
    const [ neighborData, setNeighborData ] = useState([]);
+   const [ identifierData, setIdentifierData ] = useState([]);
    const [ components, setComponents ] = useState(["1", "2"]);
    const [ type, setType ] = useState("umap");
    const [ svg, setSvg ] = useState({});
@@ -160,6 +161,7 @@ export default function MoleculeInfo() {
             setMolData(items[0]);
             setNeighborData(items[1]);
             setSvg(items[2]);
+            setIdentifierData(items[3][0]);
       })
    }
    
@@ -187,6 +189,8 @@ export default function MoleculeInfo() {
                   {Object.keys(svg).length > 0 && <Box sx={{ my: 3 }} component="img" alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(svg.svg)}`}></Box>}
                   {Object.keys(molData).length > 0 && <Box sx={{ my: 3 }}>
                      <Typography> <strong>Smiles:</strong> {molData.smiles} </Typography>
+                     <Typography> <strong>InChI:</strong> {identifierData.InChI} </Typography>
+                     <Typography> <strong>InChIKey:</strong> {identifierData.InChIKey} </Typography>
                      <Typography> <strong>Molecular Weight:</strong> {molData.molecular_weight.toFixed(2)} </Typography>
                   </Box>}
             </Grid>
