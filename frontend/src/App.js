@@ -21,7 +21,7 @@ const pages = {
 function Content() {
   const location = useLocation();
   return (
-    <div>
+    <div class="content">
       {location.pathname !== "/" && location.pathname !== "/home" && <ResponsiveAppBar pages={pages} />}
       <AppRoutes pages={pages} />
     </div>
