@@ -9,7 +9,7 @@ import { retrieveSVG } from "../common/MoleculeUtils";
 export default function MoleculeInfo() {
    const params = useParams();
    const [ molData, setMolData ] = useState([]);
-   const [ neighborData, setNeighborData ] = useState([]);
+   const [ umapNeighborData, setUmapNeighborData ] = useState([]);
    const [ identifierData, setIdentifierData ] = useState([]);
    const [ components, setComponents ] = useState(["1", "2"]);
    const [ type, setType ] = useState("umap");
@@ -147,10 +147,11 @@ export default function MoleculeInfo() {
        */
          const fetchData = async () => {
             const molecule_data = await molecule(molid, signal);
-            const neighbor_data = await dimensionality(molid, type, components, signal);
+            const umap_neighbor_data = await dimensionality(molid, "umap", ["1", "2"], signal);
+            const pca_neighbor_data = await dimensionality(molid, "pca", ["1", "2", "3", "4"], signal);
             const svg_data = await retrieveSVG(molecule_data.smiles, signal);
             const identifier_data = await identifiers(molecule_data.smiles, signal);
-            return [ molecule_data, neighbor_data, svg_data, identifier_data ]
+            return [ molecule_data, umap_neighbor_data, pca_neighbor_data, svg_data, identifier_data ]
          }
 
          fetchData()
@@ -158,10 +159,12 @@ export default function MoleculeInfo() {
             console.log(error);
          })
          .then( (items )=> {
+            console.log(items[1]);
+            console.log(items[2]);
             setMolData(items[0]);
-            setNeighborData(items[1]);
-            setSvg(items[2]);
-            setIdentifierData(items[3][0]);
+            setUmapNeighborData(items[1]);
+            setSvg(items[3]);
+            setIdentifierData(items[4][0]);
       })
    }
    
@@ -199,7 +202,7 @@ export default function MoleculeInfo() {
                {Object.keys(molData).length > 0 && Table(molData.ml_data)}
             </Grid>
             <Grid item xs={12}>
-                  {Object.keys(neighborData).length > 0 && <Graph molData={neighborData} componentArray={components} type={type} neighborSearch={true}></Graph>}
+                  {Object.keys(umapNeighborData).length > 0 && <Graph molData={umapNeighborData} componentArray={components} type={type} neighborSearch={true}></Graph>}
             </Grid>
          </Grid>
       </Container>
