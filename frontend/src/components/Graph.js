@@ -171,6 +171,14 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
         }
     );
 
+    // Need a use effect here, to reset the indices for xIndex and yIndex when new components are passed.
+    useEffect( ( ) => {
+        setXIndex(0);
+        setYIndex(1);
+      },
+        [ componentArray ]
+      );
+
     return (
         <Container>
         <Container sx={{display: 'flex', flexDirection: "row", justifyContent: 'center'}}>

@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { Box, Grid, Container, TextField, MenuItem } from "@mui/material";
 import { DataGrid, GridFooterContainer, GridFooter } from "@mui/x-data-grid";
 import Typography from '@mui/material/Typography';
+import { CircularProgress } from "@mui/material";
 import { retrieveSVG } from "../common/MoleculeUtils";
 
 export default function MoleculeInfo() {
@@ -75,6 +76,20 @@ export default function MoleculeInfo() {
          else {
             return await response.json()
          }
+   }
+
+   function switchDimensionality(event) {
+      setType(event.target.value);
+      console.log(event.target.value)
+      if (event.target.value === "umap")
+      {
+         setComponents(["1", "2"]);
+         setNeighborData(umapNeighborData);
+      }
+      else {
+         setComponents(["1", "2", "3", "4"]);
+         setNeighborData(pcaNeighborData);
+      }
    }
 
    function Table(data) {
@@ -189,10 +204,10 @@ export default function MoleculeInfo() {
    );
 
    return (
-      <Container maxWidth="xl" sx={{ my: 5, display: 'flex', height: 850, alignItems: 'center'}}>
+      <Container maxWidth="xl" sx={{ display: 'flex', alignItems: 'center' }}>
          <Grid container rowSpacing={1} maxWidth="xl" sx={{alignItems: 'center'}}>
-            <Grid item xs={6}>
-                  {Object.keys(svg).length > 0 && <Box sx={{ my: 3 }} component="img" alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(svg.svg)}`}></Box>}
+            <Grid item xs={6} sx={{my: 3}}>
+                  {Object.keys(svg).length > 0 && <Box component="img" alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(svg.svg)}`}></Box>}
                   {Object.keys(molData).length > 0 && 
                      <Box sx={{ my: 3 }}>
                         <Typography align='left'> <strong>Smiles:</strong> {molData.smiles} </Typography>
@@ -205,29 +220,23 @@ export default function MoleculeInfo() {
                {Object.keys(molData).length > 0 && Table(molData.ml_data)}
             </Grid>
             <Grid item xs={12}>
-                  <TextField
+                  {Object.keys(neighborData).length > 0 ? (<TextField
                   sx={{ m: 0.5 }}
                   select
                   id="dimension-outline"
                   value={type}
-                  onChange={ function(event) {
-                     setType(event.target.value);
-                     console.log(event.target.value)
-                     if (event.target.value === "umap")
-                     {
-                        setComponents(["1", "2"]);
-                        setNeighborData(umapNeighborData);
-                     }
-                     else {
-                        setComponents(["1", "2", "3", "4"]);
-                        setNeighborData(pcaNeighborData);
-                     }
-                     }}
+                  onChange={event => switchDimensionality(event)}
                   >
-                        <MenuItem value={"pca"}>PCA</MenuItem>
                         <MenuItem value={"umap"}>UMAP</MenuItem>
-                  </TextField>
-                  {Object.keys(neighborData).length > 0 && <Graph molData={neighborData} componentArray={components} type={type} neighborSearch={true}></Graph>}
+                        <MenuItem value={"pca"}>PCA</MenuItem>
+                  </TextField>)
+                  :
+                  <CircularProgress sx={{ color: "#ed1c24" }} />
+                  }
+                  {Object.keys(neighborData).length > 0 && 
+                  <Container sx={{ display: 'flex', height: 750, mb: 10}}>
+                     <Graph molData={neighborData} componentArray={components} type={type} neighborSearch={true}></Graph>
+                  </Container>}
             </Grid>
          </Grid>
       </Container>
