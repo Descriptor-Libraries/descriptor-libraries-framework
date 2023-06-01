@@ -1,7 +1,7 @@
 import Graph from "../components/Graph"
 import React, { useEffect, useState } from 'react';
 import { useParams } from "react-router-dom";
-import { Box, Grid, Container } from "@mui/material";
+import { Box, Grid, Container, TextField, MenuItem } from "@mui/material";
 import { DataGrid, GridFooterContainer, GridFooter } from "@mui/x-data-grid";
 import Typography from '@mui/material/Typography';
 import { retrieveSVG } from "../common/MoleculeUtils";
@@ -10,7 +10,9 @@ export default function MoleculeInfo() {
    const params = useParams();
    const [ molData, setMolData ] = useState([]);
    const [ umapNeighborData, setUmapNeighborData ] = useState([]);
+   const [ pcaNeighborData, setPcaNeighborData ] = useState([]);
    const [ identifierData, setIdentifierData ] = useState([]);
+   const [ neighborData, setNeighborData ] = useState([]);
    const [ components, setComponents ] = useState(["1", "2"]);
    const [ type, setType ] = useState("umap");
    const [ svg, setSvg ] = useState({});
@@ -159,12 +161,13 @@ export default function MoleculeInfo() {
             console.log(error);
          })
          .then( (items )=> {
-            console.log(items[1]);
-            console.log(items[2]);
             setMolData(items[0]);
             setUmapNeighborData(items[1]);
+            setPcaNeighborData(items[2]);
             setSvg(items[3]);
             setIdentifierData(items[4][0]);
+            // Initiall set neighbor data to umap so it appears on load.
+            setNeighborData(items[1]);
       })
    }
    
@@ -202,7 +205,29 @@ export default function MoleculeInfo() {
                {Object.keys(molData).length > 0 && Table(molData.ml_data)}
             </Grid>
             <Grid item xs={12}>
-                  {Object.keys(umapNeighborData).length > 0 && <Graph molData={umapNeighborData} componentArray={components} type={type} neighborSearch={true}></Graph>}
+                  <TextField
+                  sx={{ m: 0.5 }}
+                  select
+                  id="dimension-outline"
+                  value={type}
+                  onChange={ function(event) {
+                     setType(event.target.value);
+                     console.log(event.target.value)
+                     if (event.target.value === "umap")
+                     {
+                        setComponents(["1", "2"]);
+                        setNeighborData(umapNeighborData);
+                     }
+                     else {
+                        setComponents(["1", "2", "3", "4"]);
+                        setNeighborData(pcaNeighborData);
+                     }
+                     }}
+                  >
+                        <MenuItem value={"pca"}>PCA</MenuItem>
+                        <MenuItem value={"umap"}>UMAP</MenuItem>
+                  </TextField>
+                  {Object.keys(neighborData).length > 0 && <Graph molData={neighborData} componentArray={components} type={type} neighborSearch={true}></Graph>}
             </Grid>
          </Grid>
       </Container>
