@@ -16,8 +16,8 @@ a {
 .content {
 	display: flex;
 	flex-direction: column;
-	min-height: 100vh;
-	padding-bottom: 90px;
+	min-height: 90vh;
+	padding-bottom: 0px;
 	box-sizing: border-box;
 }
 
@@ -29,7 +29,6 @@ body, html {
   
 
 .footer {
-  position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
