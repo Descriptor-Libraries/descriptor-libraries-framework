@@ -1829,6 +1829,11 @@
     prop-types "^15.8.1"
     reselect "^4.1.8"
 
+"@n1ru4l/use-async-effect@^1.2.4":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@n1ru4l/use-async-effect/-/use-async-effect-1.4.0.tgz#662824fd1a35fbe9bec70a350b26599039fc1a9b"
+  integrity sha512-gQcaM5n+Gb5ZibEWN4m8P3Tv+JCh5Llb2SNLMf0oY/1Gog40QcNYt4oEivMst1O1NXURY8OXIWHTosGzrGsP4Q==
+
 "@nicolo-ribaudo/eslint-scope-5-internals@5.1.1-v1":
   version "5.1.1-v1"
   resolved "https://registry.yarnpkg.com/@nicolo-ribaudo/eslint-scope-5-internals/-/eslint-scope-5-internals-5.1.1-v1.tgz#dbf733a965ca47b1973177dc0bb6c889edcfb129"
@@ -8211,6 +8216,11 @@ next-tick@^1.1.0:
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.1.0.tgz#1836ee30ad56d67ef281b22bd199f709449b35eb"
   integrity sha512-CXdUiJembsNjuToQvxayPZF9Vqht7hewsvy2sOWafLvi2awflj9mOC6bHIg50orX8IJvWKY9wYQ/zB2kogPslQ==
 
+ngl@2.0.0-dev.37:
+  version "2.0.0-dev.37"
+  resolved "https://registry.yarnpkg.com/ngl/-/ngl-2.0.0-dev.37.tgz#6c7052d2b2f9f7db0ee1c13eb0f8711ab3bb9de8"
+  integrity sha512-quGzzIoi0RK1s2Y+fvC3WiVj68ObNubKl0NIjrPM1GnHOcVqJnYcvh8PSMaN3CMhrrOkT7kjVWHxgl5UxHLS6Q==
+
 no-case@^3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/no-case/-/no-case-3.0.4.tgz#d361fd5c9800f558551a8369fc0dcd4662b6124d"
@@ -9677,6 +9687,15 @@ react-lifecycles-compat@^3.0.4:
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
 
+react-ngl@^0.2.3:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/react-ngl/-/react-ngl-0.2.3.tgz#580e35cbd131c455b07f8189137dd027f1ed3ccf"
+  integrity sha512-clo6Qy2k9k4oGrg6IEWp0GM1SxXNy6FFkbXG6AXvsycvv37H9jplczE+vlhDPuSlegvTdXOvUCtsE9QFdNv7YQ==
+  dependencies:
+    "@n1ru4l/use-async-effect" "^1.2.4"
+    ngl "2.0.0-dev.37"
+    three "^0.125.0"
+
 react-plotly.js@^2.6.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/react-plotly.js/-/react-plotly.js-2.6.0.tgz#ad6b68ee64f1b5cfa142ee92c59687f9c2c09209"
@@ -11091,6 +11110,11 @@ three@0.131.3:
   version "0.131.3"
   resolved "https://registry.yarnpkg.com/three/-/three-0.131.3.tgz#406fd210c603ca9154937ae3582996fbfd3cb716"
   integrity sha512-VkZAv8ZTJqiE/fyEmoWLxcNHImpVcjqW7RO0GzMu3tRpwO0KUvK9pjTmJzJcAbc51BOeB2G38zh80yjHTbP8gQ==
+
+three@^0.125.0:
+  version "0.125.2"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.125.2.tgz#dcba12749a2eb41522e15212b919cd3fbf729b12"
+  integrity sha512-7rIRO23jVKWcAPFdW/HREU2NZMGWPBZ4XwEMt0Ak0jwLUKVJhcKM55eCBWyGZq/KiQbeo1IeuAoo/9l2dzhTXA==
 
 throat@^6.0.1:
   version "6.0.1"

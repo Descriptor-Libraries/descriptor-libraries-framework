@@ -1,11 +1,12 @@
 import Graph from "../components/Graph"
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useParams } from "react-router-dom";
 import { Box, Grid, Container, TextField, MenuItem, Card, CardContent } from "@mui/material";
 import { DataGrid, GridFooterContainer, GridFooter } from "@mui/x-data-grid";
 import Typography from '@mui/material/Typography';
 import { CircularProgress } from "@mui/material";
 import { retrieveSVG } from "../common/MoleculeUtils";
+import { Stage, Component } from "react-ngl";
 
 export default function MoleculeInfo() {
    const params = useParams();
@@ -17,6 +18,10 @@ export default function MoleculeInfo() {
    const [ components, setComponents ] = useState(["1", "2"]);
    const [ type, setType ] = useState("umap");
    const [ svg, setSvg ] = useState({});
+
+   const reprList = useMemo(() => [{
+      type: 'cartoon'
+    }], []);
 
    async function molecule(molecule_id, signal) {
       /**
@@ -206,7 +211,7 @@ export default function MoleculeInfo() {
    return (
       <Container maxWidth="xl" sx={{ display: 'flex', alignItems: 'center' }}>
          <Grid container spacing={2} maxWidth="xl" sx={{alignItems: 'center'}}>
-            <Grid item xs={6} sx={{my: 3}}>
+            <Grid item xs={6} sx={{mt: 3}}>
                   {Object.keys(svg).length > 0 && <Box component="img" alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(svg.svg)}`}></Box>}
                   {Object.keys(molData).length > 0 && 
                         <Card>
@@ -221,7 +226,18 @@ export default function MoleculeInfo() {
             <Grid item xs={6}>
                {Object.keys(molData).length > 0 && Table(molData.ml_data)}
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={6}>
+               <Box
+               display="flex"
+               justifyContent="center"
+               alignItems="center"
+               >
+                  <Stage width="600px" height="450px" params={{backgroundColor: 'white'}}>
+                     <Component path="rcsb://4hhb" reprList={reprList} />
+                  </Stage>
+               </Box>
+            </Grid>
+            <Grid item xs={6}>
                   {Object.keys(neighborData).length > 0 ? (<TextField
                   sx={{ mb: 0.5 }}
                   select
@@ -236,7 +252,7 @@ export default function MoleculeInfo() {
                   <CircularProgress sx={{ color: "#ed1c24" }} />
                   }
                   {Object.keys(neighborData).length > 0 && 
-                  <Container sx={{ display: 'flex', height: 750, mb: 10}}>
+                  <Container sx={{ display: 'flex', height: 450, mb: 10}}>
                      <Graph molData={neighborData} componentArray={components} type={type} neighborSearch={true}></Graph>
                   </Container>}
             </Grid>
