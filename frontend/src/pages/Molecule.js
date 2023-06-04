@@ -1,7 +1,7 @@
 import Graph from "../components/Graph"
 import React, { useEffect, useState } from 'react';
 import { useParams } from "react-router-dom";
-import { Box, Grid, Container, TextField, MenuItem } from "@mui/material";
+import { Box, Grid, Container, TextField, MenuItem, Card, CardContent } from "@mui/material";
 import { DataGrid, GridFooterContainer, GridFooter } from "@mui/x-data-grid";
 import Typography from '@mui/material/Typography';
 import { CircularProgress } from "@mui/material";
@@ -205,23 +205,25 @@ export default function MoleculeInfo() {
 
    return (
       <Container maxWidth="xl" sx={{ display: 'flex', alignItems: 'center' }}>
-         <Grid container rowSpacing={1} maxWidth="xl" sx={{alignItems: 'center'}}>
+         <Grid container spacing={2} maxWidth="xl" sx={{alignItems: 'center'}}>
             <Grid item xs={6} sx={{my: 3}}>
                   {Object.keys(svg).length > 0 && <Box component="img" alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(svg.svg)}`}></Box>}
                   {Object.keys(molData).length > 0 && 
-                     <Box sx={{ my: 3 }}>
-                        <Typography align='left'> <strong>Smiles:</strong> {molData.smiles} </Typography>
-                        <Typography align='left'> <strong>InChI:</strong> {identifierData.InChI} </Typography>
-                        <Typography align='left'> <strong>InChIKey:</strong> {identifierData.InChIKey} </Typography>
-                        <Typography align='left'> <strong>Molecular Weight:</strong> {molData.molecular_weight.toFixed(2)} </Typography>
-                     </Box>}
+                        <Card>
+                           <CardContent>
+                           <Typography align='left'> <strong>Smiles:</strong> {molData.smiles} </Typography>
+                           <Typography align='left'> <strong>InChI:</strong> {identifierData.InChI} </Typography>
+                           <Typography align='left'> <strong>InChIKey:</strong> {identifierData.InChIKey} </Typography>
+                           <Typography align='left'> <strong>Molecular Weight:</strong> {molData.molecular_weight.toFixed(2)} </Typography>
+                           </CardContent>
+                        </Card>}
             </Grid>
             <Grid item xs={6}>
                {Object.keys(molData).length > 0 && Table(molData.ml_data)}
             </Grid>
             <Grid item xs={12}>
                   {Object.keys(neighborData).length > 0 ? (<TextField
-                  sx={{ m: 0.5 }}
+                  sx={{ mb: 0.5 }}
                   select
                   id="dimension-outline"
                   value={type}
