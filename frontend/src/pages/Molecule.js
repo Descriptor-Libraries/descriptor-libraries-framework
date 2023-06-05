@@ -18,6 +18,8 @@ export default function MoleculeInfo() {
    const [ components, setComponents ] = useState(["1", "2"]);
    const [ type, setType ] = useState("umap");
    const [ svg, setSvg ] = useState({});
+   const [ allConformers, setAllConformers ] = useState([]);
+   const [ conformer, setConformer ] = useState("");
 
    const reprList = useMemo(() => [{
       type: 'ball+stick'
@@ -186,8 +188,16 @@ export default function MoleculeInfo() {
             setPcaNeighborData(items[2]);
             setSvg(items[3]);
             setIdentifierData(items[4][0]);
-            // Initiall set neighbor data to umap so it appears on load.
+            // Initial set neighbor data to umap so it appears on load.
             setNeighborData(items[1]);
+            // If we have conformers, we can set our states.
+            if (items[0].conformers_id.length > 0)
+            {
+               // Get list of conformers
+               setAllConformers(items[0].conformers_id);
+               // Set conformer to the first one available.
+               setConformer(items[0].conformers_id[0].toString());
+            }
       })
    }
    
@@ -226,18 +236,18 @@ export default function MoleculeInfo() {
             <Grid item xs={6}>
                {Object.keys(molData).length > 0 && Table(molData.ml_data)}
             </Grid>
-            <Grid item xs={6}>
-               <Box
+            <Grid item xs={allConformers.length > 0 && conformer.length > 0 ? 6 : 0}>
+               {allConformers.length > 0 && conformer.length > 0 && <Box
                display="flex"
                justifyContent="center"
                alignItems="center"
                >
-                  <Stage width="600px" height="450px" params={{backgroundColor: 'white'}}>
-                     <Component path="/api/conformers/export/31646.sdf" reprList={reprList} />
+                  <Stage width="600px" height="600px" params={{backgroundColor: 'white'}} cameraState={{distance: -20}}>
+                     <Component path={"/api/conformers/export/"+ conformer + ".sdf"} reprList={reprList} />
                   </Stage>
-               </Box>
+               </Box>}
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={allConformers.length > 0 && conformer.length > 0 ? 6 : 12}>
                   {Object.keys(neighborData).length > 0 ? (<TextField
                   sx={{ mb: 0.5 }}
                   select
@@ -252,7 +262,7 @@ export default function MoleculeInfo() {
                   <CircularProgress sx={{ color: "#ed1c24" }} />
                   }
                   {Object.keys(neighborData).length > 0 && 
-                  <Container sx={{ display: 'flex', height: 450, mb: 10}}>
+                  <Container sx={{ display: 'flex', height: 600, mb: 10}}>
                      <Graph molData={neighborData} componentArray={components} type={type} neighborSearch={true}></Graph>
                   </Container>}
             </Grid>
