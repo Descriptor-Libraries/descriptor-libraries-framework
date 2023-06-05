@@ -1,7 +1,7 @@
 import Graph from "../components/Graph"
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams } from "react-router-dom";
-import { Box, Grid, Container, TextField, MenuItem, Card, CardContent } from "@mui/material";
+import { Box, Grid, Container, TextField, MenuItem, Card, CardContent, Select, InputLabel, FormControl} from "@mui/material";
 import { DataGrid, GridFooterContainer, GridFooter } from "@mui/x-data-grid";
 import Typography from '@mui/material/Typography';
 import { CircularProgress } from "@mui/material";
@@ -243,29 +243,33 @@ export default function MoleculeInfo() {
                {Object.keys(molData).length > 0 && Table(molData.ml_data)}
             </Grid>
             <Grid item xs={allConformers.length > 0 && conformer.length > 0 ? 6 : 0}>
-               {allConformers.length > 0 && conformer.length > 0 && <Box
-               display="flex"
-               justifyContent="center"
-               alignItems="center"
-               >
-                  <TextField
-                  id="dimension-outline"
-                  value={conformer}
-                  label="Conformer"
-                  select
-                  style={{width: 250}}
-                  sx={{ m: 0.5 }}
-                  onChange={ function(event) {setConformer(event.target.value.toString());} }
+               {allConformers.length > 0 && conformer.length > 0 && 
+               <Container>
+                  <FormControl fullWidth variant="standard">
+                     <InputLabel id="conformer">Conformer</InputLabel>
+                     <Select
+                     labelId="conformer"
+                     id="dimension-outline"
+                     value={conformer}
+                     style={{width: 125}}
+                     MenuProps={{ PaperProps: { sx: { maxHeight: 200 } } }}
+                     onChange={ function(event) {setConformer(event.target.value.toString());} }
+                     >
+                        {allConformers.map((item, index) => (
+                           <MenuItem key={index} value={item}>{item}</MenuItem>
+                        ))}
+                     </Select>
+                  </FormControl>
+                  <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
                   >
-                     {allConformers.map((item, index) => (
-                        <MenuItem key={index} value={item}>{item}</MenuItem>
-                     ))}
-
-                  </TextField>
-                  <Stage width="600px" height="600px" params={{backgroundColor: 'white'}} cameraState={{distance: -20}}>
-                     <Component path={"/api/conformers/export/"+ conformer + ".sdf"} reprList={reprList} />
-                  </Stage>
-               </Box>}
+                     <Stage width="600px" height="600px" params={{backgroundColor: 'white'}} cameraState={{distance: -20}}>
+                        <Component path={"/api/conformers/export/"+ conformer + ".sdf"} reprList={reprList} />
+                     </Stage>
+                  </Box>
+               </Container>}
             </Grid>
             <Grid item xs={allConformers.length > 0 && conformer.length > 0 ? 6 : 12}>
                   {Object.keys(neighborData).length > 0 ? (<TextField
