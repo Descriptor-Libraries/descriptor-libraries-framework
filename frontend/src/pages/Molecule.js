@@ -20,7 +20,7 @@ export default function MoleculeInfo() {
    const [ svg, setSvg ] = useState({});
 
    const reprList = useMemo(() => [{
-      type: 'cartoon'
+      type: 'ball+stick'
     }], []);
 
    async function molecule(molecule_id, signal) {
@@ -233,7 +233,7 @@ export default function MoleculeInfo() {
                alignItems="center"
                >
                   <Stage width="600px" height="450px" params={{backgroundColor: 'white'}}>
-                     <Component path="rcsb://4hhb" reprList={reprList} />
+                     <Component path="/api/conformers/export/31646.sdf" reprList={reprList} />
                   </Stage>
                </Box>
             </Grid>
