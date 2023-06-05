@@ -218,12 +218,6 @@ export default function MoleculeInfo() {
       [ params ]
    );
 
-   useEffect( ( ) => {
-      console.log(conformer);
-   },
-      [ conformer ]
-   );
-
    return (
       <Container maxWidth="xl" sx={{ display: 'flex', alignItems: 'center' }}>
          <Grid container spacing={2} maxWidth="xl" sx={{alignItems: 'center'}}>
