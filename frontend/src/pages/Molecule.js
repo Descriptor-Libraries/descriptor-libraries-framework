@@ -218,6 +218,12 @@ export default function MoleculeInfo() {
       [ params ]
    );
 
+   useEffect( ( ) => {
+      console.log(conformer);
+   },
+      [ conformer ]
+   );
+
    return (
       <Container maxWidth="xl" sx={{ display: 'flex', alignItems: 'center' }}>
          <Grid container spacing={2} maxWidth="xl" sx={{alignItems: 'center'}}>
@@ -242,6 +248,20 @@ export default function MoleculeInfo() {
                justifyContent="center"
                alignItems="center"
                >
+                  <TextField
+                  id="dimension-outline"
+                  value={conformer}
+                  label="Conformer"
+                  select
+                  style={{width: 250}}
+                  sx={{ m: 0.5 }}
+                  onChange={ function(event) {setConformer(event.target.value.toString());} }
+                  >
+                     {allConformers.map((item, index) => (
+                        <MenuItem key={index} value={item}>{item}</MenuItem>
+                     ))}
+
+                  </TextField>
                   <Stage width="600px" height="600px" params={{backgroundColor: 'white'}} cameraState={{distance: -20}}>
                      <Component path={"/api/conformers/export/"+ conformer + ".sdf"} reprList={reprList} />
                   </Stage>
