@@ -7,7 +7,6 @@ import MenuItem from '@mui/material/MenuItem';
 
 
 export default function Graph({ molData, componentArray, type, neighborSearch }){
-
     // Set the x and y indices to the first 2 values in the component array.
     const [ xIndex, setXIndex ] = useState(0);
     const [ yIndex, setYIndex ] = useState(1);
@@ -58,7 +57,7 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
      * Requests svg data for the molecule you are hovering on.
      * @param {event} event Hover even when hovering over a point on the plotly graph.
      */
-    fetch(`depict/cow/svg?smi=${event.points[0].text}&w=40&h=40`).then(response => 
+    fetch(`/depict/cow/svg?smi=${event.points[0].text}&w=40&h=40`).then(response => 
         response.text() ).then( body => showSVGWindow(body, event) );
     }
     
@@ -172,8 +171,16 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
         }
     );
 
+    // Need a use effect here, to reset the indices for xIndex and yIndex when new components are passed.
+    useEffect( ( ) => {
+        setXIndex(0);
+        setYIndex(1);
+      },
+        [ componentArray ]
+      );
+
     return (
-        <Container style={{ height: '100%' }}>
+        <Container>
         <Container sx={{display: 'flex', flexDirection: "row", justifyContent: 'center'}}>
             <TextField
                 id="dimension-outline"

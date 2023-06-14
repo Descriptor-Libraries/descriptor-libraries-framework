@@ -32,7 +32,6 @@ def get_conformer_and_format(conformer_id, format, db):
 
     if format == "xyz":
         return xyz
-
     mol = utils.obabel("xyz", format, xyz)
     return mol
 

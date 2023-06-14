@@ -16,8 +16,6 @@ import { Link } from 'react-router-dom'
 
 import OriginalKraken from './OriginalKraken';
 
-
-
 const ResponsiveAppBar = ({pages}) => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
 

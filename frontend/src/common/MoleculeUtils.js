@@ -65,7 +65,7 @@ function dynamicGrid( svgs ) {
             
             {result.distance !== undefined && (
                 <Typography sx={{ wordBreak: "break-word" }}>
-                  <strong>Distance: </strong> {result.distance.toExponential(2)}
+                  <strong>Distance: </strong> {result.distance.toFixed(2)}
                 </Typography>
               )}
 
@@ -124,4 +124,4 @@ async function retrieveSVG(smiles, substructure = undefined, distance = undefine
   
 
 
-export { retrieveAllSVGs, dynamicGrid, substructureSearch, theme };
+export { retrieveSVG, retrieveAllSVGs, dynamicGrid, substructureSearch, theme };

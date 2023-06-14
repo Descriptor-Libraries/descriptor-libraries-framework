@@ -1,8 +1,8 @@
 import './App.css';
-import { BrowserRouter as Router, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, useLocation} from 'react-router-dom';
 
 import ResponsiveAppBar from './common/Navbar';
-import AppRoutes from './common/Routes';
+import { AppRoutes } from './common/Routes';
 import Footer from './common/Footer';
 
 import Home from './pages/Home'
