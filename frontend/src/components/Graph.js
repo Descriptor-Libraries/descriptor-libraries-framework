@@ -7,6 +7,7 @@ import MenuItem from '@mui/material/MenuItem';
 
 
 export default function Graph({ molData, componentArray, type, neighborSearch }){
+    console.log(molData)
     // Set the x and y indices to the first 2 values in the component array.
     const [ xIndex, setXIndex ] = useState(0);
     const [ yIndex, setYIndex ] = useState(1);
@@ -75,6 +76,7 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
      * The x and y labels are mapped to the axis dictionary to write pc1 instead of pca1.
      */
     let myPlot = <Plot
+                    onClick={(event) => console.debug(event.points[0])}
                     onHover={ (event) => showSVG(event) } 
                     onUnhover={ (event)=> hideSVG(event) } 
                     style={{'width': '100%', 'height': '100%' }}
@@ -154,7 +156,7 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
             {
                 x: values.map( row => {if (row.pat == element) { return row.components[xIndex] } }),
                 y: values.map( row => {if (row.pat == element) { return row.components[yIndex] } }),
-                text: values.map( row => { return encodeURIComponent(row.smiles) }),
+                text: values.map( row => { return encodeURIComponent(row.smiles) + "," + row.molecule_id }),
                 hovertemplate: "( %{x}, %{y})",
                 hovermode: "closest",
                 type: 'scatter',
