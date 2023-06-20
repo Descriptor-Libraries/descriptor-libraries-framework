@@ -7,7 +7,6 @@ import MenuItem from '@mui/material/MenuItem';
 
 
 export default function Graph({ molData, componentArray, type, neighborSearch }){
-    console.log(molData)
     // Set the x and y indices to the first 2 values in the component array.
     const [ xIndex, setXIndex ] = useState(0);
     const [ yIndex, setYIndex ] = useState(1);
@@ -58,28 +57,43 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
      * Requests svg data for the molecule you are hovering on.
      * @param {event} event Hover even when hovering over a point on the plotly graph.
      */
-    let smiles = event.points[0].text.split(",")[0]; 
-    fetch(`/depict/cow/svg?smi=${smiles}&w=40&h=40`).then(response => 
-        response.text() ).then( body => showSVGWindow(body, event) );
+        let smiles = event.points[0].text.split(",")[0]; 
+        fetch(`/depict/cow/svg?smi=${smiles}&w=40&h=40`).then(response => 
+            response.text() ).then( body => showSVGWindow(body, event) );
     }
     
     function hideSVG() {
     /**
      * Removes molecule element which holds its SVG, when you are no longer hovering.
      */
-    if (document.getElementById("molecule")) {
-        document.getElementById("molecule").remove()
-    }
+        if (document.getElementById("molecule")) {
+            document.getElementById("molecule").remove()
+        }
     }
     
+    function moleculePage(event) {
+        /**
+         * Redirects to the molecule page for the molecule when clicking on a point on the graph.
+         * @param {event} event event when hovering over a point on the plotly graph.
+         */
+        // Gets the original url for the window and splits it into its components. The first element will always be http(s):, second will always be empty, third will always be 
+        // website name. Need the first and third elements (0, 2) to redirect to the molecule endpoint below. This is so that regardless of which page we are on, we can redirect to the
+        // molecule page.
+        let og_url = window.location.href.split("/");
+        let molecule_id = event.points[0].text.split(",")[1];
+        let url = og_url[0] + "//" + og_url[2] + "/molecule/" + molecule_id;
+        if (molecule_id !== undefined) {
+            window.open(url, "_blank", "noreferrer");
+        }
+    }
     /**
      * Creates plotly react graph object.
      * The x and y labels are mapped to the axis dictionary to write pc1 instead of pca1.
      */
     let myPlot = <Plot
-                    onClick={(event) => console.debug(event.points[0])}
-                    onHover={ (event) => showSVG(event) } 
-                    onUnhover={ (event)=> hideSVG(event) } 
+                    onClick={(event) => moleculePage(event)}
+                    onHover={ (event) => showSVG(event) }
+                    onUnhover={ (event)=> hideSVG(event) }
                     style={{'width': '100%', 'height': '100%' }}
                     useResizeHandler={true}
                     // Empty data to fill in later
@@ -157,6 +171,7 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
             {
                 x: values.map( row => {if (row.pat == element) { return row.components[xIndex] } }),
                 y: values.map( row => {if (row.pat == element) { return row.components[yIndex] } }),
+                // The text parameter now 
                 text: values.map( row => { return encodeURIComponent(row.smiles) + "," + row.molecule_id }),
                 hovertemplate: "( %{x}, %{y})",
                 hovermode: "closest",
