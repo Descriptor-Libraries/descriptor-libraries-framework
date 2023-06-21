@@ -1,7 +1,7 @@
 @import "../basic.css";
 
 html[data-theme="light"] {
-    --pst-color-primary: #ed1c24;
+    --pst-color-primary: #393536;
 	--pst-color-warning: #ed1c24;
 	--pst-color-primary-highlight: #bc151b;
 	--pst-color-secondary: #1d35e7;
@@ -21,7 +21,7 @@ html[data-theme="dark"] {
 }
 
 html[data-theme="light"] a:hover {
-	color: #1A1A1A;
+	color: #ed1c24;
 }
 
 html[data-theme="dark"] h1, html[data-theme="dark"] h2, html[data-theme="dark"] h3, html[data-theme="dark"] h4, html[data-theme="dark"] h5, html[data-theme="dark"] h6 {

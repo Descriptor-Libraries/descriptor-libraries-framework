@@ -144,7 +144,7 @@ export default function MoleculeInfo() {
             sx={{
             width: '100%',
             '& .super-app-theme--header': {
-               backgroundColor: 'rgba(237, 28, 36)',
+               backgroundColor: '#393536',
                color: 'white',
             },
             }}
@@ -277,7 +277,7 @@ export default function MoleculeInfo() {
                         <MenuItem value={"pca"}>PCA</MenuItem>
                   </TextField>)
                   :
-                  <CircularProgress sx={{ color: "#ed1c24" }} />
+                  <CircularProgress sx={{ color: "#393536" }} />
                   }
                   {Object.keys(neighborData).length > 0 && 
                   <Container sx={{ display: 'flex', height: 600, mb: 10}}>

@@ -30,7 +30,9 @@
 }
 
 .App-link {
-  color: #ed1c24;
+  color: #393536;
+  font-weight: bold;
+  text-decoration: underline;
 }
 
 

@@ -28,7 +28,7 @@ const ResponsiveAppBar = ({pages}) => {
   };
 
   return (
-      <AppBar position="static" style={{backgroundColor: "#ed1c24"}} sx={{mb: 2}} >
+      <AppBar position="static" style={{backgroundColor: "#393536"}} sx={{mb: 2}} >
         <Container maxWidth="xl">
           <Toolbar disableGutters>
             <OriginalKraken sx={{ display: { xs: 'none', md: 'flex' }, mr: 1, fontSize: '60px' }} />

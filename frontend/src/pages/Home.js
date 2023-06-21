@@ -116,7 +116,7 @@ function Home() {
 
   return (
    <>
-   <Box sx={{ backgroundColor: "#ed1c24", display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-around', padding: 2, height: !isMobile && '35vh' }}>  
+   <Box sx={{ backgroundColor: "#393536", display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-around', padding: 2, height: !isMobile && '35vh' }}>  
    <Box 
         sx={{ 
             display: 'flex', 

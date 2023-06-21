@@ -24,6 +24,8 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
                         "psi": "P[S]<sub>n</sub>[I]<sub>m</sub>", 
                         "other": "other"};
 
+    const colors = ["#a4876e", "#fb7986", "#d792d0", "#0a9dc7", "#a9d04e", "#eded49", "#ffb152", "#b6ddf6", "#b1b1ae"]
+
     // Plotting functions to show molecules on hover
     function showSVGWindow(svg, event) {
     /**
@@ -160,11 +162,12 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
                 type: 'scatter',
                 mode: 'markers',
                 marker: {size: 12 ,
+                         color: colors[index],
                         // Randomly assigning symbols from the designated ones above
                         // This causes the symbols to change on data load, which is not bueno.
                         symbol: symbols[index % symbols.length],
                         line: {
-                            width: 2,
+                            width: 0.0,
                             color: 'DarkSlateGrey'}},
                 name: pattern_dict[element],
             });
