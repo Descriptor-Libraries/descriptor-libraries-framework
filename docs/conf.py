@@ -101,7 +101,7 @@ html_theme_options = {
 	"twitter_url": "https://twitter.com/MolSSI_NSF",
 
 	"logo": {
-      "image_light": "kraken_red.svg",
+      "image_light": "kraken_gray.svg",
       "image_dark": "kraken_red.svg",
       "text": "kraken",
       "molssi_light": "molssi_main_logo.png",
