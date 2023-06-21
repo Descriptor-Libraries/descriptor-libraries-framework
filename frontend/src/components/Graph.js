@@ -161,13 +161,14 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
                 hovermode: "closest",
                 type: 'scatter',
                 mode: 'markers',
-                marker: {size: 12 ,
+                marker: {size: 10 ,
+                        opacity: 0.75,
                          color: colors[index],
                         // Randomly assigning symbols from the designated ones above
                         // This causes the symbols to change on data load, which is not bueno.
                         symbol: symbols[index % symbols.length],
                         line: {
-                            width: 0.0,
+                            width: 0.5,
                             color: 'DarkSlateGrey'}},
                 name: pattern_dict[element],
             });
