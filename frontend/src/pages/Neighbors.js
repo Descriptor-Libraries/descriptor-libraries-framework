@@ -47,7 +47,6 @@ export default function NeighborSearchHook () {
      * a graph, and the dynamic grid component based on what data is available.
      */
     const interval = 15;
-    const axis_dict = {"pca1": "pc1", "pca2": "pc2", "pca3": "pc3", "pca4": "pc4", "umap1": "umap1", "umap2": "umap2"};
     
     const [ moleculeid, setSearch ] = useState(1);
     const [ type, setType ] = useState("pca");
@@ -62,7 +61,6 @@ export default function NeighborSearchHook () {
     const [ componentArrayForm, setComponentArrayForm ] = useState(["1", "2"]);
     const [ graphComponentArrayForm, setGraphComponentArrayForm ] = useState(["1", "2"]);
     const [ updatedParameters, setUpdatedParameters ] = useState(true);
-    const [ showGraph, setShowGraph ] = useState(true);
     const [ searchToggle, setSearchToggle ] = useState(true);
 
     function buildComponentArray(event, label){
@@ -159,12 +157,6 @@ export default function NeighborSearchHook () {
             setIsLoadingMore(false);
             setValidMolecule(true);
 
-            if (componentArrayForm.length == 2){
-              setShowGraph(true);
-            }
-            else {
-              setShowGraph(false);
-            }
           })
     }
 
@@ -252,7 +244,7 @@ export default function NeighborSearchHook () {
             </Box>
             <Box>
             {/* If molecule is valid and there is mol data, then generate the graph based on the data*/}
-            { !isLoading && validMolecule && Object.keys(molData).length > 0 && componentArrayForm.length > 1 && <Container sx={{ display: 'flex', height: 750}}>{ <Graph molData={molData} componentArray={graphComponentArrayForm} type={graphType} neighborSearch={true}></Graph> }</Container> } 
+            { !isLoading && validMolecule && Object.keys(molData).length > 0 && graphComponentArrayForm.length > 1 && <Container sx={{ display: 'flex', height: 750}}>{ <Graph molData={molData} componentArray={graphComponentArrayForm} type={graphType} neighborSearch={true}></Graph> }</Container> } 
             </Box>
             <Box sx={{ display: 'flex' }}>
             {/* If molecule is valid and there is svg data, then generate the images of the molecules*/}
