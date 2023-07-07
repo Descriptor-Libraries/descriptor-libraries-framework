@@ -6,7 +6,8 @@ import { DataGrid, GridFooterContainer, GridFooter } from "@mui/x-data-grid";
 import Typography from '@mui/material/Typography';
 import { CircularProgress } from "@mui/material";
 import { retrieveSVG } from "../common/MoleculeUtils";
-import { Stage, Component } from "react-ngl";
+//import { Stage, Component } from "react-ngl";
+import { NGLStage, Component } from "../components/NGL"
 
 export default function MoleculeInfo() {
    const params = useParams();
@@ -258,9 +259,9 @@ export default function MoleculeInfo() {
                   justifyContent="center"
                   alignItems="center"
                   >
-                     <Stage width="600px" height="600px" params={{backgroundColor: 'white'}} cameraState={{distance: -20}}>
-                        <Component path={"/api/conformers/export/"+ conformer + ".sdf"} reprList={reprList} />
-                     </Stage>
+                     <NGLStage width="600px" height="600px" >
+                        <Component path={"/api/conformers/export/"+ conformer + ".sdf"} />
+                     </NGLStage>
                   </Box>
                </Container>}
             </Grid>
