@@ -47,10 +47,10 @@ export default function NeighborSearchHook () {
      * a graph, and the dynamic grid component based on what data is available.
      */
     const interval = 15;
-    const axis_dict = {"pca1": "pc1", "pca2": "pc2", "pca3": "pc3", "pca4": "pc4", "umap1": "umap1", "umap2": "umap2"};
     
     const [ moleculeid, setSearch ] = useState(1);
     const [ type, setType ] = useState("pca");
+    const [ graphType, setGraphType ] = useState("pca");
     const [ skip, setSkip ] = useState(0);
     const [ validMolecule, setValidMolecule ] = useState(true);
     const [ svg_results, setSVGResults ] = useState([])
@@ -59,8 +59,8 @@ export default function NeighborSearchHook () {
     const [ isLoadingMore, setIsLoadingMore ] = useState(false);
     const [ molData, setMolData] = useState([]);
     const [ componentArrayForm, setComponentArrayForm ] = useState(["1", "2"]);
+    const [ graphComponentArrayForm, setGraphComponentArrayForm ] = useState(["1", "2"]);
     const [ updatedParameters, setUpdatedParameters ] = useState(true);
-    const [ showGraph, setShowGraph ] = useState(true);
     const [ searchToggle, setSearchToggle ] = useState(true);
 
     function buildComponentArray(event, label){
@@ -157,13 +157,19 @@ export default function NeighborSearchHook () {
             setIsLoadingMore(false);
             setValidMolecule(true);
 
-            if (componentArrayForm.length == 2){
-              setShowGraph(true);
-            }
-            else {
-              setShowGraph(false);
-            }
           })
+    }
+
+    function updateGraphComponentProps() {
+      /**
+       * Used to update the type and component array form which is sent to the graph component. This is necessary because changing the type or components on the form
+       * can change the output on the graph and its x and y axis immediately, even before a search is conducted. To prevent this, 2 sets of variables for type and components exist.
+       * The type and componentArrayForm are used to hold the changes from the user while graphType and graphComponentArrayForm are used by the graph component to render the graph.
+       * Thus this function is called to update the graphType and graphComponentArrayForm when a new search is called, so that the graph component can be updated, allowing the user to
+       * make selections without updating the graph component.
+       */
+      setGraphType(type);
+      setGraphComponentArrayForm(componentArrayForm);
     }
 
     // If any parameters change, we must set updatedParameters to true.
@@ -174,6 +180,7 @@ export default function NeighborSearchHook () {
     function _handleKeyDown(event) {
       if (event.key === "Enter") {
         newSearch();
+        updateGraphComponentProps();
       }
     }
 
@@ -197,7 +204,7 @@ export default function NeighborSearchHook () {
     return (
         <Container maxWidth="lg">
         <h2>Neighbor Search</h2>
-        <TextField 
+        <TextField
                   style = {{width: 350}}
                   sx={{ m: 0.5}}
                   id="search-outline" 
@@ -206,7 +213,7 @@ export default function NeighborSearchHook () {
                   value= {moleculeid} 
                   onKeyDown = { (e) => _handleKeyDown(e) }
                   onChange = { event => setSearch( event.target.value ) }
-                  InputProps={{endAdornment: <Button onClick={ () => newSearch() } >Search</Button>}}
+                  InputProps={{endAdornment: <Button onClick={ () => {newSearch(); updateGraphComponentProps();} } >Search</Button>}}
         />
         <TextField
             sx={{ m: 0.5 }}
@@ -238,7 +245,7 @@ export default function NeighborSearchHook () {
             </Box>
             <Box>
             {/* If molecule is valid and there is mol data, then generate the graph based on the data*/}
-            { !isLoading && validMolecule && Object.keys(molData).length > 0 && componentArrayForm.length > 1 && <Container sx={{ display: 'flex', height: 750}}>{ <Graph molData={molData} componentArray={componentArrayForm} type={type} neighborSearch={true}></Graph> }</Container> } 
+            { !isLoading && validMolecule && Object.keys(molData).length > 0 && graphComponentArrayForm.length > 1 && <Container sx={{ display: 'flex', height: 750}}>{ <Graph molData={molData} componentArray={graphComponentArrayForm} type={graphType} neighborSearch={true}></Graph> }</Container> } 
             </Box>
             <Box sx={{ display: 'flex' }}>
             {/* If molecule is valid and there is svg data, then generate the images of the molecules*/}
