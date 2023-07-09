@@ -11,6 +11,7 @@ import BubbleChartIcon from '@mui/icons-material/BubbleChart';
 import DownloadIcon from '@mui/icons-material/Download';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import StatCard from '../components/SummaryCard';
+import IconLink from '../components/IconLink';
 
 const stats = [
   {
@@ -137,46 +138,18 @@ function Home() {
                   ligands.
         </Typography>
       }
-       <Grid container justifyContent="center" spacing={3} sx={{ mb: 1 }}>
+       <Grid container alignItems="center" justifyContent="center" spacing={3} sx={{ mb: 1 }}>
           <Grid item>
-            <Link to="/search">
-              <IconButton color="inherit">
-                <SearchIcon sx={{ color: 'white', fontSize: 40 }} />
-              </IconButton>
-            </Link>
-            <Typography color="white" textAlign="center">
-              Substructure Search
-            </Typography>
+            <IconLink IconElement={SearchIcon} text="Substructure Search" link='/search'></IconLink>
           </Grid>
           <Grid item>
-            <Link to="/neighbors">
-              <IconButton color="inherit">
-                <BubbleChartIcon sx={{ color: 'white', fontSize: 40 }} />
-              </IconButton>
-            </Link>
-            <Typography color="white" textAlign="center">
-              Neighbor Search
-            </Typography>
+            <IconLink IconElement={BubbleChartIcon} text="Neighbor Search" link='/neighbors'></IconLink>
           </Grid>
           <Grid item>
-            <Link to="/download">
-              <IconButton color="inherit">
-                <DownloadIcon sx={{ color: 'white', fontSize: 40 }} />
-              </IconButton>
-            </Link>
-            <Typography color="white" textAlign="center">
-              Download
-            </Typography>
+            <IconLink IconElement={DownloadIcon} text="Download" link="/download"></IconLink>
           </Grid>
           <Grid item>
-            <Link to="/docs/" reloadDocument>
-              <IconButton color="inherit">
-                <AutoStoriesIcon sx={{ color: 'white', fontSize: 40 }} />
-              </IconButton>
-            </Link>
-            <Typography color="white" textAlign="center">
-              Documentation
-            </Typography>
+            <IconLink IconElement={AutoStoriesIcon} text="Documentation" link="/docs" reloadDocument></IconLink>
           </Grid>
         </Grid>
      </Box>

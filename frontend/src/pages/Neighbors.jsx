@@ -203,8 +203,10 @@ export default function NeighborSearchHook () {
 
     return (
         <Container maxWidth="lg">
-        <h2>Neighbor Search</h2>
-        <TextField
+        <Typography variant="h2" textAlign="center">Neighbor Search</Typography>
+
+        <Box display="flex" justifyContent="center" pt={2}>
+        <TextField 
                   style = {{width: 350}}
                   sx={{ m: 0.5}}
                   id="search-outline" 
@@ -225,6 +227,7 @@ export default function NeighborSearchHook () {
             <MenuItem value={"pca"}>PCA</MenuItem>
             <MenuItem value={"umap"}>UMAP</MenuItem>
         </TextField>
+        </Box>
         {type == "pca" && <FormGroup sx={{position: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
                           <FormControlLabel control={<Checkbox defaultChecked value={"1"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="1" />
                           <FormControlLabel control={<Checkbox defaultChecked value={"2"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="2" />
@@ -237,9 +240,11 @@ export default function NeighborSearchHook () {
                           <FormControlLabel control={<Checkbox defaultChecked value={"2"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="2" />
                         </FormGroup>
         }
-        { (isLoading || isLoadingMore) ? <CircularProgress sx={{ color: "#ed1c24" }} /> : <ThemeProvider theme={theme}> <Button disabled={updatedParameters} variant="contained" sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> </ThemeProvider>}
+        <Box display="flex" justifyContent="center">
+        { (isLoading || isLoadingMore) ? <CircularProgress />: <ThemeProvider theme={theme}> <Button disabled={updatedParameters} variant="contained" sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> </ThemeProvider>}
+        </Box>
         <Container sx={{justifyContent: 'center', my: 3}}>
-            <Box sx={{ display: 'flex' }}>
+            <Box sx={{ display: 'flex' }} justifyContent="center">
             {/* If molecule is not valid and there is no mol data, then state that there are no results for the molecule ID requested*/}
             { !isLoading && !validMolecule && Object.keys(molData).length == 0 && <Typography>No results found for Molecule ID.</Typography> } 
             </Box>
@@ -247,7 +252,7 @@ export default function NeighborSearchHook () {
             {/* If molecule is valid and there is mol data, then generate the graph based on the data*/}
             { !isLoading && validMolecule && Object.keys(molData).length > 0 && graphComponentArrayForm.length > 1 && <Container sx={{ display: 'flex', height: 750}}>{ <Graph molData={molData} componentArray={graphComponentArrayForm} type={graphType} neighborSearch={true}></Graph> }</Container> } 
             </Box>
-            <Box sx={{ display: 'flex' }}>
+            <Box sx={{ display: 'flex' }} justifyContent="center">
             {/* If molecule is valid and there is svg data, then generate the images of the molecules*/}
             { !isLoading && validMolecule && Object.keys(svg_results).length > 0 && 
              <Container> 
@@ -258,7 +263,7 @@ export default function NeighborSearchHook () {
             { !isLoading && Object.keys(svg_results).length > 0 && 
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
             {isLoadingMore ? (
-              <CircularProgress sx={{ color: "#ed1c24" }} />
+              <CircularProgress />
             ) : (
               <ThemeProvider theme={theme}> <Button disabled={updatedParameters} variant="contained" sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> </ThemeProvider>
             )}

@@ -34,7 +34,6 @@ function Component({ path, representationType = 'ball+stick' }) {
     if (!stage) return;
 
     stage.loadFile(path).then(component => {
-      window.alert("Hello")
       componentRef.current = component;
       component.addRepresentation(representationType);
       stage.autoView();
