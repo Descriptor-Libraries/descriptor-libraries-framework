@@ -222,7 +222,14 @@ export default function MoleculeInfo() {
       <Container maxWidth="xl" sx={{ display: 'flex', alignItems: 'center' }}>
          <Grid container spacing={2} maxWidth="xl" sx={{alignItems: 'center'}}>
             <Grid item xs={6} sx={{mt: 3}}>
-                  {Object.keys(svg).length > 0 && <Box component="img" alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(svg.svg)}`}></Box>}
+            {Object.keys(svg).length > 0 && 
+               <Box 
+                  display="flex" 
+                  justifyContent="center"
+                  alignItems="center" 
+                  width="100%">
+                     <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(svg.svg)}`} />
+               </Box>}
                   {Object.keys(molData).length > 0 && 
                         <Card>
                            <CardContent>

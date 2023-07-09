@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
+import { ThemeProvider } from '@mui/material/styles';
+
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import Slide from '@mui/material/Slide';
@@ -8,6 +10,8 @@ import { Ketcher } from 'ketcher-core';
 import { StandaloneStructServiceProvider } from 'ketcher-standalone';
 import { Editor } from 'ketcher-react';
 import "ketcher-react/dist/index.css";
+
+import { theme } from '../common/MoleculeUtils';
 
 const structServiceProvider = new StandaloneStructServiceProvider();
 
@@ -32,9 +36,11 @@ export default function FullScreenDialog({ ketcherCallBack }) {
 
   return (
     <div>
-      <Button variant="contained" style={{backgroundColor: "#ed1c24"}} sx={{ mb: 5 }} onClick={handleClickOpen}>
-        Open Molecular Sketcher
-      </Button>
+      <ThemeProvider theme={theme}>
+        <Button variant="contained" sx={{ mb: 5 }} onClick={handleClickOpen}>
+          Open Molecular Sketcher
+        </Button>
+      </ThemeProvider>
       <Dialog
         fullWidth={true}
         maxWidth={"lg"}
