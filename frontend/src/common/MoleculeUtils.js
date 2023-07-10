@@ -4,8 +4,9 @@ import { Typography } from "@mui/material";
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Container from '@mui/material/Container';
+import Button from '@mui/material/Button';
 
-import { createTheme } from '@mui/material/styles';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const theme = createTheme({
   palette: {
@@ -37,6 +38,19 @@ async function substructureSearch(substructure, limit=48, skip=0, signal) {
     }
 }
 
+function moleculePage(molecule_id) {
+  /**
+   * Redirects to the molecule page for the molecule on click.
+   * @param {molecule_id} number molecule id for the molecule.
+   */
+  // Gets the original url for the window and splits it into its components. The first element will always be http(s):, second will always be empty, third will always be 
+  // website name. Need the first and third elements (0, 2) to redirect to the molecule endpoint below. This is so that regardless of which page we are on, we can redirect to the
+  // molecule page.
+  let og_url = window.location.href.split("/");
+  let url = og_url[0] + "//" + og_url[2] + "/molecule/" + molecule_id;
+  window.open(url, "_blank", "noreferrer");
+}
+
 
 function dynamicGrid( svgs ) {
     /**
@@ -53,13 +67,14 @@ function dynamicGrid( svgs ) {
         <Grid item xs={12} md={4}>
             {result.distance == 0 ? 
             // True condition - render Item with border if distance is 0.
-            <Item sx={{border: 3, borderColor: '#ed1c24'}}>
+            <Item sx={{border: 3, borderColor: '#ed1c24'}} onClick={() => moleculePage(result.molecule_id)}>
             <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(result.svg)}`} />
             <Typography sx={{ wordBreak: "break-word" }}> <strong>Smiles: </strong> { result.smiles }</Typography>
-            </Item> 
+            <ThemeProvider theme={theme}><Button variant="contained" sx={{ m: 0.5 }} onClick={() => moleculePage(result.molecule_id)}>View</Button></ThemeProvider>
+            </Item>
             // False condition - render Item without border if distance is not 0.
             :
-            <Item>
+            <Item onClick={() => moleculePage(result.molecule_id)}>
             <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(result.svg)}`} />
             <Typography sx={{ wordBreak: "break-word" }}> <strong>Smiles: </strong> { result.smiles }</Typography>
             
@@ -68,7 +83,7 @@ function dynamicGrid( svgs ) {
                   <strong>Distance: </strong> {result.distance.toFixed(2)}
                 </Typography>
               )}
-
+            <ThemeProvider theme={theme}><Button variant="contained" sx={{ m: 0.5 }} onClick={() => moleculePage(result.molecule_id)}>View</Button></ThemeProvider>
             </Item>} 
         </Grid>
         ))
@@ -80,11 +95,12 @@ function dynamicGrid( svgs ) {
   }
 
 
-async function retrieveSVG(smiles, substructure = undefined, distance = undefined, signal) {
+async function retrieveSVG(smiles, molecule_id, substructure = undefined, distance = undefined, signal) {
     /**
      * Retrieve SVG representation of a molecule.
      *
      * @param {string} smiles - SMILES representation of the molecule.
+     * @param {string} molecule_id - molecule_id for the molecule.
      * @param {string} [substructure=undefined] - SMILES representation of the substructure to highlight (optional).
      * @param {number} [distance=undefined] - Distance between the molecule and a reference molecule (optional).
      * @param {AbortSignal} [signal] - Signal object for aborting the fetch request (optional).
@@ -99,6 +115,7 @@ async function retrieveSVG(smiles, substructure = undefined, distance = undefine
     let result = {}
     result["svg"] = svg;
     result["smiles"] = smiles;
+    result["molecule_id"] = molecule_id;
   
     if (typeof distance !== "undefined") {
       result["distance"] = distance;
@@ -117,7 +134,7 @@ async function retrieveSVG(smiles, substructure = undefined, distance = undefine
    * @returns {Promise<Array<Object>>} - A Promise that resolves to an array of objects containing SVG, SMILES, and distance for each molecule.
    */
     return await Promise.all(items.map((item) => {
-      return retrieveSVG(item.smiles, substructure, item.dist);
+      return retrieveSVG(item.smiles, item.molecule_id, substructure, item.dist);
     }));
   }
   

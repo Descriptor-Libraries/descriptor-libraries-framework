@@ -87,7 +87,6 @@ export default function MoleculeInfo() {
 
    function switchDimensionality(event) {
       setType(event.target.value);
-      console.log(event.target.value)
       if (event.target.value === "umap")
       {
          setComponents(["1", "2"]);
