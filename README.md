@@ -1,6 +1,7 @@
-# Phosphines WebApp
+# kraken web app
 
-This web app is made up of several Docker containers which work together through Docker Compose. 
+This repository provides a web application for displaying molecule library information. Our use case is "kraken - Kolossal viRtual dAtabase formoleKular dEscriptors of orgaNophosphorus ligands." You can see the application at [kraken.molssi.org](https://kraken.molssi.org/,)
+The app is made up of several Docker containers which work together through Docker Compose. 
 The docker containers connect to a database which contains molecule + conformer information.
 
 Running the application locally
@@ -63,4 +64,14 @@ docker exec -it CONTAINER_ID /bin/bash
 
 to start an interactive bash terminal in the running container. From there, you can access the dump file in the pr3 volume (mapped to `home/db`) to load the dump file.
 
+Future Plans
+------------
+We plan to continue cleaning up this application and implementing new features. Our intention is to eventually create this as a template project "cookiecutter" so that people can easily create applications that display molecular information.
+
+Acknowledgements
+----------------
+This project is a collaboration between [The Molecular Sciences Software Institute](https://molssi.org/) and the [Center for Computer Assisted Synthesis](https://ccas.nd.edu/).
+
+MolSSI is funded by the National Science Foundation OAC-1547580 and CHE-2136142.
+C-CAS is funded by the National Science Foundation CHE–2202693.
 
