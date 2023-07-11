@@ -6,7 +6,8 @@ import { DataGrid, GridFooterContainer, GridFooter } from "@mui/x-data-grid";
 import Typography from '@mui/material/Typography';
 import { CircularProgress } from "@mui/material";
 import { retrieveSVG } from "../common/MoleculeUtils";
-import { Stage, Component } from "react-ngl";
+//import { Stage, Component } from "react-ngl";
+import { NGLStage, Component } from "../components/NGL"
 
 export default function MoleculeInfo() {
    const params = useParams();
@@ -221,7 +222,14 @@ export default function MoleculeInfo() {
       <Container maxWidth="xl" sx={{ display: 'flex', alignItems: 'center' }}>
          <Grid container spacing={2} maxWidth="xl" sx={{alignItems: 'center'}}>
             <Grid item xs={6} sx={{mt: 3}}>
-                  {Object.keys(svg).length > 0 && <Box component="img" alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(svg.svg)}`}></Box>}
+            {Object.keys(svg).length > 0 && 
+               <Box 
+                  display="flex" 
+                  justifyContent="center"
+                  alignItems="center" 
+                  width="100%">
+                     <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(svg.svg)}`} />
+               </Box>}
                   {Object.keys(molData).length > 0 && 
                         <Card>
                            <CardContent>
@@ -258,9 +266,9 @@ export default function MoleculeInfo() {
                   justifyContent="center"
                   alignItems="center"
                   >
-                     <Stage width="600px" height="600px" params={{backgroundColor: 'white'}} cameraState={{distance: -20}}>
-                        <Component path={"/api/conformers/export/"+ conformer + ".sdf"} reprList={reprList} />
-                     </Stage>
+                     <NGLStage width="600px" height="600px" >
+                        <Component path={"/api/conformers/export/"+ conformer + ".sdf"} />
+                     </NGLStage>
                   </Box>
                </Container>}
             </Grid>

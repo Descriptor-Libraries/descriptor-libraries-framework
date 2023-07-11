@@ -14,7 +14,7 @@ import '../assets/custom.css'
 
 import { Link } from 'react-router-dom'
 
-import OriginalKraken from './OriginalKraken';
+import OriginalKraken from './OriginalKraken.js';
 
 const ResponsiveAppBar = ({pages}) => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -106,7 +106,7 @@ const ResponsiveAppBar = ({pages}) => {
             </Typography>
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
               {Object.keys(pages).map((page) => (
-                <Link to={page.toLowerCase()} id={page.toLowerCase()} className="NavbarLink" >
+                <Link to={page.toLowerCase()} id={page.toLowerCase()} className="NavbarLink"  style={{ textDecoration: 'none' }} >
                     <Button
                     key={page}
                     onClick={handleCloseNavMenu}
@@ -117,7 +117,7 @@ const ResponsiveAppBar = ({pages}) => {
                 </Link>
               ))}
 
-              <Link to="/docs/" id="documentation" className="NavbarLink" reloadDocument >
+              <Link to="/docs/" id="documentation" className="NavbarLink" reloadDocument style={{ textDecoration: 'none' }} >
                   <Button
                   key="documentation"
                   sx={{ my: 2, color: 'white', display: 'block' }}>

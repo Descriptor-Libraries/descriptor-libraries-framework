@@ -1,11 +1,11 @@
 version: '3'
 
 services:
-  test_reverse-proxy:
+  local_reverse-proxy:
     # The official v2 Traefik docker image
     image: traefik:v2.8
     # Enables the web UI and tells Traefik to listen to docker
-    container_name: reverse_proxy_test
+    container_name: local_reverse_proxy
     command: 
       - --api.insecure=true 
       - --api.dashboard=true
@@ -22,20 +22,26 @@ services:
       # So that Traefik can listen to the Docker events
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
-      - web-test
-      - db-test
+      - local-web
+      - local-db
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.api.service=api@internal"
 
-  test_database:
+  local_database:
     image: 'mcs07/postgres-rdkit'
-    container_name: database_test
+    container_name: local_database
     shm_size: '4gb'
+    environment:
+      POSTGRES_SERVER: database
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWD: $postgresPWD
+      POSTGRES_DB: postgres
     ports:
       - "5432:5432"
     volumes:
-      - ./tests/db:/docker-entrypoint-initdb.d
+      - "kraken-postgres:/var/lib/postgresql/data"
+      - "pr3:/home/db"
     healthcheck:
       test: ["CMD-SHELL", "psql -U postgres -d postgres -c 'SELECT molecule_id FROM molecule LIMIT 1;' || exit 1"]
       interval: 5s
@@ -45,61 +51,61 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
       POSTGRES_DB: postgres
     networks:
-      - db-test
+      - local-db
 
-  test_backend:
+  local_backend:
     image: 'phosphines-backend:latest'
-    container_name: backend_test
+    container_name: local_backend
     build:
       context: ./backend
       dockerfile: backend.dockerfile
     volumes:
       - "./backend/app:/app"
     environment:
-      POSTGRES_SERVER: database_test
+      POSTGRES_SERVER: local_database
       POSTGRES_USER: postgres
       POSTGRES_PASSWD: testing-password
       POSTGRES_DB: postgres
     entrypoint: bash prestart.sh
     depends_on:
-      test_database:
+      local_database:
         condition: service_healthy
     networks:
-      - web-test
-      - db-test
+      - local-web
+      - local-db
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`localhost`) && PathPrefix(`/api`)"
       - "traefik.http.services.backend.loadbalancer.server.port=8080"
 
-  test_cdk-depict:
+  local_cdk-depict:
     image: 'simolecule/cdkdepict:latest'
-    container_name: cdk_depict_test
+    container_name: local_cdk-depcit
     networks:
-      - web-test
+      - local-web
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.cdk-depict.rule=Host(`localhost`) && PathPrefix(`/depict`)"
 
-  test_frontend:
+  local_frontend:
     image: 'phosphines-frontend:latest'
-    container_name: frontend_test
+    container_name: local_frontend
     volumes:
       - "./frontend/src:/app/src"
     build:
       context: .
       dockerfile: frontend.development.dockerfile
     networks:
-      - web-test
+      - local-web
     entrypoint: npm start
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`localhost`)"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
 
-  test_documentation:
+  local_documentation:
     image: "phosphines-docs:latest"
-    container_name: documentation_test
+    container_name: local_documentation
     build:
       context: ./docs
       dockerfile: docs.dockerfile
@@ -107,7 +113,7 @@ services:
     volumes:
       - "./docs:/docs"
     networks:
-      - web-test
+      - local-web
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.documentation.rule=Host(`localhost`) && PathPrefix(`/docs`)"
@@ -115,5 +121,12 @@ services:
     
 
 networks:
-  web-test:
-  db-test:
+  local-web:
+  local-db:
+
+volumes:
+  kraken-postgres:
+      external: true
+  pr3:
+      external: true
+

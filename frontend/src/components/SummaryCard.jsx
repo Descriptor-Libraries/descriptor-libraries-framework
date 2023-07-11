@@ -24,7 +24,7 @@ export default function StatCard({number, caption, size}) {
         <Grid item xs={12} md={6} lg={4}>
                 <Card style={ cardStyle }>
                     <CardContent>
-                    <Typography variant="h5">{ number }</Typography>
+                    <Typography variant="h5" textAlign="center">{ number }</Typography>
                     <Typography variant="subtitle1"> { caption }</Typography>
                     </CardContent>
                 </Card>

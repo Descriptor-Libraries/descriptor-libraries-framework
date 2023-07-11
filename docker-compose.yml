@@ -93,10 +93,10 @@ services:
       - "./frontend/src:/app/src"
     build:
       context: .
-      dockerfile: frontend.dockerfile
+      dockerfile: frontend.production.dockerfile
     networks:
       - web
-    entrypoint: npm start
+    entrypoint: npm run serve
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`kraken.molssi.org`)"
