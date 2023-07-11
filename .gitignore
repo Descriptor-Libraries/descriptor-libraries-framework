@@ -586,6 +586,6 @@ tags
 .vim
 
 # Ignoring local yml file
-docker-compose.local.yml
+# docker-compose.local.yml
 
 # End of https://www.gitignore.io/api/osx,vim,react,linux,macos,python,pycharm,reactnative,sublimetext
