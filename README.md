@@ -1,6 +1,7 @@
 # kraken web app
 
-This repository provides a web application for displaying molecule library information. Our use case is "kraken - Kolossal viRtual dAtabase formoleKular dEscriptors of orgaNophosphorus ligands." You can see the application at [kraken.molssi.org](https://kraken.molssi.org/,)
+This repository provides a web application for displaying molecule library information. Our use case is "kraken - Kolossal viRtual dAtabase formoleKular dEscriptors of orgaNophosphorus ligands." 
+You can see the application at [kraken.molssi.org](https://kraken.molssi.org/)
 The app is made up of several Docker containers which work together through Docker Compose. 
 The docker containers connect to a database which contains molecule + conformer information.
 
