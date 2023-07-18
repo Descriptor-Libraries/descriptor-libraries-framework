@@ -62,6 +62,21 @@ export default function NeighborSearchHook () {
     const [ graphComponentArrayForm, setGraphComponentArrayForm ] = useState(["1", "2"]);
     const [ updatedParameters, setUpdatedParameters ] = useState(true);
     const [ searchToggle, setSearchToggle ] = useState(true);
+    const [ isMobile, setIsMobile ] = useState(window.innerWidth < 768);
+
+    useEffect(() => {
+     function checkMobile() {
+       setIsMobile(window.innerWidth < 768);
+     }
+ 
+     // Set isMobile at the start in case it's not the initial render
+     checkMobile();
+ 
+     window.addEventListener('resize', checkMobile);
+ 
+     // Cleanup the listener when the component is unmounted
+     return () => window.removeEventListener('resize', checkMobile);
+   }, []); // Empty array means this effect runs once on mount and cleanup on unmount
 
     function buildComponentArray(event, label){
       /**
@@ -250,7 +265,7 @@ export default function NeighborSearchHook () {
             </Box>
             <Box>
             {/* If molecule is valid and there is mol data, then generate the graph based on the data*/}
-            { !isLoading && validMolecule && Object.keys(molData).length > 0 && graphComponentArrayForm.length > 1 && <Container sx={{ display: 'flex', height: 750}}>{ <Graph molData={molData} componentArray={graphComponentArrayForm} type={graphType} neighborSearch={true}></Graph> }</Container> } 
+            { !isLoading && validMolecule && Object.keys(molData).length > 0 && graphComponentArrayForm.length > 1 && !isMobile && <Container sx={{ display: 'flex', height: 750}}>{ <Graph molData={molData} componentArray={graphComponentArrayForm} type={graphType} neighborSearch={true}></Graph> }</Container> } 
             </Box>
             <Box sx={{ display: 'flex' }} justifyContent="center">
             {/* If molecule is valid and there is svg data, then generate the images of the molecules*/}
