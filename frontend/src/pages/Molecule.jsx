@@ -234,12 +234,12 @@ export default function MoleculeInfo() {
    );
 
    return (
-      <Container maxWidth="xl" sx={{ display: 'flex', alignItems: 'center' }}>
-         <Grid container spacing={2} maxWidth="xl" sx={{alignItems: 'center'}}>
+      <Container maxWidth="xl">
+         <Grid container alignItems="center" justifyContent="center" spacing={2}>
             <Grid item xs={(width > 1366) ? 6 : 12} sx={{mt: 3}}>
             {Object.keys(svg).length > 0 && 
                <Box 
-                  display="flex" 
+                  display="flex"
                   justifyContent="center"
                   alignItems="center" 
                   width="100%">
@@ -280,30 +280,34 @@ export default function MoleculeInfo() {
                   justifyContent="center"
                   alignItems="center"
                   >
-                     <NGLStage width="600px" height="600px" >
+                     <NGLStage width="700px" height="600px" >
                         <Component path={"/api/conformers/export/"+ conformer + ".sdf"} />
                      </NGLStage>
                   </Box>
                </Container>
             </Grid>}
             {(width > 768) && <Grid item xs={(width > 1366) && allConformers.length > 0 && conformer.length > 0 ? 6 : 12}>
-               {Object.keys(neighborData).length > 0 ? (<TextField
-               sx={{ mb: 0.5 }}
-               select
-               id="dimension-outline"
-               value={type}
-               onChange={event => switchDimensionality(event)}
-               >
-                     <MenuItem value={"umap"}>UMAP</MenuItem>
-                     <MenuItem value={"pca"}>PCA</MenuItem>
-               </TextField>)
+               {Object.keys(neighborData).length > 0 ? 
+               <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center">
+                  <TextField
+                  select
+                  id="dimension-outline"
+                  value={type}
+                  onChange={event => switchDimensionality(event)}
+                  sx={{ mb: 1 }}
+                  >
+                        <MenuItem value={"umap"}>UMAP</MenuItem>
+                        <MenuItem value={"pca"}>PCA</MenuItem>
+                  </TextField>
+                  <Container sx={{ display: 'flex', height: 600, mb: 10}}>
+                     <Graph molData={neighborData} componentArray={components} type={type} neighborSearch={true}></Graph>
+                  </Container>
+               </Box>
                :
-               <CircularProgress sx={{ color: "#393536" }} />
+               <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center">
+                  <CircularProgress sx={{ color: "#393536" }} />
+               </Box>
                }
-               {Object.keys(neighborData).length > 0 && 
-               <Container sx={{ display: 'flex', height: 600, mb: 10}}>
-                  <Graph molData={neighborData} componentArray={components} type={type} neighborSearch={true}></Graph>
-               </Container>}
             </Grid>
             }
          </Grid>
