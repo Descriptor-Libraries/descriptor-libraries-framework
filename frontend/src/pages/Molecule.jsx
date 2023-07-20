@@ -21,6 +21,21 @@ export default function MoleculeInfo() {
    const [ svg, setSvg ] = useState({});
    const [ allConformers, setAllConformers ] = useState([]);
    const [ conformer, setConformer ] = useState("");
+   const [ width, setWidth ] = useState(window.innerWidth);
+
+   useEffect(() => {
+    function checkMobile() {
+      setWidth(window.innerWidth);
+    }
+
+    // Set isMobile at the start in case it's not the initial render
+    checkMobile();
+
+    window.addEventListener('resize', checkMobile);
+
+    // Cleanup the listener when the component is unmounted
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []); // Empty array means this effect runs once on mount and cleanup on unmount
 
    const reprList = useMemo(() => [{
       type: 'ball+stick'
@@ -219,12 +234,12 @@ export default function MoleculeInfo() {
    );
 
    return (
-      <Container maxWidth="xl" sx={{ display: 'flex', alignItems: 'center' }}>
-         <Grid container spacing={2} maxWidth="xl" sx={{alignItems: 'center'}}>
-            <Grid item xs={6} sx={{mt: 3}}>
+      <Container maxWidth="xl">
+         <Grid container alignItems="center" justifyContent="center" spacing={2}>
+            <Grid item xs={(width > 1366) ? 6 : 12} sx={{mt: 3}}>
             {Object.keys(svg).length > 0 && 
                <Box 
-                  display="flex" 
+                  display="flex"
                   justifyContent="center"
                   alignItems="center" 
                   width="100%">
@@ -240,11 +255,10 @@ export default function MoleculeInfo() {
                            </CardContent>
                         </Card>}
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={(width > 1366) ? 6 : 12}>
                {Object.keys(molData).length > 0 && Table(molData.ml_data)}
             </Grid>
-            <Grid item xs={allConformers.length > 0 && conformer.length > 0 ? 6 : 0}>
-               {allConformers.length > 0 && conformer.length > 0 && 
+            {(width > 768) && allConformers.length > 0 && conformer.length > 0 && <Grid item xs={(width > 1366) ? 6 : 12}>
                <Container>
                   <FormControl fullWidth variant="standard">
                      <InputLabel id="conformer">Conformer</InputLabel>
@@ -266,31 +280,36 @@ export default function MoleculeInfo() {
                   justifyContent="center"
                   alignItems="center"
                   >
-                     <NGLStage width="600px" height="600px" >
+                     <NGLStage width="700px" height="600px" >
                         <Component path={"/api/conformers/export/"+ conformer + ".sdf"} />
                      </NGLStage>
                   </Box>
-               </Container>}
-            </Grid>
-            <Grid item xs={allConformers.length > 0 && conformer.length > 0 ? 6 : 12}>
-                  {Object.keys(neighborData).length > 0 ? (<TextField
-                  sx={{ mb: 0.5 }}
+               </Container>
+            </Grid>}
+            {(width > 768) && <Grid item xs={(width > 1366) && allConformers.length > 0 && conformer.length > 0 ? 6 : 12}>
+               {Object.keys(neighborData).length > 0 ? 
+               <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center">
+                  <TextField
                   select
                   id="dimension-outline"
                   value={type}
                   onChange={event => switchDimensionality(event)}
+                  sx={{ mb: 1 }}
                   >
                         <MenuItem value={"umap"}>UMAP</MenuItem>
                         <MenuItem value={"pca"}>PCA</MenuItem>
-                  </TextField>)
-                  :
-                  <CircularProgress sx={{ color: "#393536" }} />
-                  }
-                  {Object.keys(neighborData).length > 0 && 
+                  </TextField>
                   <Container sx={{ display: 'flex', height: 600, mb: 10}}>
                      <Graph molData={neighborData} componentArray={components} type={type} neighborSearch={true}></Graph>
-                  </Container>}
+                  </Container>
+               </Box>
+               :
+               <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center">
+                  <CircularProgress sx={{ color: "#393536" }} />
+               </Box>
+               }
             </Grid>
+            }
          </Grid>
       </Container>
    )

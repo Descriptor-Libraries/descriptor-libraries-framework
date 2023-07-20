@@ -52,6 +52,10 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
         mol.style.position = "fixed";
         mol.style.left = `${xpos}px`;
         mol.style.top = `${ypos}px`;
+        mol.style.border = "ridge #393536";
+        mol.style.borderRadius = "5px";
+        mol.style.height = "40mm";
+        mol.style.width = "40mm";
     }
     
     function showSVG(event) {

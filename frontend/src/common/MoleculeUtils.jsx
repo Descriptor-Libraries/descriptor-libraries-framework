@@ -67,14 +67,14 @@ function dynamicGrid( svgs ) {
         <Grid item xs={12} md={4}>
             {result.distance == 0 ? 
             // True condition - render Item with border if distance is 0.
-            <Item sx={{border: 3, borderColor: '#ed1c24'}} onClick={() => moleculePage(result.molecule_id)}>
+            <Item sx={{border: 3, borderColor: '#ed1c24'}}>
             <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(result.svg)}`} />
             <Typography sx={{ wordBreak: "break-word" }}> <strong>Smiles: </strong> { result.smiles }</Typography>
             <ThemeProvider theme={theme}><Button variant="contained" sx={{ m: 0.5 }} onClick={() => moleculePage(result.molecule_id)}>View</Button></ThemeProvider>
             </Item>
             // False condition - render Item without border if distance is not 0.
             :
-            <Item onClick={() => moleculePage(result.molecule_id)}>
+            <Item>
             <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(result.svg)}`} />
             <Typography sx={{ wordBreak: "break-word" }}> <strong>Smiles: </strong> { result.smiles }</Typography>
             
