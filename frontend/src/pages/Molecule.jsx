@@ -6,8 +6,68 @@ import { DataGrid, GridFooterContainer, GridFooter } from "@mui/x-data-grid";
 import Typography from '@mui/material/Typography';
 import { CircularProgress } from "@mui/material";
 import { retrieveSVG } from "../common/MoleculeUtils";
-//import { Stage, Component } from "react-ngl";
 import { NGLStage, Component } from "../components/NGL"
+
+
+async function molecule(molecule_id, signal) {
+   /**
+    * Requests general umap or pca data from the backend.
+    * @param {number} molecule_id Id of the molecule to search on.
+    * @param {AbortSignal} signal Abortsignal object.
+    */
+      const response =  await fetch(`/api/molecules/${molecule_id}`, {signal: signal})
+   
+      if (!response.ok) {
+         throw new Error('Invalid Molecule Id')
+      }
+   
+      else {
+         return await response.json()
+      }
+}
+
+async function dimensionality(molecule_id, type, components, signal, limit=10) {
+   /**
+    * Requests general umap or pca data from the backend.
+    * @param {number} molecule_id Id of the molecule to search on.
+    * @param {string} type Type of dimensionality reduction. Can be one of PCA or UMAP.
+    * @param {string} components String of comma separated integers.
+    * @param {AbortSignal} signal Abortsignal object.
+    * @param {number} limit Limit of the search.
+    * @return {json}  The response json.
+    */
+      let encoded = encodeURIComponent(components);
+
+      const response =  await fetch(`/api/molecules/${molecule_id}/neighbors/?type=${type}&components=${encoded}&skip=0&limit=${limit}`, {signal: signal})
+   
+      if (!response.ok) {
+         throw new Error('Invalid Molecule Id')
+      }
+   
+      else {
+         return await response.json()
+      }
+}
+
+async function identifiers(smiles, signal) {
+   /**
+    * Requests general umap or pca data from the backend.
+    * @param {string} smiles Smiles of the molecule.
+    * @param {AbortSignal} signal Abortsignal object.
+    * @return {json}  The response json.
+    */
+      let encoded = encodeURIComponent(smiles);
+
+      const response =  await fetch(`/api/molecules/identifiers/?smiles=${encoded}`, {signal: signal})
+   
+      if (!response.ok) {
+         throw new Error('Invalid Molecule Smiles')
+      }
+   
+      else {
+         return await response.json()
+      }
+}
 
 export default function MoleculeInfo() {
    const params = useParams();
@@ -36,70 +96,6 @@ export default function MoleculeInfo() {
     // Cleanup the listener when the component is unmounted
     return () => window.removeEventListener('resize', checkMobile);
   }, []); // Empty array means this effect runs once on mount and cleanup on unmount
-
-   const reprList = useMemo(() => [{
-      type: 'ball+stick'
-    }], []);
-
-   async function molecule(molecule_id, signal) {
-      /**
-       * Requests general umap or pca data from the backend.
-       * @param {number} molecule_id Id of the molecule to search on.
-       * @param {AbortSignal} signal Abortsignal object.
-       */
-         const response =  await fetch(`/api/molecules/${molecule_id}`, {signal: signal})
-      
-         if (!response.ok) {
-            throw new Error('Invalid Molecule Id')
-         }
-      
-         else {
-            return await response.json()
-         }
-   }
-
-   async function dimensionality(molecule_id, type, components, signal, limit=10) {
-      /**
-       * Requests general umap or pca data from the backend.
-       * @param {number} molecule_id Id of the molecule to search on.
-       * @param {string} type Type of dimensionality reduction. Can be one of PCA or UMAP.
-       * @param {string} components String of comma separated integers.
-       * @param {AbortSignal} signal Abortsignal object.
-       * @param {number} limit Limit of the search.
-       * @return {json}  The response json.
-       */
-         let encoded = encodeURIComponent(components);
-
-         const response =  await fetch(`/api/molecules/${molecule_id}/neighbors/?type=${type}&components=${encoded}&skip=0&limit=${limit}`, {signal: signal})
-      
-         if (!response.ok) {
-            throw new Error('Invalid Molecule Id')
-         }
-      
-         else {
-            return await response.json()
-         }
-   }
-
-   async function identifiers(smiles, signal) {
-      /**
-       * Requests general umap or pca data from the backend.
-       * @param {string} smiles Smiles of the molecule.
-       * @param {AbortSignal} signal Abortsignal object.
-       * @return {json}  The response json.
-       */
-         let encoded = encodeURIComponent(smiles);
-
-         const response =  await fetch(`/api/molecules/identifiers/?smiles=${encoded}`, {signal: signal})
-      
-         if (!response.ok) {
-            throw new Error('Invalid Molecule Smiles')
-         }
-      
-         else {
-            return await response.json()
-         }
-   }
 
    function switchDimensionality(event) {
       setType(event.target.value);
