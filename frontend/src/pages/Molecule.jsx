@@ -1,7 +1,8 @@
 import Graph from "../components/Graph"
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from "react-router-dom";
 import { Box, Grid, Container, TextField, MenuItem, Card, CardContent, Select, InputLabel, FormControl} from "@mui/material";
+import Button from "@mui/material/Button";
 import { DataGrid, GridFooterContainer, GridFooter } from "@mui/x-data-grid";
 import Typography from '@mui/material/Typography';
 import { CircularProgress } from "@mui/material";
@@ -109,6 +110,18 @@ export default function MoleculeInfo() {
          setNeighborData(pcaNeighborData);
       }
    }
+
+   function downloadDataAsJSON() {
+      const jsonData = JSON.stringify(molData);
+      const blob = new Blob([jsonData], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+  
+      const downloadLink = document.createElement("a");
+      downloadLink.href = url;
+      downloadLink.download = `${params.molid}_data.json`;
+  
+      downloadLink.click();
+    }
 
    function Table(data) {
       let columns = [];
@@ -271,11 +284,7 @@ export default function MoleculeInfo() {
                         ))}
                      </Select>
                   </FormControl>
-                  <Box
-                  display="flex"
-                  justifyContent="center"
-                  alignItems="center"
-                  >
+                  <Box display="flex" justifyContent="center" alignItems="center">
                      <NGLStage width="700px" height="600px" >
                         <Component path={"/api/conformers/export/"+ conformer + ".sdf"} />
                      </NGLStage>
@@ -306,6 +315,13 @@ export default function MoleculeInfo() {
                }
             </Grid>
             }
+            {Object.keys(molData).length > 0 && (width > 768) && <Grid item xs={12}>
+               <Box display="flex" justifyContent="center" alignItems="center">
+                  <Button onClick={() => { downloadDataAsJSON();}}>
+                     Download
+                  </Button>
+               </Box>
+            </Grid>}
          </Grid>
       </Container>
    )
