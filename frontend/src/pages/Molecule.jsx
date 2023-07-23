@@ -1,12 +1,12 @@
 import Graph from "../components/Graph"
 import React, { useEffect, useState } from 'react';
 import { useParams } from "react-router-dom";
-import { Box, Grid, Container, TextField, MenuItem, Card, CardContent, Select, InputLabel, FormControl} from "@mui/material";
+import { Box, Grid, Container, TextField, MenuItem, Card, CardContent, Select, InputLabel, FormControl, ThemeProvider} from "@mui/material";
 import Button from "@mui/material/Button";
 import { DataGrid, GridFooterContainer, GridFooter } from "@mui/x-data-grid";
 import Typography from '@mui/material/Typography';
 import { CircularProgress } from "@mui/material";
-import { retrieveSVG } from "../common/MoleculeUtils";
+import { retrieveSVG, theme } from "../common/MoleculeUtils";
 import { NGLStage, Component } from "../components/NGL"
 
 
@@ -112,6 +112,7 @@ export default function MoleculeInfo() {
    }
 
    function downloadDataAsJSON() {
+      // Function to download all the molecule data as a JSON file.
       const jsonData = JSON.stringify(molData);
       const blob = new Blob([jsonData], { type: "application/json" });
       const url = URL.createObjectURL(blob);
@@ -317,9 +318,11 @@ export default function MoleculeInfo() {
             }
             {Object.keys(molData).length > 0 && (width > 768) && <Grid item xs={12}>
                <Box display="flex" justifyContent="center" alignItems="center">
-                  <Button onClick={() => { downloadDataAsJSON();}}>
-                     Download
-                  </Button>
+                  <ThemeProvider theme={theme}>
+                     <Button variant="contained" sx={{ my: 3 }} onClick={() => { downloadDataAsJSON();}}>
+                        Download
+                     </Button>
+                  </ThemeProvider>
                </Box>
             </Grid>}
          </Grid>
