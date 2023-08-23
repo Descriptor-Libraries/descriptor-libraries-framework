@@ -6,7 +6,7 @@ import { TextField } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
 
 
-export default function Graph({ molData, componentArray, type, neighborSearch }){
+export default function Graph({ molData, componentArray, type, neighborSearch, containerStyle=null }){
     // Set the x and y indices to the first 2 values in the component array.
     const [ xIndex, setXIndex ] = useState(0);
     const [ yIndex, setYIndex ] = useState(1);
@@ -107,6 +107,7 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
                     layout={ {
                         autosize: true,
                         useResizeHandler: true,
+                        showlegend: true,
                         style: {width: '100%', height: '100%'},
                         xaxis: {
                         title: {
@@ -206,8 +207,8 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
       );
 
     return (
-        <Container>
-        <Container sx={{display: 'flex', flexDirection: "row", justifyContent: 'center'}}>
+        <Container sx={containerStyle ? containerStyle : {}}>
+            <Container sx={{display: 'flex', flexDirection: "row", justifyContent: 'center'}}>
             <TextField
                 id="dimension-outline"
                 value={xIndex}
@@ -236,6 +237,6 @@ export default function Graph({ molData, componentArray, type, neighborSearch })
                 ))}
             </TextField>
       </Container>
-        {myPlot}
+            {myPlot}
       </Container>);
 }
