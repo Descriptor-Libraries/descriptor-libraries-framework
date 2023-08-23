@@ -6,29 +6,29 @@ from pydantic import BaseModel
 class Molecule(BaseModel):
     molecule_id: int
     smiles: str
-    molecular_weight: Optional[float]
+    molecular_weight: Optional[float] = None
     conformers_id: List[Optional[int]]
-    dft_data: Optional[Dict]
-    xtb_data: Optional[Dict]
-    xtb_ni_data: Optional[Dict]
-    ml_data: Optional[Dict]
+    dft_data: Optional[Dict] = None
+    xtb_data: Optional[Dict] = None
+    xtb_ni_data: Optional[Dict] = None
+    ml_data: Optional[Dict] = None
 
 class MoleculeSimple(BaseModel):
     molecule_id: int
-    umap1: Optional[float]
-    umap2: Optional[float]
-    pat: Optional[str]
+    umap1: Optional[float] = None
+    umap2: Optional[float] = None
+    pat: Optional[str] = None
     smiles: str
 
 class MoleculeComponents(BaseModel):
-    type: Optional[str]
+    type: Optional[str] = None
     molecule_id: int
-    pat: Optional[str]
+    pat: Optional[str] = None
     smiles: str
-    components: Optional[list[float]]
+    components: Optional[list[float]] = None
 
 class MoleculeNeighbors(MoleculeComponents):
-    dist: Optional[float]
+    dist: Optional[float] = None
 
 class MoleculeIdentifiers(BaseModel):
     smiles: str

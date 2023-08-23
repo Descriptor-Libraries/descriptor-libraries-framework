@@ -1,8 +1,12 @@
-FROM continuumio/miniconda3
+FROM mambaorg/micromamba
 
-RUN yes | conda install -c conda-forge rdkit fastapi alembic psycopg2-binary "sqlalchemy<2.0" tenacity uvicorn curl openbabel
+COPY environment.yaml* /tmp/conda-tmp/
+
+ARG MAMBA_DOCKERFILE_ACTIVATE=1
+
+RUN micromamba install -f /tmp/conda-tmp/environment.yaml && \
+    micromamba clean --all --yes
 
 WORKDIR /app/
 ADD ./app /app/
 RUN pip install -e .
-
