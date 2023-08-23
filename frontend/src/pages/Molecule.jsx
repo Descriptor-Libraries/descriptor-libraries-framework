@@ -1,13 +1,74 @@
 import Graph from "../components/Graph"
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from "react-router-dom";
-import { Box, Grid, Container, TextField, MenuItem, Card, CardContent, Select, InputLabel, FormControl} from "@mui/material";
+import { Box, Grid, Container, TextField, MenuItem, Card, CardContent, Select, InputLabel, FormControl, ThemeProvider} from "@mui/material";
+import Button from "@mui/material/Button";
 import { DataGrid, GridFooterContainer, GridFooter } from "@mui/x-data-grid";
 import Typography from '@mui/material/Typography';
 import { CircularProgress } from "@mui/material";
-import { retrieveSVG } from "../common/MoleculeUtils";
-//import { Stage, Component } from "react-ngl";
+import { retrieveSVG, theme } from "../common/MoleculeUtils";
 import { NGLStage, Component } from "../components/NGL"
+
+
+async function molecule(molecule_id, signal) {
+   /**
+    * Requests general umap or pca data from the backend.
+    * @param {number} molecule_id Id of the molecule to search on.
+    * @param {AbortSignal} signal Abortsignal object.
+    */
+      const response =  await fetch(`/api/molecules/${molecule_id}`, {signal: signal})
+   
+      if (!response.ok) {
+         throw new Error('Invalid Molecule Id')
+      }
+   
+      else {
+         return await response.json()
+      }
+}
+
+async function dimensionality(molecule_id, type, components, signal, limit=10) {
+   /**
+    * Requests general umap or pca data from the backend.
+    * @param {number} molecule_id Id of the molecule to search on.
+    * @param {string} type Type of dimensionality reduction. Can be one of PCA or UMAP.
+    * @param {string} components String of comma separated integers.
+    * @param {AbortSignal} signal Abortsignal object.
+    * @param {number} limit Limit of the search.
+    * @return {json}  The response json.
+    */
+      let encoded = encodeURIComponent(components);
+
+      const response =  await fetch(`/api/molecules/${molecule_id}/neighbors/?type=${type}&components=${encoded}&skip=0&limit=${limit}`, {signal: signal})
+   
+      if (!response.ok) {
+         throw new Error('Invalid Molecule Id')
+      }
+   
+      else {
+         return await response.json()
+      }
+}
+
+async function identifiers(smiles, signal) {
+   /**
+    * Requests general umap or pca data from the backend.
+    * @param {string} smiles Smiles of the molecule.
+    * @param {AbortSignal} signal Abortsignal object.
+    * @return {json}  The response json.
+    */
+      let encoded = encodeURIComponent(smiles);
+
+      const response =  await fetch(`/api/molecules/identifiers/?smiles=${encoded}`, {signal: signal})
+   
+      if (!response.ok) {
+         throw new Error('Invalid Molecule Smiles')
+      }
+   
+      else {
+         return await response.json()
+      }
+}
 
 export default function MoleculeInfo() {
    const params = useParams();
@@ -37,70 +98,6 @@ export default function MoleculeInfo() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []); // Empty array means this effect runs once on mount and cleanup on unmount
 
-   const reprList = useMemo(() => [{
-      type: 'ball+stick'
-    }], []);
-
-   async function molecule(molecule_id, signal) {
-      /**
-       * Requests general umap or pca data from the backend.
-       * @param {number} molecule_id Id of the molecule to search on.
-       * @param {AbortSignal} signal Abortsignal object.
-       */
-         const response =  await fetch(`/api/molecules/${molecule_id}`, {signal: signal})
-      
-         if (!response.ok) {
-            throw new Error('Invalid Molecule Id')
-         }
-      
-         else {
-            return await response.json()
-         }
-   }
-
-   async function dimensionality(molecule_id, type, components, signal, limit=10) {
-      /**
-       * Requests general umap or pca data from the backend.
-       * @param {number} molecule_id Id of the molecule to search on.
-       * @param {string} type Type of dimensionality reduction. Can be one of PCA or UMAP.
-       * @param {string} components String of comma separated integers.
-       * @param {AbortSignal} signal Abortsignal object.
-       * @param {number} limit Limit of the search.
-       * @return {json}  The response json.
-       */
-         let encoded = encodeURIComponent(components);
-
-         const response =  await fetch(`/api/molecules/${molecule_id}/neighbors/?type=${type}&components=${encoded}&skip=0&limit=${limit}`, {signal: signal})
-      
-         if (!response.ok) {
-            throw new Error('Invalid Molecule Id')
-         }
-      
-         else {
-            return await response.json()
-         }
-   }
-
-   async function identifiers(smiles, signal) {
-      /**
-       * Requests general umap or pca data from the backend.
-       * @param {string} smiles Smiles of the molecule.
-       * @param {AbortSignal} signal Abortsignal object.
-       * @return {json}  The response json.
-       */
-         let encoded = encodeURIComponent(smiles);
-
-         const response =  await fetch(`/api/molecules/identifiers/?smiles=${encoded}`, {signal: signal})
-      
-         if (!response.ok) {
-            throw new Error('Invalid Molecule Smiles')
-         }
-      
-         else {
-            return await response.json()
-         }
-   }
-
    function switchDimensionality(event) {
       setType(event.target.value);
       if (event.target.value === "umap")
@@ -113,6 +110,19 @@ export default function MoleculeInfo() {
          setNeighborData(pcaNeighborData);
       }
    }
+
+   function downloadDataAsJSON() {
+      // Function to download all the molecule data as a JSON file.
+      const jsonData = JSON.stringify(molData);
+      const blob = new Blob([jsonData], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+  
+      const downloadLink = document.createElement("a");
+      downloadLink.href = url;
+      downloadLink.download = `${params.molid}_data.json`;
+  
+      downloadLink.click();
+    }
 
    function Table(data) {
       let columns = [];
@@ -275,11 +285,7 @@ export default function MoleculeInfo() {
                         ))}
                      </Select>
                   </FormControl>
-                  <Box
-                  display="flex"
-                  justifyContent="center"
-                  alignItems="center"
-                  >
+                  <Box display="flex" justifyContent="center" alignItems="center">
                      <NGLStage width="700px" height="600px" >
                         <Component path={"/api/conformers/export/"+ conformer + ".sdf"} />
                      </NGLStage>
@@ -310,6 +316,15 @@ export default function MoleculeInfo() {
                }
             </Grid>
             }
+            {Object.keys(molData).length > 0 && (width > 768) && <Grid item xs={12}>
+               <Box display="flex" justifyContent="center" alignItems="center">
+                  <ThemeProvider theme={theme}>
+                     <Button variant="contained" sx={{ my: 3 }} onClick={() => { downloadDataAsJSON();}}>
+                        Download
+                     </Button>
+                  </ThemeProvider>
+               </Box>
+            </Grid>}
          </Grid>
       </Container>
    )
