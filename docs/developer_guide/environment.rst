@@ -14,7 +14,7 @@ You can run the app using a minimal data set by running the "testing app".
     
 .. code-block:: shell
 
-    docker-compose -f docker-compose.test.yml
+    docker-compose -f docker-compose.test.yml up
 
 To run the app in the background, you can add the argument `--detach` to the command above. 
 After running the command, you should be able to navigate to ``http://localhost`` in your browser and see
