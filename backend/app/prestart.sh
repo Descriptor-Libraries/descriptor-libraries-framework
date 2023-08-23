@@ -1,11 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 
-# Wait for DB to be ready
-$python $(pwd)/app/backend_prestart.py
+# Initialize the shell for micromamba
+eval "$(micromamba shell hook --shell bash)"
 
-# Upgrade if needed
-#alembic upgrade head
+# Activate the environment. If you're using a different environment name other than "base", replace it.
+micromamba activate base
 
-# Start FastAPI
+# Navigate to app directory and start FastAPI using Uvicorn.
 cd app
 uvicorn main:app --reload --port 8080 --host 0.0.0.0

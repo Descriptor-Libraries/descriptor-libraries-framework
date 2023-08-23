@@ -1,0 +1,16 @@
+name: base
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python
+  - rdkit
+  - fastapi
+  - pydantic-settings
+  - alembic 
+  - psycopg2-binary 
+  - sqlalchemy 
+  - tenacity 
+  - uvicorn 
+  - curl 
+  - openbabel
