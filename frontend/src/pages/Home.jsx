@@ -8,7 +8,7 @@ import Graph from "../components/Graph";
 
 import SearchIcon from '@mui/icons-material/Search';
 import BubbleChartIcon from '@mui/icons-material/BubbleChart';
-import DownloadIcon from '@mui/icons-material/Download';
+//import DownloadIcon from '@mui/icons-material/Download';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import StatCard from '../components/SummaryCard';
 import IconLink from '../components/IconLink';
@@ -36,7 +36,7 @@ const stats = [
 
   {
     "number": "21,437",
-    "description": "unique molecules"
+    "description": "unique conformers"
   },
 
   {
@@ -106,18 +106,18 @@ function Home() {
             setMolData(items);   
       })
       }
-
-      useEffect( ( ) => { 
-      loadData() },  
-      [ type ] 
-   );
    useEffect(() => {
       loadData()
    }, [type]);
 
   return (
-   <>
-   <Box sx={{ backgroundColor: "#393536", display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-around', padding: 2, height: !isMobile && '35vh' }}>  
+  <>
+   <Box sx={{ backgroundColor: "#393536", 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'space-around', 
+            padding: 2, height: !isMobile && '35vh' }}>  
    <Box 
         sx={{ 
             display: 'flex', 
@@ -145,26 +145,33 @@ function Home() {
           <Grid item>
             <IconLink IconElement={BubbleChartIcon} text="Neighbor Search" link='/neighbors'></IconLink>
           </Grid>
-          <Grid item>
-            <IconLink IconElement={DownloadIcon} text="Download" link="/download"></IconLink>
-          </Grid>
+          {/* Hide until we're ready to add
+            <Grid item>
+              <IconLink IconElement={DownloadIcon} text="Download" link="/download"></IconLink>
+            </Grid> 
+            */}
           <Grid item>
             <IconLink IconElement={AutoStoriesIcon} text="Documentation" link="/docs" reloadDocument></IconLink>
           </Grid>
         </Grid>
      </Box>
 
-    <Container maxWidth="xl" sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <Container maxWidth="xl" sx={{ display: "flex", flexDirection: "column", alignItems: "center"  }}>
       <Grid container spacing={2} sx={{ mt: 3 }}>
             {stats.map((stat, index) => (
               <StatCard key={index} number={stat.number} caption={stat.description} size={150} />
             ))}
       </Grid>
-      <Box sx={{ width: '100%', mt: 3 }}>
-        {!isMobile && <Graph molData={molData} componentArray={components} type={type} neighborSearch={false}></Graph>}
-      </Box>
-    </Container>
-
+      </Container>
+      <Box sx={{ 
+        width: '100%',
+        height: '80vh', 
+        mt: 3,
+        alignItems: 'center',  
+        justifyContent: 'center', 
+      }}>
+  {!isMobile && <Graph molData={molData} componentArray={components} type={type} neighborSearch={false} containerStyle={{ width: '100%', height: '90%' }}></Graph>}
+</Box>
     </>
   );
 }

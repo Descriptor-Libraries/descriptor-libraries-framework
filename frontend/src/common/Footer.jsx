@@ -29,20 +29,21 @@ function Footer() {
     return (
     <><Box className="footer">
         <Divider />
-        <Grid container spacing={2}>
+        <Grid container spacing={2} alignItems="center" justifyContent="center">
             
-            <Grid item xs={2}>
-            {!isMobile &&
-                <a href="https://ccas.nd.edu/" target="_blank" title="Go to C-CAS in a new tab" >
-                <img src={ccas_logo} alt="CCAS logo" class="footer_logo" />
-                </a>
+        <Grid item xs={2} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {!isMobile &&
+                    <a href="https://ccas.nd.edu/" target="_blank" title="Go to C-CAS in a new tab" 
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
+                        <img src={ccas_logo} alt="CCAS logo" className="footer_logo" />
+                    </a>
                 }
             </Grid>
             <Grid item xs={8}>
-                <p style={{ textAlign: 'left' }}> &copy; Copyright 2019-2023 <a href="https://molssi.org/">The Molecular Sciences Software Institute </a>
+                <p style={{ textAlign: 'center' }}>This site is maintained by <a href="https://molssi.org/">The Molecular Sciences Software Institute </a>
                     and the <a href="https://ccas.nd.edu/">Center for Computer Assisted Synthesis</a>
                 </p>
-                <p style={{ textAlign: 'left' }}>
+                <p style={{ textAlign: 'center' }}>
                     MolSSI is Funded by the National Science Foundation <a href="https://nsf.gov/awardsearch/showAward?AWD_ID=1547580">OAC-1547580 </a> and
                     <a href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=2136142"> CHE-2136142.</a>
                 </p>
