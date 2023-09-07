@@ -35,7 +35,7 @@ services:
     environment:
       POSTGRES_SERVER: database
       POSTGRES_USER: postgres
-      POSTGRES_PASSWD: $postgresPWD
+      POSTGRES_PASSWD: "$postgresPWD"
       POSTGRES_DB: postgres
     ports:
       - "5432:5432"

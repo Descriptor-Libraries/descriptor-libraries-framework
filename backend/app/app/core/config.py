@@ -2,7 +2,7 @@ from pydantic import PostgresDsn, validator
 from pydantic_settings import SettingsConfigDict, BaseSettings
 
 from typing import Any, Optional, Dict
-
+from urllib.parse import quote
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = 'Phosphines'
@@ -22,7 +22,7 @@ class Settings(BaseSettings):
         return PostgresDsn.build(
             scheme="postgresql",
             username=values.get("POSTGRES_USER"),
-            password=values.get("POSTGRES_PASSWD"),
+            password=quote(values.get("POSTGRES_PASSWD")),
             host=values.get("POSTGRES_SERVER"),
             path=f"{values.get('POSTGRES_DB') or ''}"
         )
