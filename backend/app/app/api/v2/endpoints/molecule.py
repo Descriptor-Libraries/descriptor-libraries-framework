@@ -37,10 +37,10 @@ def valid_smiles(smiles):
         When a smile string cannot be created from an rdkit molecule.
     """
     mol = Chem.MolFromSmiles(smiles)
-    Chem.SanitizeMol(mol)
     if mol is None:
         raise HTTPException(status_code=400, detail="Invalid Smiles")
 
+    Chem.SanitizeMol(mol)
     smiles = Chem.MolToSmiles(mol)
     if smiles is None:
         raise HTTPException(status_code=400, detail="Invalid Smiles")
