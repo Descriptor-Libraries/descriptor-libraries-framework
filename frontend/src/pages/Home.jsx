@@ -10,6 +10,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import BubbleChartIcon from '@mui/icons-material/BubbleChart';
 //import DownloadIcon from '@mui/icons-material/Download';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
+import InfoIcon from '@mui/icons-material/Info';
 import StatCard from '../components/SummaryCard';
 import IconLink from '../components/IconLink';
 
@@ -144,6 +145,9 @@ function Home() {
           </Grid>
           <Grid item>
             <IconLink IconElement={BubbleChartIcon} text="Neighbor Search" link='/neighbors'></IconLink>
+          </Grid>
+          <Grid item>
+            <IconLink IconElement={InfoIcon} text="Library Details" link="/about"></IconLink>
           </Grid>
           {/* Hide until we're ready to add
             <Grid item>

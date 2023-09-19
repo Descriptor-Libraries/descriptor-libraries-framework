@@ -10,11 +10,13 @@ import Home from './pages/Home';
 
 const Search = lazy(() => import('./pages/SearchHook'));
 const NeighborSearch = lazy(() => import('./pages/Neighbors'));
+const About = lazy(() => import('./pages/About'))
 
 const pages = {
   'Home': <Home />, 
   'Search': <Search />,
   'Neighbors': <NeighborSearch/>, 
+  'About': <About/>,
 };
 
 function Content() {
