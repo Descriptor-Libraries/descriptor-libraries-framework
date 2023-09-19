@@ -7,6 +7,8 @@ import Dialog from '@mui/material/Dialog';
 import Slide from '@mui/material/Slide';
 
 import { Ketcher } from 'ketcher-core';
+//import { convertStructToString } from 'ketcher-core'
+import { ChemicalMimeType } from 'ketcher-core';
 import { StandaloneStructServiceProvider } from 'ketcher-standalone';
 import { Editor } from 'ketcher-react';
 import "ketcher-react/dist/index.css";
@@ -28,7 +30,9 @@ export default function FullScreenDialog({ ketcherCallBack }) {
   };
 
   async function handleClose() {
-      const smiles = await ketcher.getSmiles().then(result => {return result;});
+      let smiles = await ketcher.getSmiles().then(result => {return result;});
+      let mol = await ketcher.indigo.aromatize(smiles).then(result => {return result;});
+      smiles = await ketcher.indigo.convert(mol, {outputFormat: ChemicalMimeType.DaylightSmiles }).then(result => {return result.struct})
       const SMARTS = await ketcher.getSmarts().then(result => {return result;});
       ketcherCallBack([smiles, SMARTS]);
       setOpen(false);

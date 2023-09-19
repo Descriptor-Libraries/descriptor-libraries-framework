@@ -39,6 +39,8 @@ def valid_smiles(smiles):
     mol = Chem.MolFromSmiles(smiles)
     if mol is None:
         raise HTTPException(status_code=400, detail="Invalid Smiles")
+
+    Chem.SanitizeMol(mol)
     smiles = Chem.MolToSmiles(mol)
     if smiles is None:
         raise HTTPException(status_code=400, detail="Invalid Smiles")
@@ -133,21 +135,12 @@ def search_molecules(
     db: Session = Depends(deps.get_db),
 ):
     # Check if the substructure provided is valid
-    valid_smiles(substructure)
+    substructure = valid_smiles(substructure)
 
-    # The original query is not doing a substructure search at all. It is doing string
-    # comparisons between the substructure and the molecule smiles string.
-    # added WHERE mol@>:substructure. Leaving order by results in a
-    # very slow query, as mentioned in this blog
+    # Very slow query observed for substructure search.
+    # set enable_sort=off as advised by this blog to improve speed.
     # https://depth-first.com/articles/2021/08/11/the-rdkit-postgres-ordered-substructure-search-problem/
-    # Adopting their solution works  (set enable_sort=off)
-    # However, this isn't the (only) problem.
-    # returning the data is very slow.
-
-    # Create mol from smiles in db - select mol_from_smiles('smiles')
-    # currently does a substructure search then orders by molecular fingerprint.
-    # Timing - without setting enable_sort = off about 34 seconds for 100 molecules
-    # with enable_sort off, 0.039 seconds
+    # ::qmol in the following query allows for SMARTS strings.
 
     sql = text(
         """
