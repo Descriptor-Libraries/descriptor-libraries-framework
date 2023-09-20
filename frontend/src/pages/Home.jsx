@@ -147,7 +147,7 @@ function Home() {
             <IconLink IconElement={BubbleChartIcon} text="Neighbor Search" link='/neighbors'></IconLink>
           </Grid>
           <Grid item>
-            <IconLink IconElement={InfoIcon} text="Library Details" link="/about"></IconLink>
+            <IconLink IconElement={InfoIcon} text="Library Details" link="/library_details"></IconLink>
           </Grid>
           {/* Hide until we're ready to add
             <Grid item>

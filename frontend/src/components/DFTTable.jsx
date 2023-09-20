@@ -19,7 +19,7 @@ function createData(
 };
 
 const rows = [
-    createData("boltz", "Boltzmann-weighted average of all conformers' properties (T=298.15 K", true, true),
+    createData("boltz", "Boltzmann-weighted average of all conformers' properties (T=298.15 K)", true, true),
     createData("max", "highest value of a property of any conformer", true, true),
     createData("min", "lowest value of a property of any conformer", true, true),
     createData("std", "standard deviation of the value across all conformers", true, false),

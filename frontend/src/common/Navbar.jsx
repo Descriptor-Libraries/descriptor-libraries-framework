@@ -106,7 +106,7 @@ const ResponsiveAppBar = ({pages}) => {
             </Typography>
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
               {Object.keys(pages).map((page) => (
-                <Link to={page.toLowerCase()} id={page.toLowerCase()} className="NavbarLink"  style={{ textDecoration: 'none' }} >
+                <Link to={page.replace(" ", "_").toLowerCase()} id={page.replace(" ", "_").toLowerCase()} className="NavbarLink"  style={{ textDecoration: 'none' }} >
                     <Button
                     key={page}
                     onClick={handleCloseNavMenu}
