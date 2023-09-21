@@ -40,13 +40,14 @@ function Footer() {
                 }
             </Grid>
             <Grid item xs={8}>
-                <p style={{ textAlign: 'center' }}>This site is maintained by <a href="https://molssi.org/">The Molecular Sciences Software Institute </a>
-                    and the <a href="https://ccas.nd.edu/">Center for Computer Assisted Synthesis</a>
+                <p style={{ textAlign: 'center' }}>This site is maintained by <a href="https://molssi.org/">The Molecular Sciences Software Institute (MolSSI)</a>
+                    and the <a href="https://ccas.nd.edu/">Center for Computer Assisted Synthesis (CCAS).</a>
                 </p>
                 <p style={{ textAlign: 'center' }}>
                     MolSSI is Funded by the National Science Foundation <a href="https://nsf.gov/awardsearch/showAward?AWD_ID=1547580">OAC-1547580 </a> and
-                    <a href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=2136142"> CHE-2136142.</a>
+                    <a href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=2136142"> CHE-2136142.</a> CCAS is Funded by the National Science Foundation <a href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=2202693">CHE–2202693.</a>
                 </p>
+                
             </Grid>
             <Grid item xs={2}>
             {!isMobile &&
