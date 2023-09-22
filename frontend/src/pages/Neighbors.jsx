@@ -6,17 +6,13 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { ThemeProvider } from '@mui/material/styles';
 
 import Button from '@mui/material/Button';
-import MenuItem from '@mui/material/MenuItem';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 
 import Graph from '../components/Graph'
 
 import { retrieveAllSVGs, dynamicGrid, theme } from '../common/MoleculeUtils';
 
 
-async function NeighborSearch(molecule_id, type, components, limit=48, skip=0, signal) {
+async function NeighborSearch(molecule_id, type="pca", components="1,2,3,4", limit=48, skip=0, signal) {
   /**
    * Requests neighbor data on the molecule from the backend.
    * @param {number} molecule_id Id of the molecule to query.
@@ -49,8 +45,6 @@ export default function NeighborSearchHook () {
     const interval = 15;
     
     const [ moleculeid, setSearch ] = useState(1);
-    const [ type, setType ] = useState("pca");
-    const [ graphType, setGraphType ] = useState("pca");
     const [ skip, setSkip ] = useState(0);
     const [ validMolecule, setValidMolecule ] = useState(true);
     const [ svg_results, setSVGResults ] = useState([])
@@ -58,8 +52,6 @@ export default function NeighborSearchHook () {
     const [ isLoading, setIsLoading ] = useState(true);
     const [ isLoadingMore, setIsLoadingMore ] = useState(false);
     const [ molData, setMolData] = useState([]);
-    const [ componentArrayForm, setComponentArrayForm ] = useState(["1", "2"]);
-    const [ graphComponentArrayForm, setGraphComponentArrayForm ] = useState(["1", "2"]);
     const [ updatedParameters, setUpdatedParameters ] = useState(true);
     const [ searchToggle, setSearchToggle ] = useState(true);
     const [ isMobile, setIsMobile ] = useState(window.innerWidth < 768);
@@ -77,40 +69,6 @@ export default function NeighborSearchHook () {
      // Cleanup the listener when the component is unmounted
      return () => window.removeEventListener('resize', checkMobile);
    }, []); // Empty array means this effect runs once on mount and cleanup on unmount
-
-    function buildComponentArray(event, label){
-      /**
-       * Manages the array of components based on how many checkboxes are ticked.
-       * @param {event} event Selecting or deselecting the checkbox event.
-       * @param {string} label The label of the checkbox.
-       */
-
-      // Add new label if the checkbox was checked
-      if (event === true) {
-        setComponentArrayForm(prevArray => {
-          const newArray = [...prevArray, label];
-          newArray.sort();
-          return newArray;
-        });
-      }
-      // Remove label otherwise
-      else {
-        setComponentArrayForm(prevArray => {
-          const newArray = prevArray.filter(item => item !== label);
-          newArray.sort();
-          return newArray;
-        });
-      }
-    }
-
-    function arrayToString(components){
-      /**
-       * Converts components from an array to a comma separated string to use in our neighbor search API.
-       * @param {string[]} components An array of components as strings.
-       * @returns A comma separated string of the components.
-       */
-      return components.join(", ");
-    }
 
     function loadMore() {
       /**
@@ -142,7 +100,7 @@ export default function NeighborSearchHook () {
        * @param {AbortSignal} signal Abortsignal object.
        */
         const fetchData = async () => {
-            const molecule_data = await NeighborSearch(moleculeid, type, arrayToString(componentArrayForm), interval, skip, signal);
+            const molecule_data = await NeighborSearch(moleculeid, "pca", "1,2,3,4", interval, skip, signal);
             const svg_data = await retrieveAllSVGs(molecule_data, signal);
 
             return [ molecule_data, svg_data ]
@@ -175,22 +133,10 @@ export default function NeighborSearchHook () {
           })
     }
 
-    function updateGraphComponentProps() {
-      /**
-       * Used to update the type and component array form which is sent to the graph component. This is necessary because changing the type or components on the form
-       * can change the output on the graph and its x and y axis immediately, even before a search is conducted. To prevent this, 2 sets of variables for type and components exist.
-       * The type and componentArrayForm are used to hold the changes from the user while graphType and graphComponentArrayForm are used by the graph component to render the graph.
-       * Thus this function is called to update the graphType and graphComponentArrayForm when a new search is called, so that the graph component can be updated, allowing the user to
-       * make selections without updating the graph component.
-       */
-      setGraphType(type);
-      setGraphComponentArrayForm(componentArrayForm);
-    }
-
     // If any parameters change, we must set updatedParameters to true.
     useEffect(() => {
       setUpdatedParameters(true);
-    }, [moleculeid, type, componentArrayForm])
+    }, [moleculeid])
 
     function _handleKeyDown(event) {
       if (event.key === "Enter") {
@@ -230,31 +176,9 @@ export default function NeighborSearchHook () {
                   value= {moleculeid} 
                   onKeyDown = { (e) => _handleKeyDown(e) }
                   onChange = { event => setSearch( event.target.value ) }
-                  InputProps={{endAdornment: <Button onClick={ () => {newSearch(); updateGraphComponentProps();} } >Search</Button>}}
+                  InputProps={{endAdornment: <Button onClick={ () => {newSearch(); } } >Search</Button>}}
         />
-        <TextField
-            sx={{ m: 0.5 }}
-            select
-            id="dimension-outline"
-            value={type}
-            onChange={ function(event) {setType(event.target.value); setComponentArrayForm(["1", "2"]);}}
-        >
-            <MenuItem value={"pca"}>PCA</MenuItem>
-            <MenuItem value={"umap"}>UMAP</MenuItem>
-        </TextField>
         </Box>
-        {type == "pca" && <FormGroup sx={{position: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
-                          <FormControlLabel control={<Checkbox defaultChecked value={"1"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="1" />
-                          <FormControlLabel control={<Checkbox defaultChecked value={"2"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="2" />
-                          <FormControlLabel control={<Checkbox onChange = {event => buildComponentArray(event.target.checked, "3")}/>} label="3" />
-                          <FormControlLabel control={<Checkbox onChange = {event => buildComponentArray(event.target.checked, "4")}/>} label="4" />
-                        </FormGroup>
-        }
-        {type == "umap" && <FormGroup sx={{position: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
-                          <FormControlLabel control={<Checkbox defaultChecked value={"1"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="1" />
-                          <FormControlLabel control={<Checkbox defaultChecked value={"2"} onChange = {event => buildComponentArray(event.target.checked, event.target.value)}/>} label="2" />
-                        </FormGroup>
-        }
         <Box display="flex" justifyContent="center">
         { (isLoading || isLoadingMore) ? <CircularProgress />: <ThemeProvider theme={theme}> <Button disabled={updatedParameters} variant="contained" sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> </ThemeProvider>}
         </Box>
@@ -265,7 +189,7 @@ export default function NeighborSearchHook () {
             </Box>
             <Box>
             {/* If molecule is valid and there is mol data, then generate the graph based on the data*/}
-            { !isLoading && validMolecule && Object.keys(molData).length > 0 && graphComponentArrayForm.length > 1 && !isMobile && <Container sx={{ display: 'flex', height: 750}}>{ <Graph molData={molData} componentArray={graphComponentArrayForm} type={graphType} neighborSearch={true}></Graph> }</Container> } 
+            { !isLoading && validMolecule && Object.keys(molData).length > 0 && !isMobile && <Container sx={{ display: 'flex', height: 750}}>{ <Graph molData={molData} componentArray={["1", "2", "3", "4"]} type="pca" neighborSearch={true}></Graph> }</Container> } 
             </Box>
             <Box sx={{ display: 'flex' }} justifyContent="center">
             {/* If molecule is valid and there is svg data, then generate the images of the molecules*/}
