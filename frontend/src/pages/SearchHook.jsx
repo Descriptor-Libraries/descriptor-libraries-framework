@@ -207,13 +207,13 @@ export default function SearchHook () {
         }
         <Container sx={{display: 'flex', justifyContent: 'center', my: 3}}>
             <Box sx={{ display: 'flex' }}>
-             { isLoading && <CircularProgress sx={{ color: "#ed1c24" }} /> }
+             { isLoading && <CircularProgress /> }
              { !isLoading && !validSmiles  && <Typography>Search string is not valid SMILES or SMARTS. Please provide valid SMILES or SMARTS strings.</Typography> }
              { !isLoading && validSmiles && Object.keys(svg_results).length > 0 && 
              <Container> 
                 { dynamicGrid(svg_results)  }
                 <Box sx={{ display: 'flex', justifyContent: 'center', my: 3 }}>
-                  { isLoadingMore ? <CircularProgress sx={{ color: "#ed1c24" }} /> 
+                  { isLoadingMore ? <CircularProgress /> 
                   : <ThemeProvider theme={theme}>
                       <Button disabled={updatedParameters} variant="contained" sx={{ my: 3 }} onClick={ () => loadMore() } >Load More</Button>
                     </ThemeProvider> 
