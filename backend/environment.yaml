@@ -10,6 +10,7 @@ dependencies:
   - alembic 
   - psycopg2-binary 
   - sqlalchemy 
+  - pandas
   - tenacity 
   - uvicorn 
   - curl 
