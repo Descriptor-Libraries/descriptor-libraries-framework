@@ -20,6 +20,36 @@ from app.db.session import models
 
 router = APIRouter()
 
+def _pandas_long_to_wide(df):
+    """
+    Internal function for reshaping from long to wide format for CSV export.
+    """
+    # Reshape the data into wide format
+    df_wide = df.pivot(index=["molecule_id", "smiles"], columns="property")
+
+    # Flatten multi-level columns and reset the index
+    df_wide.columns = ['_'.join(col[::-1]).strip() for col in df_wide.columns.values]
+
+    df_wide.reset_index(inplace=True)
+
+    df_wide.dropna(axis=1, inplace=True)
+
+    return df_wide
+
+def _pandas_to_buffer(df):
+    """Internal function for converting dataframe to buffer"""
+    
+    # Create a buffer to hold the csv file.
+    buffer = io.StringIO()
+
+    # Write the dataframe to the buffer.
+    df.to_csv(buffer, index=False)
+
+    # Set the buffer to the beginning of the file.
+    buffer.seek(0)
+
+    return buffer
+
 
 def valid_smiles(smiles):
     """Check to see if a smile string is valid to represent a molecule.
@@ -56,7 +86,7 @@ def valid_smiles(smiles):
     return smiles
 
 @router.get("/data/export/{molecule_id}", response_class=StreamingResponse)
-def get_molecule_data(molecule_id: int,
+async def get_molecule_data(molecule_id: int,
                       data_type: str="ml",
                       db: Session = Depends(deps.get_db)):
 
@@ -76,7 +106,7 @@ def get_molecule_data(molecule_id: int,
     if data_type.lower() not in ["ml", "dft", "xtb", "xtb_ni"]:
         raise HTTPException(status_code=400, detail="Invalid data type.")
     
-    # Use pandas.read_sql_query to get the data.
+    # Use pandas.rea``  d_sql_query to get the data.
     table_name = f"{data_type}_data"
     query = text(f"""
         SELECT t.*, m.SMILES
@@ -89,34 +119,9 @@ def get_molecule_data(molecule_id: int,
 
     df = pd.read_sql_query(stmt, db.bind)
 
-    # Reshape the data into wide format
-    df_wide = df.pivot(index=["molecule_id", "smiles"], columns="property")
+    df_wide = _pandas_long_to_wide(df)      
 
-    # Flatten multi-level columns and reset the index
-    df_wide.columns = ['_'.join(col[::-1]).strip() for col in df_wide.columns.values]
-    df_wide.reset_index(inplace=True)
-
-    # Add the SMILES column back
-    df_wide = pd.merge(df_wide, df[["molecule_id", "smiles"]].drop_duplicates(), on="molecule_id", how="left")
-
-    df_wide.dropna(axis=1, inplace=True)
-
-    df_wide.drop(columns="smiles_y", inplace=True)
-
-    df_wide.rename( columns = {'smiles_x':'smiles'}, inplace=True) 
-
-    # Send csv file as streaming response.
-    # See: https://github.com/tiangolo/fastapi/issues/1277
-    # See: https://stackoverflow.com/questions/61140398/fastapi-return-a-file-response-with-the-output-of-a-sql-query
-
-    # Create a buffer to hold the csv file.
-    buffer = io.StringIO()
-
-    # Write the dataframe to the buffer.
-    df_wide.to_csv(buffer, index=False)
-
-    # Set the buffer to the beginning of the file.
-    buffer.seek(0)
+    buffer = _pandas_to_buffer(df_wide)
 
     # Return the buffer as a streaming response.
     response = StreamingResponse(buffer, media_type="text/csv")
@@ -124,7 +129,7 @@ def get_molecule_data(molecule_id: int,
     return response
 
 @router.get("/data/export", response_class=StreamingResponse)
-def get_molecules_data(molecule_ids: str,
+async def get_molecules_data(molecule_ids: str,
                        data_type: str="ml",
                        db: Session = Depends(deps.get_db)):
     
@@ -152,31 +157,9 @@ def get_molecules_data(molecule_ids: str,
 
     df = pd.read_sql_query(query, db.bind)
 
-    # Reshape the data into wide format
-    df_wide = df.pivot(index=["molecule_id", "smiles"], columns="property")
+    df_wide = _pandas_long_to_wide(df)      
 
-    # Flatten multi-level columns and reset the index
-    df_wide.columns = ['_'.join(col[::-1]).strip() for col in df_wide.columns.values]
-
-    df_wide.reset_index(inplace=True)
-
-    # Add the SMILES column back
-    df_wide = pd.merge(df_wide, df[["molecule_id", "smiles"]].drop_duplicates(), on="molecule_id", how="left")
-
-    df_wide.dropna(axis=1, inplace=True)
-
-    df_wide.drop(columns="smiles_y", inplace=True)
-
-    df_wide.rename( columns = {'smiles_x':'smiles'}, inplace=True)
-    
-    # Create a buffer to hold the csv file.
-    buffer = io.StringIO()
-
-    # Write the dataframe to the buffer.
-    df_wide.to_csv(buffer, index=False)
-
-    # Set the buffer to the beginning of the file.
-    buffer.seek(0)
+    buffer = _pandas_to_buffer(df_wide)
 
     # Return the buffer as a streaming response.
     response = StreamingResponse(buffer, media_type="text/csv")
