@@ -1,14 +1,22 @@
-from multiprocessing.sharedctypes import Value
-from re import sub
+"""
+API endpoints for molecules. 
+Prefixed with /molecules
+"""
+
+import io
 from typing import List, Optional, Any
+
+import pandas as pd
+
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
+from rdkit import Chem
+from sqlalchemy import exc, text
+from sqlalchemy.orm import Session
 
 from app import schemas
 from app.api import deps
 from app.db.session import models
-from fastapi import APIRouter, Depends, HTTPException
-from rdkit import Chem
-from sqlalchemy import exc, text
-from sqlalchemy.orm import Session
 
 router = APIRouter()
 
@@ -47,6 +55,135 @@ def valid_smiles(smiles):
 
     return smiles
 
+@router.get("/data/export/{molecule_id}", response_class=StreamingResponse)
+def get_molecule_data(molecule_id: int,
+                      data_type: str="ml",
+                      db: Session = Depends(deps.get_db)):
+
+    # Generalized - get max molecule id.
+    query = text(f"SELECT MAX(molecule_id) FROM molecule;")
+    max_molecule_id = db.execute(query).fetchall()[0][0]
+
+    # Check to see if the molecule_id is within range.
+    if molecule_id > max_molecule_id:
+        raise HTTPException(status_code=404, detail=f"Molecule with ID supplied not found, the maximum ID is {max_molecule_id}")
+    
+    # Check to see if the molecule_id is within range.
+    if molecule_id <= 0:
+        raise HTTPException(status_code=500)
+    
+    # Check for valid data type.
+    if data_type.lower() not in ["ml", "dft", "xtb", "xtb_ni"]:
+        raise HTTPException(status_code=400, detail="Invalid data type.")
+    
+    # Use pandas.read_sql_query to get the data.
+    table_name = f"{data_type}_data"
+    query = text(f"""
+        SELECT t.*, m.SMILES
+        FROM {table_name} t
+        JOIN molecule m ON t.molecule_id = m.molecule_id
+        WHERE t.molecule_id = :molecule_id
+    """)
+
+    stmt = query.bindparams(molecule_id=molecule_id)
+
+    df = pd.read_sql_query(stmt, db.bind)
+
+    # Reshape the data into wide format
+    df_wide = df.pivot(index=["molecule_id", "smiles"], columns="property")
+
+    # Flatten multi-level columns and reset the index
+    df_wide.columns = ['_'.join(col[::-1]).strip() for col in df_wide.columns.values]
+    df_wide.reset_index(inplace=True)
+
+    # Add the SMILES column back
+    df_wide = pd.merge(df_wide, df[["molecule_id", "smiles"]].drop_duplicates(), on="molecule_id", how="left")
+
+    df_wide.dropna(axis=1, inplace=True)
+
+    df_wide.drop(columns="smiles_y", inplace=True)
+
+    df_wide.rename( columns = {'smiles_x':'smiles'}, inplace=True) 
+
+    # Send csv file as streaming response.
+    # See: https://github.com/tiangolo/fastapi/issues/1277
+    # See: https://stackoverflow.com/questions/61140398/fastapi-return-a-file-response-with-the-output-of-a-sql-query
+
+    # Create a buffer to hold the csv file.
+    buffer = io.StringIO()
+
+    # Write the dataframe to the buffer.
+    df_wide.to_csv(buffer, index=False)
+
+    # Set the buffer to the beginning of the file.
+    buffer.seek(0)
+
+    # Return the buffer as a streaming response.
+    response = StreamingResponse(buffer, media_type="text/csv")
+    response.headers["Content-Disposition"] = f"attachment; filename={molecule_id}_{data_type}.csv"
+    return response
+
+@router.get("/data/export", response_class=StreamingResponse)
+def get_molecules_data(molecule_ids: str,
+                       data_type: str="ml",
+                       db: Session = Depends(deps.get_db)):
+    
+    # Sanitize molecule ids
+    int_check = [x.strip().isdigit() for x in molecule_ids.split(",")]
+
+    if not all(int_check):
+        raise HTTPException(status_code=400, detail="Invalid molecule ids.")
+
+    # Check for valid data type.
+    if data_type.lower() not in ["ml", "dft", "xtb", "xtb_ni"]:
+        raise HTTPException(status_code=400, detail="Invalid data type.")
+    
+    # Use pandas.read_sql_query to get the data.
+    table_name = f"{data_type}_data"
+
+    #molecule_ids= [int(x) for x in molecule_ids.split(",")]
+
+    query = text(f"""
+        SELECT t.*, m.SMILES
+        FROM {table_name} t
+        JOIN molecule m ON t.molecule_id = m.molecule_id
+        WHERE t.molecule_id IN ({molecule_ids})
+    """)
+
+    df = pd.read_sql_query(query, db.bind)
+
+    # Reshape the data into wide format
+    df_wide = df.pivot(index=["molecule_id", "smiles"], columns="property")
+
+    # Flatten multi-level columns and reset the index
+    df_wide.columns = ['_'.join(col[::-1]).strip() for col in df_wide.columns.values]
+
+    df_wide.reset_index(inplace=True)
+
+    # Add the SMILES column back
+    df_wide = pd.merge(df_wide, df[["molecule_id", "smiles"]].drop_duplicates(), on="molecule_id", how="left")
+
+    df_wide.dropna(axis=1, inplace=True)
+
+    df_wide.drop(columns="smiles_y", inplace=True)
+
+    df_wide.rename( columns = {'smiles_x':'smiles'}, inplace=True)
+    
+    # Create a buffer to hold the csv file.
+    buffer = io.StringIO()
+
+    # Write the dataframe to the buffer.
+    df_wide.to_csv(buffer, index=False)
+
+    # Set the buffer to the beginning of the file.
+    buffer.seek(0)
+
+    # Return the buffer as a streaming response.
+    response = StreamingResponse(buffer, media_type="text/csv")
+    response.headers["Content-Disposition"] = f"attachment; filename={data_type}_{molecule_ids.replace(',','_')}.csv"
+
+    return response
+                 
 
 @router.get("/umap", response_model=List[schemas.MoleculeSimple])
 def get_molecule_umap(
