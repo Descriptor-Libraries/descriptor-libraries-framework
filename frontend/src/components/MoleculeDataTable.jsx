@@ -14,10 +14,12 @@ const dataTypeMapping = {
 };
 
 
-async function retrieveData(molecule_id, data_type) {
+async function retrieveData(molecule_id, data_type="ml") {
     try {
         const response = await fetch(`/api/molecules/data/export/${molecule_id}?data_type=${data_type}&return_type=json`);
         const data = await response.json();
+        console.log(data_type);
+        console.log(data);
         return data;
     } catch (error) {
         console.log(error);
@@ -25,16 +27,34 @@ async function retrieveData(molecule_id, data_type) {
     }
 }
 
-function CustomFooter({ selectedDataType, setSelectedDataType }) {
+async function downloadData(molecule_id, data_type) {
+    try {
+        const response = await fetch(`/api/molecules/data/export/${molecule_id}?data_type=${data_type}&return_type=csv`);
+        
+        if(response.status === 200) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `data_${molecule_id}_${data_type}.csv`;  // you can name the file however you'd like
+            a.click();
+            window.URL.revokeObjectURL(url);
+        } else {
+            console.error("Failed to fetch CSV");
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+function CustomFooter({ selectedDataType, setSelectedDataType, moleculeID }) {
     const handleChange = (event) => {
       setSelectedDataType(event.target.value);
     };
   
     return (
       <GridFooterContainer>
-        <Typography sx={{ color: 'gray', display: 'inline-block', verticalAlign: 'middle' }}>
-          Data Type:
-        </Typography>
         <Select
           value={selectedDataType}
           onChange={handleChange}
@@ -46,6 +66,9 @@ function CustomFooter({ selectedDataType, setSelectedDataType }) {
           <MenuItem value="XTB Data">XTB Data</MenuItem>
           <MenuItem value="XTB_NI Data">XTB_NI Data</MenuItem>
         </Select>
+        <Button variant="contained" color="primary" sx={{ marginLeft: 'auto', marginRight: '16px', display: 'inline-block', verticalAlign: 'middle' }} onClick={() => { downloadData(moleculeID, dataTypeMapping[selectedDataType]) }} >
+            Download as CSV
+        </Button>
         <GridFooter sx={{
           border: 'none', // To delete double border.
         }} />
@@ -53,21 +76,30 @@ function CustomFooter({ selectedDataType, setSelectedDataType }) {
     );
   }
   
+  function CustomNoRowsOverlay({ selectedDataType}) {
+    return (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+            <Typography variant="h6">{selectedDataType} is not available for this molecule.</Typography>
+        </div>
+    );
+}
+
   
 
 export default function MoleculeDataTable({ molecule_id, initial_data_type }) {
     const [moleculeData, setMoleculeData] = useState(null);
     const [data_type, setDataType] = useState(initial_data_type);
     const [selectedDataType, setSelectedDataType] = useState("ML Data"); // Set the default value to "ML Data"
+    const [moleculeID, setMoleculeID] = useState(molecule_id);
 
     useEffect(() => {
         async function fetchData() {
-            let data = await retrieveData(molecule_id, dataTypeMapping["DFT Data"]);
+            let data = await retrieveData(moleculeID, dataTypeMapping["DFT Data"]);
     
             // If DFT data is empty, default to ML Data
             if (!data || Object.keys(data).length === 0) {
                 setSelectedDataType("ML Data");
-                data = await retrieveData(molecule_id, dataTypeMapping["ML Data"]);
+                data = await retrieveData(moleculeID, dataTypeMapping["ML Data"]);
             } else {
                 setSelectedDataType("DFT Data");
             }
@@ -75,7 +107,17 @@ export default function MoleculeDataTable({ molecule_id, initial_data_type }) {
         }
     
         fetchData();
-    }, [molecule_id]);
+    }, [moleculeID]);
+
+    useEffect(() => {
+        async function fetchData() {
+            const data = await retrieveData(moleculeID, data_type);
+            setMoleculeData(data);
+        }
+
+        fetchData();
+
+    }, [data_type]);
 
     useEffect(() => {
         setDataType(dataTypeMapping[selectedDataType]);
@@ -100,9 +142,10 @@ export default function MoleculeDataTable({ molecule_id, initial_data_type }) {
             <DataGrid
                 rows={rows}
                 columns={columns}
-                components={{Footer: CustomFooter}}
+                components={{Footer: CustomFooter, NoRowsOverlay: CustomNoRowsOverlay}}
                 componentsProps={{
-                    footer: { selectedDataType, setSelectedDataType }
+                    footer: { selectedDataType, setSelectedDataType, moleculeID },
+                    noRowsOverlay: { selectedDataType },
                 }}
                 initialState={{
                     pagination: {
