@@ -8,6 +8,17 @@ import { Box } from '@mui/material'
 
 import Home from './pages/Home';
 
+
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#393536",
+    }
+  },
+});
+
 const Search = lazy(() => import('./pages/SearchHook'));
 const NeighborSearch = lazy(() => import('./pages/Neighbors'));
 const Library_Details = lazy(() => import('./pages/Library_Details'))
@@ -35,9 +46,11 @@ function App() {
   return (
     <>
     <Box sx={{ display: 'flex', flexDirection: 'column'}}>
+      <ThemeProvider theme={theme}>
         <Router>
             <Content />
         </Router>
+      </ThemeProvider>
     </Box>
     <Footer />
     </>

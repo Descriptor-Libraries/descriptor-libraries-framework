@@ -11,7 +11,7 @@ import { ThemeProvider } from '@mui/material/styles';
 
 import FullScreenDialog from '../components/KetcherPopup';
 
-import { substructureSearch, retrieveAllSVGs, dynamicGrid, theme } from '../common/MoleculeUtils';
+import { substructureSearch, retrieveAllSVGs, dynamicGrid } from '../common/MoleculeUtils';
 
 export default function SearchHook () {
 
@@ -214,9 +214,7 @@ export default function SearchHook () {
                 { dynamicGrid(svg_results)  }
                 <Box sx={{ display: 'flex', justifyContent: 'center', my: 3 }}>
                   { isLoadingMore ? <CircularProgress /> 
-                  : <ThemeProvider theme={theme}>
                       <Button disabled={updatedParameters} variant="contained" sx={{ my: 3 }} onClick={ () => loadMore() } >Load More</Button>
-                    </ThemeProvider> 
                   }
                 </Box>
                </Container>  }

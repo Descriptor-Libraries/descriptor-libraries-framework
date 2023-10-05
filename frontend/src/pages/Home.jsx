@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from "react-router-dom";
 
-import { Container, Typography, Box, Grid, IconButton } from "@mui/material";
+import { Container, Typography, Box, Grid } from "@mui/material";
+import { useTheme } from '@mui/material/styles';
 
 import OriginalKraken from '../common/OriginalKraken';
 import Graph from "../components/Graph";
@@ -52,6 +53,7 @@ function Home() {
    const [ components, setComponents ] = useState(["1", "2"]);
    const [ type, setType ] = useState("umap");
    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+   const theme = useTheme();
 
    useEffect(() => {
     function checkMobile() {
@@ -113,7 +115,7 @@ function Home() {
 
   return (
   <>
-   <Box sx={{ backgroundColor: "#393536", 
+   <Box sx={{ backgroundColor: theme.palette.primary.main, 
             display: 'flex', 
             flexDirection: 'column', 
             alignItems: 'center', 

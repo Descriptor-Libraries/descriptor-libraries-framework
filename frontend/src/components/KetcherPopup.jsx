@@ -13,7 +13,6 @@ import { StandaloneStructServiceProvider } from 'ketcher-standalone';
 import { Editor } from 'ketcher-react';
 import "ketcher-react/dist/index.css";
 
-import { theme } from '../common/MoleculeUtils';
 
 const structServiceProvider = new StandaloneStructServiceProvider();
 
@@ -40,11 +39,8 @@ export default function FullScreenDialog({ ketcherCallBack }) {
 
   return (
     <div>
-      <ThemeProvider theme={theme}>
         <Button variant="contained" sx={{ mb: 5 }} onClick={handleClickOpen}>
           Open Molecular Sketcher
-        </Button>
-      </ThemeProvider>
       <Dialog
         fullWidth={true}
         maxWidth={"lg"}
