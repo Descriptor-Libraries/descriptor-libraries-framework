@@ -3,12 +3,12 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from "react-router-dom";
 import { Box, Grid, Container, TextField, MenuItem, Card, CardContent, Select, InputLabel, FormControl, ThemeProvider} from "@mui/material";
 import Button from "@mui/material/Button";
-import { DataGrid, GridFooterContainer, GridFooter } from "@mui/x-data-grid";
 import Typography from '@mui/material/Typography';
 import { CircularProgress } from "@mui/material";
 import { retrieveSVG, theme } from "../common/MoleculeUtils";
 import { NGLStage, Component } from "../components/NGL"
 
+import MoleculeDataTable from "../components/MoleculeDataTable";
 
 async function molecule(molecule_id, signal) {
    /**
@@ -111,84 +111,6 @@ export default function MoleculeInfo() {
       }
    }
 
-   function downloadDataAsJSON() {
-      // Function to download all the molecule data as a JSON file.
-      const jsonData = JSON.stringify(molData);
-      const blob = new Blob([jsonData], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-  
-      const downloadLink = document.createElement("a");
-      downloadLink.href = url;
-      downloadLink.download = `${params.molid}_data.json`;
-  
-      downloadLink.click();
-    }
-
-   function Table(data) {
-      let columns = [];
-      let rows = [];
-
-      let keys = Object.keys(data);
-      let properties = Object.keys(data["max_data"])
-
-      columns.push({field: "id", flex: 1, headerClassName: "super-app-theme--header"});
-      
-      // Loop through all the keys and create columns and rows. Avoid boltzmann_averaged_data since it does not have the same keys as the rest.
-      for (const element of keys) {
-         if (element != "boltzmann_averaged_data")
-         {
-            columns.push({field: element, flex: 0.75, headerClassName: "super-app-theme--header"});
-         }
-      }
-
-      // Make the rows of the table
-      for (const property of properties) {
-         let newObj = {id: property};
-         for (const element of keys) {
-            if (element != "boltzmann_averaged_data")
-            {
-               newObj[element] = data[element][property];
-            }
-         }
-         rows.push(newObj);
-      }
-
-      function CustomFooter () {
-         return (
-           <GridFooterContainer>
-             <Typography sx= {{mx: 1, color: 'gray'}}> ML Data </Typography>
-             <GridFooter sx={{
-               border: 'none', // To delete double border.
-               }} />
-           </GridFooterContainer>
-         );
-       }
-
-      return (
-         <Box
-            sx={{
-            width: '100%',
-            '& .super-app-theme--header': {
-               backgroundColor: '#393536',
-               color: 'white',
-            },
-            }}
-         >
-            <DataGrid
-               disableColumnMenu
-               rows={rows}
-               columns={columns}
-               components={{Footer: CustomFooter}}
-               initialState={{
-                  pagination: {
-                     paginationModel: { page: 0, pageSize: 4 },
-                  },
-               }}
-            />
-         </Box>
-      )
-   }
-
    function loadData(signal, molid) {
       /**
        * Main driver function which loads the neighbors for a molecule requested by the user.
@@ -266,7 +188,7 @@ export default function MoleculeInfo() {
                         </Card>}
             </Grid>
             <Grid item xs={(width > 1366) ? 6 : 12}>
-               {Object.keys(molData).length > 0 && Table(molData.ml_data)}
+               {Object.keys(molData).length > 0 && <MoleculeDataTable molecule_id={molData.molecule_id} initial_data_type="ml" />}
             </Grid>
             {(width > 768) && allConformers.length > 0 && conformer.length > 0 && <Grid item xs={(width > 1366) ? 6 : 12}>
                <Container>
@@ -317,13 +239,6 @@ export default function MoleculeInfo() {
             </Grid>
             }
             {Object.keys(molData).length > 0 && (width > 768) && <Grid item xs={12}>
-               <Box display="flex" justifyContent="center" alignItems="center">
-                  <ThemeProvider theme={theme}>
-                     <Button variant="contained" sx={{ my: 3 }} onClick={() => { downloadDataAsJSON();}}>
-                        Download
-                     </Button>
-                  </ThemeProvider>
-               </Box>
             </Grid>}
          </Grid>
       </Container>
