@@ -5,7 +5,7 @@ services:
     image: traefik:v2.9
     container_name: reverse_proxy
     command:
-      - --api.insecure=true
+      - --api.insecure=false
       - --providers.docker
       - --providers.docker.exposedByDefault=false
       - --entrypoints.web.address=:80
@@ -16,13 +16,11 @@ services:
       - --entrypoints.websecure.address=:443
       - --entrypoints.websecure.http.tls=true
       - --certificatesresolvers.le.acme.email=janash@vt.edu
-      - --certificatesresolvers.le.acme.storage=acme.json
       - --certificatesresolvers.le.acme.httpchallenge.entrypoint=web
       - --certificatesResolvers.le.acme.storage=/acme/acme.json
     ports:
       - "80:80"
       - "443:443"
-      - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./acme:/acme
