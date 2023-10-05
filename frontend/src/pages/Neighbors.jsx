@@ -180,7 +180,7 @@ export default function NeighborSearchHook () {
         />
         </Box>
         <Box display="flex" justifyContent="center">
-        { (isLoading || isLoadingMore) ? <CircularProgress />:  <Button disabled={updatedParameters} variant="contained" sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button>
+          { (isLoading || isLoadingMore) ? <CircularProgress />:  <Button disabled={updatedParameters} variant="contained" sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> }
         </Box>
         <Container sx={{justifyContent: 'center', my: 3}}>
             <Box sx={{ display: 'flex' }} justifyContent="center">

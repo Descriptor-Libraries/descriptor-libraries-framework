@@ -7,7 +7,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import { Switch } from '@mui/material';
 import Button from '@mui/material/Button';
-import { ThemeProvider } from '@mui/material/styles';
 
 import FullScreenDialog from '../components/KetcherPopup';
 
@@ -214,7 +213,9 @@ export default function SearchHook () {
                 { dynamicGrid(svg_results)  }
                 <Box sx={{ display: 'flex', justifyContent: 'center', my: 3 }}>
                   { isLoadingMore ? <CircularProgress /> 
+                  : 
                       <Button disabled={updatedParameters} variant="contained" sx={{ my: 3 }} onClick={ () => loadMore() } >Load More</Button>
+
                   }
                 </Box>
                </Container>  }

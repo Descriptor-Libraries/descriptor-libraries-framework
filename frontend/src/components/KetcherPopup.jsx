@@ -13,7 +13,6 @@ import { StandaloneStructServiceProvider } from 'ketcher-standalone';
 import { Editor } from 'ketcher-react';
 import "ketcher-react/dist/index.css";
 
-
 const structServiceProvider = new StandaloneStructServiceProvider();
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -41,6 +40,7 @@ export default function FullScreenDialog({ ketcherCallBack }) {
     <div>
         <Button variant="contained" sx={{ mb: 5 }} onClick={handleClickOpen}>
           Open Molecular Sketcher
+        </Button>
       <Dialog
         fullWidth={true}
         maxWidth={"lg"}
