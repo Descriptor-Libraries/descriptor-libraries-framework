@@ -9,7 +9,7 @@ import Button from '@mui/material/Button';
 
 import Graph from '../components/Graph'
 
-import { retrieveAllSVGs, dynamicGrid, theme } from '../common/MoleculeUtils';
+import { retrieveAllSVGs, dynamicGrid } from '../common/MoleculeUtils';
 
 
 async function NeighborSearch(molecule_id, type="pca", components="1,2,3,4", limit=48, skip=0, signal) {
@@ -180,7 +180,7 @@ export default function NeighborSearchHook () {
         />
         </Box>
         <Box display="flex" justifyContent="center">
-        { (isLoading || isLoadingMore) ? <CircularProgress />: <ThemeProvider theme={theme}> <Button disabled={updatedParameters} variant="contained" sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> </ThemeProvider>}
+          { (isLoading || isLoadingMore) ? <CircularProgress />:  <Button disabled={updatedParameters} variant="contained" sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> }
         </Box>
         <Container sx={{justifyContent: 'center', my: 3}}>
             <Box sx={{ display: 'flex' }} justifyContent="center">
@@ -204,7 +204,7 @@ export default function NeighborSearchHook () {
             {isLoadingMore ? (
               <CircularProgress />
             ) : (
-              <ThemeProvider theme={theme}> <Button disabled={updatedParameters} variant="contained" sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> </ThemeProvider>
+              <Button disabled={updatedParameters} variant="contained" sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> 
             )}
           </Box>
           }

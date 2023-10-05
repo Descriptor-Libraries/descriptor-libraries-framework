@@ -5,7 +5,7 @@ import { Box, Grid, Container, TextField, MenuItem, Card, CardContent, Select, I
 import Button from "@mui/material/Button";
 import Typography from '@mui/material/Typography';
 import { CircularProgress } from "@mui/material";
-import { retrieveSVG, theme } from "../common/MoleculeUtils";
+import { retrieveSVG } from "../common/MoleculeUtils";
 import { NGLStage, Component } from "../components/NGL"
 
 import MoleculeDataTable from "../components/MoleculeDataTable";
@@ -233,7 +233,7 @@ export default function MoleculeInfo() {
                </Box>
                :
                <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center">
-                  <CircularProgress sx={{ color: "#393536" }} />
+                  <CircularProgress />
                </Box>
                }
             </Grid>

@@ -70,7 +70,7 @@ function dynamicGrid( svgs ) {
             <Item sx={{border: 3, borderColor: '#ed1c24'}}>
             <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(result.svg)}`} />
             <Typography sx={{ wordBreak: "break-word" }}> <strong>Smiles: </strong> { result.smiles }</Typography>
-            <ThemeProvider theme={theme}><Button variant="contained" sx={{ m: 0.5 }} onClick={() => moleculePage(result.molecule_id)}>View</Button></ThemeProvider>
+            <Button variant="contained" sx={{ m: 0.5 }} onClick={() => moleculePage(result.molecule_id)}>View</Button>
             </Item>
             // False condition - render Item without border if distance is not 0.
             :
@@ -83,7 +83,7 @@ function dynamicGrid( svgs ) {
                   <strong>Distance: </strong> {result.distance.toFixed(2)}
                 </Typography>
               )}
-            <ThemeProvider theme={theme}><Button variant="contained" sx={{ m: 0.5 }} onClick={() => moleculePage(result.molecule_id)}>View</Button></ThemeProvider>
+            <Button variant="contained" sx={{ m: 0.5 }} onClick={() => moleculePage(result.molecule_id)}>View</Button>
             </Item>} 
         </Grid>
         ))
@@ -141,4 +141,4 @@ async function retrieveSVG(smiles, molecule_id, substructure = undefined, distan
   
 
 
-export { retrieveSVG, retrieveAllSVGs, dynamicGrid, substructureSearch, theme };
+export { retrieveSVG, retrieveAllSVGs, dynamicGrid, substructureSearch };
