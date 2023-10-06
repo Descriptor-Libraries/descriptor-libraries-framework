@@ -10,6 +10,8 @@ import { NGLStage, Component } from "../components/NGL"
 
 import MoleculeDataTable from "../components/MoleculeDataTable";
 
+import { neighborPage } from "../common/MoleculeUtils";
+
 async function molecule(molecule_id, signal) {
    /**
     * Requests general umap or pca data from the backend.
@@ -184,6 +186,9 @@ export default function MoleculeInfo() {
                            <Typography align='left'> <strong>InChI:</strong> {identifierData.InChI} </Typography>
                            <Typography align='left'> <strong>InChIKey:</strong> {identifierData.InChIKey} </Typography>
                            <Typography align='left'> <strong>Molecular Weight:</strong> {molData.molecular_weight.toFixed(2)} </Typography>
+                           <Box display="flex" justifyContent="center">
+                              <Button variant="contained" sx={{ m: 0.5 }} onClick={() => neighborPage(params.molid)}>View Molecule Neighbors</Button>
+                           </Box>
                            </CardContent>
                         </Card>}
             </Grid>

@@ -3,7 +3,7 @@ import { TextField, Typography } from "@mui/material";
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import CircularProgress from '@mui/material/CircularProgress';
-import { ThemeProvider } from '@mui/material/styles';
+import { useParams } from "react-router-dom";
 
 import Button from '@mui/material/Button';
 
@@ -42,9 +42,11 @@ export default function NeighborSearchHook () {
      * @returns {jsx} The front end JSX that will generate the HTML users will interact with. It contains a search bar as well as generated 
      * a graph, and the dynamic grid component based on what data is available.
      */
+
+    const params = useParams();
     const interval = 15;
     
-    const [ moleculeid, setSearch ] = useState(1);
+    const [ moleculeid, setMoleculeID ] = useState(params.molid || 1);
     const [ skip, setSkip ] = useState(0);
     const [ validMolecule, setValidMolecule ] = useState(true);
     const [ svg_results, setSVGResults ] = useState([])
@@ -175,7 +177,7 @@ export default function NeighborSearchHook () {
                   variant="outlined"
                   value= {moleculeid} 
                   onKeyDown = { (e) => _handleKeyDown(e) }
-                  onChange = { event => setSearch( event.target.value ) }
+                  onChange = { event => setMoleculeID( event.target.value ) }
                   InputProps={{endAdornment: <Button onClick={ () => {newSearch(); } } >Search</Button>}}
         />
         </Box>
