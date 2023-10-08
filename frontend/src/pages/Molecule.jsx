@@ -212,9 +212,6 @@ export default function MoleculeInfo() {
                         ))}
                      </Select>
                   </FormControl>
-                     <Box display="flex" justifyContent="center">
-                        <Button variant="contained" sx={{ m: 0.5 }} onClick={() => neighborPage(params.molid)}>View Neighbors</Button>
-                     </Box>
                      <Box display="flex" justifyContent="center" alignItems="center">
                      <NGLStage width="700px" height="600px" >
                         <Component path={"/api/conformers/export/"+ conformer + ".sdf"} />
