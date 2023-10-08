@@ -48,7 +48,7 @@ async function downloadData(molecule_id, data_type) {
 }
 
 
-function CustomFooter({ selectedDataType, setSelectedDataType, moleculeID }) {
+function CustomFooter({ selectedDataType, setSelectedDataType, moleculeID, download }) {
     const handleChange = (event) => {
       setSelectedDataType(event.target.value);
     };
@@ -66,7 +66,7 @@ function CustomFooter({ selectedDataType, setSelectedDataType, moleculeID }) {
           <MenuItem value="XTB Data">XTB Data</MenuItem>
           <MenuItem value="XTB_NI Data">XTB_NI Data</MenuItem>
         </Select>
-        <Button variant="contained" color="primary" sx={{ marginLeft: 'auto', marginRight: '16px', verticalAlign: 'middle' }} onClick={() => { downloadData(moleculeID, dataTypeMapping[selectedDataType]) }} >
+        <Button disabled={!download} variant="contained" color="primary" sx={{ marginLeft: 'auto', marginRight: '16px', verticalAlign: 'middle' }} onClick={() => { downloadData(moleculeID, dataTypeMapping[selectedDataType]) }} >
             Download CSV
         </Button>
         <GridFooter sx={{
@@ -91,6 +91,7 @@ export default function MoleculeDataTable({ molecule_id, initial_data_type }) {
     const [data_type, setDataType] = useState(initial_data_type);
     const [selectedDataType, setSelectedDataType] = useState("ML Data"); // Set the default value to "ML Data"
     const [moleculeID, setMoleculeID] = useState(molecule_id);
+    const [download, setDownload] = useState(true); // Allow CSV download
 
     useEffect(() => {
         async function fetchData() {
@@ -112,6 +113,14 @@ export default function MoleculeDataTable({ molecule_id, initial_data_type }) {
     useEffect(() => {
         async function fetchData() {
             const data = await retrieveData(moleculeID, data_type);
+
+            // Check to see if the data is empty, set download to false.
+            if (!data) {
+                setDownload(false);
+            }
+            else {
+                setDownload(true);
+            }
             setMoleculeData(data);
         }
 
@@ -144,7 +153,7 @@ export default function MoleculeDataTable({ molecule_id, initial_data_type }) {
                 columns={columns}
                 components={{Footer: CustomFooter, NoRowsOverlay: CustomNoRowsOverlay}}
                 componentsProps={{
-                    footer: { selectedDataType, setSelectedDataType, moleculeID },
+                    footer: { selectedDataType, setSelectedDataType, moleculeID, download },
                     noRowsOverlay: { selectedDataType },
                 }}
                 initialState={{
