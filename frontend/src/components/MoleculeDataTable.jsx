@@ -54,20 +54,20 @@ function CustomFooter({ selectedDataType, setSelectedDataType, moleculeID }) {
     };
   
     return (
-      <GridFooterContainer>
+      <GridFooterContainer sx= {{ overflowX: 'auto', whiteSpace: 'nowrap' }}>
         <Select
           value={selectedDataType}
           onChange={handleChange}
           displayEmpty
-          sx={{ marginLeft: '8px', marginRight: '16px', display: 'inline-block', verticalAlign: 'middle' }}
+          sx={{ marginLeft: '8px', marginRight: '16px', height: '40px', verticalAlign: 'middle' }}
         >
           <MenuItem value="ML Data">ML Data</MenuItem>
           <MenuItem value="DFT Data">DFT Data</MenuItem>
           <MenuItem value="XTB Data">XTB Data</MenuItem>
           <MenuItem value="XTB_NI Data">XTB_NI Data</MenuItem>
         </Select>
-        <Button variant="contained" color="primary" sx={{ marginLeft: 'auto', marginRight: '16px', display: 'inline-block', verticalAlign: 'middle' }} onClick={() => { downloadData(moleculeID, dataTypeMapping[selectedDataType]) }} >
-            Download as CSV
+        <Button variant="contained" color="primary" sx={{ marginLeft: 'auto', marginRight: '16px', verticalAlign: 'middle' }} onClick={() => { downloadData(moleculeID, dataTypeMapping[selectedDataType]) }} >
+            Download CSV
         </Button>
         <GridFooter sx={{
           border: 'none', // To delete double border.
