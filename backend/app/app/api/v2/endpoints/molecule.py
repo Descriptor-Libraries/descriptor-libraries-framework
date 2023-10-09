@@ -100,10 +100,32 @@ def valid_smiles(smiles):
 
     return smiles
 
-@router.get("/data/export/{molecule_id}")
+@router.get("/data/{molecule_id}", response_model=List[schemas.MoleculeData])
 async def get_molecule_data(molecule_id: int,
+                            data_type: str="ml",
+                            db: Session = Depends(deps.get_db)):
+    
+    # Check for valid data type.
+    if data_type.lower() not in ["ml", "dft", "xtb", "xtb_ni"]:
+        raise HTTPException(status_code=400, detail="Invalid data type.")
+                            
+    table_name = f"{data_type}_data"
+    query = text(f"""
+        SELECT t.*, m.SMILES
+        FROM {table_name} t
+        JOIN molecule m ON t.molecule_id = m.molecule_id
+        WHERE t.molecule_id = :molecule_id
+    """)
+
+    stmt = query.bindparams(molecule_id=molecule_id)
+
+    results = db.execute(stmt).fetchall()
+    
+    return results
+
+@router.get("/data/export/{molecule_id}")
+async def export_molecule_data(molecule_id: int,
                       data_type: str="ml",
-                      return_type: str="csv",
                       db: Session = Depends(deps.get_db)):
 
     # Check to see if the molecule_id is valid.
@@ -113,10 +135,7 @@ async def get_molecule_data(molecule_id: int,
     if data_type.lower() not in ["ml", "dft", "xtb", "xtb_ni"]:
         raise HTTPException(status_code=400, detail="Invalid data type.")
     
-    if return_type.lower() not in ["csv", "json"]:
-        raise HTTPException(status_code=400, detail="Invalid return type.")
-    
-    # Use pandas.rea``  d_sql_query to get the data.
+    # Use pandas.read_sql_query to get the data.
     table_name = f"{data_type}_data"
     query = text(f"""
         SELECT t.*, m.SMILES
@@ -135,16 +154,12 @@ async def get_molecule_data(molecule_id: int,
     else:
         df_wide = _pandas_long_to_wide(df)      
 
-        if return_type.lower() == "json":
-            json_data =  df_wide.to_dict(orient="records")[0]
-            return json_data
-        else:
-            buffer = _pandas_to_buffer(df_wide)
+        buffer = _pandas_to_buffer(df_wide)
 
-            # Return the buffer as a streaming response.
-            response = StreamingResponse(buffer, media_type="text/csv")
-            response.headers["Content-Disposition"] = f"attachment; filename={molecule_id}_{data_type}.csv"
-            return response
+        # Return the buffer as a streaming response.
+        response = StreamingResponse(buffer, media_type="text/csv")
+        response.headers["Content-Disposition"] = f"attachment; filename={molecule_id}_{data_type}.csv"
+        return response
 
 @router.get("/data/export")
 async def get_molecules_data(molecule_ids: str,
