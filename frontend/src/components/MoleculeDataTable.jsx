@@ -17,10 +17,18 @@ const dataTypeMapping = {
 async function retrieveData(molecule_id, data_type="ml") {
     try {
         const response = await fetch(`/api/molecules/data/export/${molecule_id}?data_type=${data_type}&return_type=json`);
-        const data = await response.json();
-        console.log(data_type);
-        console.log(data);
-        return data;
+        
+        // If the status code is 200 we have data for the data type and we can return it, if it is 204 there is no data and we just return null
+        if (response.status === 200) {
+            const data = await response.json();
+            console.log(data_type);
+            console.log(data);
+            return data;
+        } else if (response.status === 204) {
+            console.log("There is no data for this molecule: ", molecule_id, "of type: ", data_type);
+            return null;
+        }
+        // Catches other errors
     } catch (error) {
         console.log(error);
         return null;

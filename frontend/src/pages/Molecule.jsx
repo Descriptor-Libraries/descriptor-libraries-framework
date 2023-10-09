@@ -2,7 +2,6 @@ import Graph from "../components/Graph"
 import React, { useEffect, useState } from 'react';
 import { useParams } from "react-router-dom";
 import { Box, Grid, Container, TextField, MenuItem, Card, CardContent, Select, InputLabel, FormControl, ThemeProvider} from "@mui/material";
-import Button from "@mui/material/Button";
 import Typography from '@mui/material/Typography';
 import { CircularProgress } from "@mui/material";
 import { retrieveSVG } from "../common/MoleculeUtils";
