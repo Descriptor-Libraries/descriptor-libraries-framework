@@ -50,7 +50,6 @@ function neighborPage(molecule_id) {
   // website name. Need the first and third elements (0, 2) to redirect to the neighboar endpoint below. 
   let og_url = window.location.href.split("/");
   let url = og_url[0] + "//" + og_url[2] + "/neighbors/" + molecule_id;
-  console.log(url)
   window.open(url, "_blank", "noreferrer");
 }
 
