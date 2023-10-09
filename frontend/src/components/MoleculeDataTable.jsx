@@ -4,6 +4,7 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import { Select, MenuItem } from '@mui/material';
 import Button from '@mui/material/Button';
+import DownloadIcon from '@mui/icons-material/Download';
 
 
 const dataTypeMapping = {
@@ -21,11 +22,8 @@ async function retrieveData(molecule_id, data_type="ml") {
         // If the status code is 200 we have data for the data type and we can return it, if it is 204 there is no data and we just return null
         if (response.status === 200) {
             const data = await response.json();
-            console.log(data_type);
-            console.log(data);
             return data;
         } else if (response.status === 204) {
-            console.log("There is no data for this molecule: ", molecule_id, "of type: ", data_type);
             return null;
         }
         // Catches other errors
@@ -75,7 +73,7 @@ function CustomFooter({ selectedDataType, setSelectedDataType, moleculeID, downl
           <MenuItem value="XTB_NI Data">XTB_NI Data</MenuItem>
         </Select>
         <Button disabled={!download} variant="contained" color="primary" sx={{ marginLeft: 'auto', marginRight: '16px', verticalAlign: 'middle' }} onClick={() => { downloadData(moleculeID, dataTypeMapping[selectedDataType]) }} >
-            Download CSV
+        <DownloadIcon /> CSV
         </Button>
         <GridFooter sx={{
           border: 'none', // To delete double border.
@@ -138,7 +136,6 @@ export default function MoleculeDataTable({ molecule_id, initial_data_type }) {
 
     useEffect(() => {
         setDataType(dataTypeMapping[selectedDataType]);
-        console.log(data_type)
     }, [selectedDataType]);
 
     const columns = [
