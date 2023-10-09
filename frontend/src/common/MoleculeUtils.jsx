@@ -6,16 +6,6 @@ import Grid from '@mui/material/Grid';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#393536",
-    }
-  },
-});
-
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
     ...theme.typography.body2,
@@ -51,6 +41,18 @@ function moleculePage(molecule_id) {
   window.open(url, "_blank", "noreferrer");
 }
 
+function neighborPage(molecule_id) {
+  /**
+   * Redirects to the molecule page for the molecule neighbor search on click.
+   * @param {molecule_id} number molecule id for the molecule.
+   */
+  // Gets the original url for the window and splits it into its components. The first element will always be http(s):, second will always be empty, third will always be 
+  // website name. Need the first and third elements (0, 2) to redirect to the neighboar endpoint below. 
+  let og_url = window.location.href.split("/");
+  let url = og_url[0] + "//" + og_url[2] + "/neighbors/" + molecule_id;
+  window.open(url, "_blank", "noreferrer");
+}
+
 
 function dynamicGrid( svgs ) {
     /**
@@ -70,7 +72,7 @@ function dynamicGrid( svgs ) {
             <Item sx={{border: 3, borderColor: '#ed1c24'}}>
             <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(result.svg)}`} />
             <Typography sx={{ wordBreak: "break-word" }}> <strong>Smiles: </strong> { result.smiles }</Typography>
-            <Button variant="contained" sx={{ m: 0.5 }} onClick={() => moleculePage(result.molecule_id)}>View</Button>
+            <Button variant="contained" sx={{ m: 0.5 }} onClick={() => moleculePage(result.molecule_id)}>View Details</Button>
             </Item>
             // False condition - render Item without border if distance is not 0.
             :
@@ -83,7 +85,8 @@ function dynamicGrid( svgs ) {
                   <strong>Distance: </strong> {result.distance.toFixed(2)}
                 </Typography>
               )}
-            <Button variant="contained" sx={{ m: 0.5 }} onClick={() => moleculePage(result.molecule_id)}>View</Button>
+            <Button variant="contained" sx={{ m: 0.5 }} onClick={() => moleculePage(result.molecule_id)}>View Details</Button>
+            <Button variant="contained" sx={{ m: 0.5 }} onClick={() => neighborPage(result.molecule_id)}>View Neighbors</Button>
             </Item>} 
         </Grid>
         ))
@@ -141,4 +144,4 @@ async function retrieveSVG(smiles, molecule_id, substructure = undefined, distan
   
 
 
-export { retrieveSVG, retrieveAllSVGs, dynamicGrid, substructureSearch };
+export { retrieveSVG, retrieveAllSVGs, dynamicGrid, substructureSearch, neighborPage };
