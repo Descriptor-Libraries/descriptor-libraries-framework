@@ -9,7 +9,7 @@ from typing import List, Optional, Any
 import pandas as pd
 
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, Response
 from rdkit import Chem
 from sqlalchemy import exc, text
 from sqlalchemy.orm import Session
@@ -129,18 +129,22 @@ async def get_molecule_data(molecule_id: int,
 
     df = pd.read_sql_query(stmt, db.bind)
 
-    df_wide = _pandas_long_to_wide(df)      
-
-    if return_type.lower() == "json":
-        json_data =  df_wide.to_dict(orient="records")[0]
-        return json_data
+    # Need to do a check here to see the dataframe is empty, if it is we return 204 (executed properly but has no content)
+    if df.empty:
+        return Response(status_code=204)
     else:
-        buffer = _pandas_to_buffer(df_wide)
+        df_wide = _pandas_long_to_wide(df)      
 
-        # Return the buffer as a streaming response.
-        response = StreamingResponse(buffer, media_type="text/csv")
-        response.headers["Content-Disposition"] = f"attachment; filename={molecule_id}_{data_type}.csv"
-        return response
+        if return_type.lower() == "json":
+            json_data =  df_wide.to_dict(orient="records")[0]
+            return json_data
+        else:
+            buffer = _pandas_to_buffer(df_wide)
+
+            # Return the buffer as a streaming response.
+            response = StreamingResponse(buffer, media_type="text/csv")
+            response.headers["Content-Disposition"] = f"attachment; filename={molecule_id}_{data_type}.csv"
+            return response
 
 @router.get("/data/export")
 async def get_molecules_data(molecule_ids: str,
