@@ -6,6 +6,8 @@ import { Select, MenuItem } from '@mui/material';
 import Button from '@mui/material/Button';
 import DownloadIcon from '@mui/icons-material/Download';
 
+import ResponsiveButton from './ResponsiveButton'; 
+
 
 const dataTypeMapping = {
     "ML Data": "ml",
@@ -17,7 +19,7 @@ const dataTypeMapping = {
 
 async function retrieveData(molecule_id, data_type="ml") {
     try {
-        const response = await fetch(`/api/molecules/data/export/${molecule_id}?data_type=${data_type}`);
+        const response = await fetch(`/api/molecules/data/${molecule_id}?data_type=${data_type}`);
         
         // If the status code is 200 we have data for the data type and we can return it, if it is 204 there is no data and we just return null
         if (response.status === 200) {
@@ -72,9 +74,13 @@ function CustomFooter({ selectedDataType, setSelectedDataType, moleculeID, downl
           <MenuItem value="xTB Data">xTB Data</MenuItem>
           <MenuItem value="xTB_Ni Data">xTB_Ni Data</MenuItem>
         </Select>
-        <Button disabled={!download} variant="contained" color="primary" sx={{ marginLeft: 'auto', marginRight: '16px', verticalAlign: 'middle' }} onClick={() => { downloadData(moleculeID, dataTypeMapping[selectedDataType]) }} >
-        <DownloadIcon /> CSV
-        </Button>
+        <ResponsiveButton expandedButtonContent={"Download CSV"}  
+                            collapsedButtonContent={<span><DownloadIcon /> CSV</span>}
+                            disabled={!download} 
+                            variant="contained" 
+                            color="primary"
+                             sx={{ marginLeft: 'auto', marginRight: '16px', verticalAlign: 'middle' }} 
+                             onClick={() => { downloadData(moleculeID, dataTypeMapping[selectedDataType]) }} />
         <GridFooter sx={{
           border: 'none', // To delete double border.
         }} />
@@ -119,9 +125,8 @@ export default function MoleculeDataTable({ molecule_id, initial_data_type }) {
     useEffect(() => {
         async function fetchData() {
             const data = await retrieveData(moleculeID, data_type);
-
             // Check to see if the data is empty, set download to false.
-            if (!data) {
+            if (data.length==0) {
                 setDownload(false);
             }
             else {
