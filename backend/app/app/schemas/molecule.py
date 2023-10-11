@@ -13,6 +13,14 @@ class Molecule(BaseModel):
     xtb_ni_data: Optional[Dict] = None
     ml_data: Optional[Dict] = None
 
+class MoleculeData(BaseModel):
+    property: str
+    max: Optional[float] = None
+    min: Optional[float] = None
+    delta: Optional[float] = None
+    boltzmann_average: Optional[float] = None
+    vburminconf: Optional[float] = None
+
 class MoleculeSimple(BaseModel):
     molecule_id: int
     umap1: Optional[float] = None

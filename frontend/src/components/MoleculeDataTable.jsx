@@ -6,18 +6,20 @@ import { Select, MenuItem } from '@mui/material';
 import Button from '@mui/material/Button';
 import DownloadIcon from '@mui/icons-material/Download';
 
+import ResponsiveButton from './ResponsiveButton'; 
+
 
 const dataTypeMapping = {
     "ML Data": "ml",
     "DFT Data": "dft",
-    "XTB Data": "xtb",
-    "XTB_NI Data": "xtb_ni"
+    "xTB Data": "xtb",
+    "xTB_Ni Data": "xtb_ni"
 };
 
 
 async function retrieveData(molecule_id, data_type="ml") {
     try {
-        const response = await fetch(`/api/molecules/data/export/${molecule_id}?data_type=${data_type}&return_type=json`);
+        const response = await fetch(`/api/molecules/data/${molecule_id}?data_type=${data_type}`);
         
         // If the status code is 200 we have data for the data type and we can return it, if it is 204 there is no data and we just return null
         if (response.status === 200) {
@@ -35,7 +37,7 @@ async function retrieveData(molecule_id, data_type="ml") {
 
 async function downloadData(molecule_id, data_type) {
     try {
-        const response = await fetch(`/api/molecules/data/export/${molecule_id}?data_type=${data_type}&return_type=csv`);
+        const response = await fetch(`/api/molecules/data/export/${molecule_id}?data_type=${data_type}`);
         
         if(response.status === 200) {
             const blob = await response.blob();
@@ -69,12 +71,16 @@ function CustomFooter({ selectedDataType, setSelectedDataType, moleculeID, downl
         >
           <MenuItem value="ML Data">ML Data</MenuItem>
           <MenuItem value="DFT Data">DFT Data</MenuItem>
-          <MenuItem value="XTB Data">XTB Data</MenuItem>
-          <MenuItem value="XTB_NI Data">XTB_NI Data</MenuItem>
+          <MenuItem value="xTB Data">xTB Data</MenuItem>
+          <MenuItem value="xTB_Ni Data">xTB_Ni Data</MenuItem>
         </Select>
-        <Button disabled={!download} variant="contained" color="primary" sx={{ marginLeft: 'auto', marginRight: '16px', verticalAlign: 'middle' }} onClick={() => { downloadData(moleculeID, dataTypeMapping[selectedDataType]) }} >
-        <DownloadIcon /> CSV
-        </Button>
+        <ResponsiveButton expandedButtonContent={"Download CSV"}  
+                            collapsedButtonContent={<span><DownloadIcon /> CSV</span>}
+                            disabled={!download} 
+                            variant="contained" 
+                            color="primary"
+                             sx={{ marginLeft: 'auto', marginRight: '16px', verticalAlign: 'middle' }} 
+                             onClick={() => { downloadData(moleculeID, dataTypeMapping[selectedDataType]) }} />
         <GridFooter sx={{
           border: 'none', // To delete double border.
         }} />
@@ -119,9 +125,8 @@ export default function MoleculeDataTable({ molecule_id, initial_data_type }) {
     useEffect(() => {
         async function fetchData() {
             const data = await retrieveData(moleculeID, data_type);
-
             // Check to see if the data is empty, set download to false.
-            if (!data) {
+            if (data.length==0) {
                 setDownload(false);
             }
             else {
@@ -140,22 +145,35 @@ export default function MoleculeDataTable({ molecule_id, initial_data_type }) {
 
     const columns = [
         { field: 'property', headerName: 'Property', filterable: true, flex: true },
-        { field: 'value', headerName: 'Value', width: 150, filterable: true, headerAlign: 'right', align: 'right', flex: true }
+        { field: 'min', headerName: 'Min', filterable: true, headerAlign: 'right', align: 'right', flex: true },
+        { field: 'max', headerName: 'Max', filterable: true, headerAlign: 'right', align: 'right', flex: true },
+        { field: 'delta', headerName: 'Delta', filterable: true, headerAlign: 'right', align: 'right', flex: true },
+        { field: 'vburminconf', headerName: 'vbur min conf', filterable: true, headerAlign: 'right', align: 'right', flex: true },
+        { field: 'boltzmann_average', headerName: 'Boltz', filterable: true, headerAlign: 'right', align: 'right', flex: true },
     ];
+    
+    // Filter out delta and vburminconf columns for xTB data.
+    let displayColumns = columns;
+    if (selectedDataType === "xTB Data" || selectedDataType === "xTB_Ni Data") {
+        displayColumns = columns.filter(column => column.field !== 'delta' && column.field !== 'vburminconf');
+    }
 
-    const rows = moleculeData ? Object.keys(moleculeData)
-        .filter(key => key !== 'smiles' && key !== 'molecule_id')
-        .map(key => ({
-            id: key,
-            property: key,
-            value: moleculeData[key],
+    const rows = moleculeData ? moleculeData
+        .map(item => ({
+            id: item.property,
+            property: item.property,
+            max: item.max,
+            min: item.min,
+            delta: item.delta,
+            boltzmann_average: item.boltzmann_average,
+            vburminconf: item.vburminconf,
         })) : [];
 
     return (
         <Paper elevation={3} style={{ height: 400, width: '100%' }}>
             <DataGrid
                 rows={rows}
-                columns={columns}
+                columns={displayColumns}
                 components={{Footer: CustomFooter, NoRowsOverlay: CustomNoRowsOverlay}}
                 componentsProps={{
                     footer: { selectedDataType, setSelectedDataType, moleculeID, download },
