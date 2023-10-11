@@ -182,7 +182,7 @@ export default function MoleculeDataTable({ molecule_id, initial_data_type }) {
                 initialState={{
                     pagination: {
                         paginationModel: {
-                            pageSize: 25, // This sets the initial page size
+                            pageSize: 100, // This sets the initial page size
                         },
                     },
                 }}

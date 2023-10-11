@@ -209,33 +209,36 @@ export default function Graph({ molData, componentArray, type, neighborSearch, c
     return (
         <Container sx={containerStyle ? containerStyle : {}}>
             <Container sx={{display: 'flex', flexDirection: "row", justifyContent: 'center'}}>
-            <TextField
-                id="dimension-outline"
+            {type === 'pca' ? (
+            <>
+                <TextField
+                id="dimension-outline-x"
                 value={xIndex}
                 label="x-axis"
                 select
                 style={{width: 250}}
                 sx={{ m: 0.5 }}
                 onChange={ function(event) {setXIndex(parseInt(event.target.value));}}
-            >
+                >
                 {componentArray.map((item, index) => (
                     <MenuItem key={index} value={index}>{axis_dict[type + item]}</MenuItem>
                 ))}
-
-            </TextField>
-            <TextField
-                id="dimension-outline"
+                </TextField>
+                <TextField
+                id="dimension-outline-y"
                 value={yIndex}
                 label="y-axis"
                 select
                 style={{width: 250}}
                 sx={{ m: 0.5 }}
                 onChange={ function(event) {setYIndex(parseInt(event.target.value));}}
-            >
+                >
                 {componentArray.map((item, index) => (
                     <MenuItem key={index} value={index}>{axis_dict[type + item]}</MenuItem>
                 ))}
-            </TextField>
+                </TextField>
+            </>
+            ) : null}
       </Container>
             {myPlot}
       </Container>);

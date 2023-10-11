@@ -68,7 +68,7 @@ function Library_Details() {
         </Typography>
 
         <Typography variant="body1" paragraph>
-            Gensch, T.; dos Passos Gomes, G.; Friederich, P.; Peters, E.; Gaudin, T.; Pollice, R.; Jorner, K.; Nigam, A.; Lindner-D’Addario, M.; Sigman, M. S.; Aspuru-Guzik, A.  A Comprehensive Discovery Platform for Organophosphorus Ligands for Catalysis. J. Am. Chem. Soc. 2022, 144, 3, 1205–1217. DOI: 10.1021/jacs.1c09718
+            Gensch, T.; dos Passos Gomes, G.; Friederich, P.; Peters, E.; Gaudin, T.; Pollice, R.; Jorner, K.; Nigam, A.; Lindner-D’Addario, M.; Sigman, M. S.; Aspuru-Guzik, A.  A Comprehensive Discovery Platform for Organophosphorus Ligands for Catalysis. <span style={{ fontStyle: 'italic' }}>J. Am. Chem. Soc.</span> <span style={{ fontWeight: 'bold' }}>2022</span>, <span style={{ fontStyle: 'italic' }}>144</span>, 3, 1205–1217. DOI: 10.1021/jacs.1c09718
         </Typography>
 
     </Container>

@@ -79,8 +79,8 @@ export default function MoleculeInfo() {
    const [ pcaNeighborData, setPcaNeighborData ] = useState([]);
    const [ identifierData, setIdentifierData ] = useState([]);
    const [ neighborData, setNeighborData ] = useState([]);
-   const [ components, setComponents ] = useState(["1", "2"]);
-   const [ type, setType ] = useState("umap");
+   const [ components, setComponents ] = useState(["1", "2", "3", "4"]);
+   const [ type, setType ] = useState("pca");
    const [ svg, setSvg ] = useState({});
    const [ allConformers, setAllConformers ] = useState([]);
    const [ conformer, setConformer ] = useState("");
@@ -138,7 +138,7 @@ export default function MoleculeInfo() {
             setSvg(items[3]);
             setIdentifierData(items[4][0]);
             // Initial set neighbor data to umap so it appears on load.
-            setNeighborData(items[1]);
+            setNeighborData(items[2]);
             // If we have conformers, we can set our states.
             if (items[0].conformers_id.length > 0)
             {
@@ -182,7 +182,8 @@ export default function MoleculeInfo() {
                   {Object.keys(molData).length > 0 && 
                         <Card>
                            <CardContent>
-                           <Typography align='left'> <strong>Smiles:</strong> {molData.smiles} </Typography>
+                           <Typography align='left'> <strong>SMILES:</strong> {molData.smiles} </Typography>
+                           <Typography align='left'> <strong>kraken Ligand ID:</strong> {molData.molecule_id} </Typography>
                            <Typography align='left'> <strong>InChI:</strong> {identifierData.InChI} </Typography>
                            <Typography align='left'> <strong>InChIKey:</strong> {identifierData.InChIKey} </Typography>
                            <Typography align='left'> <strong>Molecular Weight:</strong> {molData.molecular_weight.toFixed(2)} </Typography>
@@ -198,7 +199,7 @@ export default function MoleculeInfo() {
             {(width > 768) && allConformers.length > 0 && conformer.length > 0 && <Grid item xs={(width > 1366) ? 6 : 12}>
                <Container>
                   <FormControl fullWidth variant="standard">
-                     <InputLabel id="conformer">Conformer</InputLabel>
+                     <InputLabel id="conformer">{allConformers.length} Conformers</InputLabel>
                      <Select
                      labelId="conformer"
                      id="dimension-outline"
@@ -208,7 +209,7 @@ export default function MoleculeInfo() {
                      onChange={ function(event) {setConformer(event.target.value.toString());} }
                      >
                         {allConformers.map((item, index) => (
-                           <MenuItem key={index} value={item}>{item}</MenuItem>
+                           <MenuItem key={index} value={item}>{index+1}</MenuItem>
                         ))}
                      </Select>
                   </FormControl>
