@@ -37,7 +37,7 @@ function DataTable() {
                         <TableRow>
                             <TableCell>Condensed Properties</TableCell>
                             <TableCell>Description</TableCell>
-                            <TableCell>For XTB</TableCell>
+                            <TableCell>For xTB</TableCell>
                             <TableCell>For DFT</TableCell>
                             <TableCell>For ML</TableCell>
                         </TableRow>
