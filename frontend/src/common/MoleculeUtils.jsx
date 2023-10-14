@@ -20,7 +20,7 @@ async function substructureSearch(substructure, limit=48, skip=0, signal) {
     const response =  await fetch(`/api/molecules/search/?substructure=${encoded}&skip=${skip}&limit=${limit}`, {signal: signal})
 
     if (!response.ok) {
-        throw new Error('invalid smiles')
+        throw new Error('Invalid SMILES')
     }
 
     else {
@@ -71,14 +71,14 @@ function dynamicGrid( svgs ) {
             // True condition - render Item with border if distance is 0.
             <Item sx={{border: 3, borderColor: '#ed1c24'}}>
             <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(result.svg)}`} />
-            <Typography sx={{ wordBreak: "break-word" }}> <strong>Smiles: </strong> { result.smiles }</Typography>
+            <Typography sx={{ wordBreak: "break-word" }}> <strong>SMILES: </strong> { result.smiles }</Typography>
             <Button variant="contained" sx={{ m: 0.5 }} onClick={() => moleculePage(result.molecule_id)}>View Details</Button>
             </Item>
             // False condition - render Item without border if distance is not 0.
             :
             <Item>
             <img alt='' src={`data:image/svg+xml;utf8,${encodeURIComponent(result.svg)}`} />
-            <Typography sx={{ wordBreak: "break-word" }}> <strong>Smiles: </strong> { result.smiles }</Typography>
+            <Typography sx={{ wordBreak: "break-word" }}> <strong>SMILES: </strong> { result.smiles }</Typography>
             
             {result.distance !== undefined && (
                 <Typography sx={{ wordBreak: "break-word" }}>
