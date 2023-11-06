@@ -9,7 +9,9 @@ import Button from '@mui/material/Button';
 
 import Graph from '../components/Graph'
 
-import { retrieveAllSVGs, dynamicGrid } from '../common/MoleculeUtils';
+import { retrieveAllSVGs, dynamicGrid, extractIdsFromResults, downloadMoleculeData } from '../common/MoleculeUtils';
+
+
 
 
 async function NeighborSearch(molecule_id, type="pca", components="1,2,3,4", limit=48, skip=0, signal) {
@@ -57,6 +59,13 @@ export default function NeighborSearchHook () {
     const [ updatedParameters, setUpdatedParameters ] = useState(true);
     const [ searchToggle, setSearchToggle ] = useState(true);
     const [ isMobile, setIsMobile ] = useState(window.innerWidth < 768);
+    const [ moleculeIDs, setMoleculeIDs ] = useState("");
+
+    // Extract the molecule ids from the results
+    useEffect(() => {
+      setMoleculeIDs(extractIdsFromResults(svg_results));
+    }, [svg_results]);
+  
 
     useEffect(() => {
      function checkMobile() {
@@ -181,24 +190,38 @@ export default function NeighborSearchHook () {
                   InputProps={{endAdornment: <Button onClick={ () => {newSearch(); } } >Search</Button>}}
         />
         </Box>
-        <Box display="flex" justifyContent="center">
-          { (isLoading || isLoadingMore) ? <CircularProgress />:  <Button disabled={updatedParameters} variant="contained" sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> }
-        </Box>
         <Container sx={{justifyContent: 'center', my: 3}}>
             <Box sx={{ display: 'flex' }} justifyContent="center">
             {/* If molecule is not valid and there is no mol data, then state that there are no results for the molecule ID requested*/}
             { !isLoading && !validMolecule && Object.keys(molData).length == 0 && <Typography>No results found for Molecule ID.</Typography> } 
             </Box>
-            <Box>
-            {/* If molecule is valid and there is mol data, then generate the graph based on the data*/}
-            { !isLoading && validMolecule && Object.keys(molData).length > 0 && !isMobile && <Container sx={{ display: 'flex', height: 750}}>{ <Graph molData={molData} componentArray={["1", "2", "3", "4"]} type="pca" neighborSearch={true}></Graph> }</Container> } 
-            </Box>
             <Box sx={{ display: 'flex' }} justifyContent="center">
             {/* If molecule is valid and there is svg data, then generate the images of the molecules*/}
-            { !isLoading && validMolecule && Object.keys(svg_results).length > 0 && 
+            { 
+            
+            !isLoading && validMolecule && Object.keys(svg_results).length > 0 && 
              <Container> 
+              <Box display="flex" justifyContent="center">
+                {!isMobile && <Container sx={{ display: 'flex', minHeight: 500, maxHeight: 750, marginBottom: '64px'}}>{ <Graph molData={molData} componentArray={["1", "2", "3", "4"]} type="pca" neighborSearch={true}></Graph> }</Container> }
+                </Box>
+                <Box display="flex" justifyContent="center">
+                {  (isLoading || isLoadingMore) ? <CircularProgress /> :
+                  <>
+                      <Button disabled={updatedParameters} variant="contained" sx={{ my: 3 }} onClick={ () => loadMore() } >Load More</Button>
+                      <Button variant="contained" sx={{ my: 3, ml: 2 }} onClick={() => downloadMoleculeData(moleculeIDs, "pca_neighbors")}>Download Search Results</Button>
+
+                  </>
+                }
+                </Box>
+                
+
+                <Container sx={{display: 'flex', justifyContent: 'left', my: 3}}>    
+                  <Typography  sx={{ fontStyle: 'italic' }}>Showing {interval + interval * (searchPage-1)} results.</Typography>
+                </Container> 
                 { dynamicGrid(svg_results)  }
-            </Container>  }
+            </Container>  
+            
+            }
             
             </Box>
             { !isLoading && Object.keys(svg_results).length > 0 && 
