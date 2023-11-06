@@ -44,7 +44,7 @@ async function downloadData(molecule_id, data_type) {
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `data_${molecule_id}_${data_type}.csv`;  // you can name the file however you'd like
+            a.download = `data_${molecule_id}_${data_type}.csv`; 
             a.click();
             window.URL.revokeObjectURL(url);
         } else {

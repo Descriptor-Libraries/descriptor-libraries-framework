@@ -123,45 +123,7 @@ async def get_molecule_data(molecule_id: int,
     
     return results
 
-@router.get("/data/export/{molecule_id}")
-async def export_molecule_data(molecule_id: int,
-                      data_type: str="ml",
-                      db: Session = Depends(deps.get_db)):
-
-    # Check to see if the molecule_id is valid.
-    _valid_molecule_id(molecule_id, db)
-    
-    # Check for valid data type.
-    if data_type.lower() not in ["ml", "dft", "xtb", "xtb_ni"]:
-        raise HTTPException(status_code=400, detail="Invalid data type.")
-    
-    # Use pandas.read_sql_query to get the data.
-    table_name = f"{data_type}_data"
-    query = text(f"""
-        SELECT t.*, m.SMILES
-        FROM {table_name} t
-        JOIN molecule m ON t.molecule_id = m.molecule_id
-        WHERE t.molecule_id = :molecule_id
-    """)
-
-    stmt = query.bindparams(molecule_id=molecule_id)
-
-    df = pd.read_sql_query(stmt, db.bind)
-
-    # Need to do a check here to see the dataframe is empty, if it is we return 204 (executed properly but has no content)
-    if df.empty:
-        return Response(status_code=204)
-    else:
-        df_wide = _pandas_long_to_wide(df)      
-
-        buffer = _pandas_to_buffer(df_wide)
-
-        # Return the buffer as a streaming response.
-        response = StreamingResponse(buffer, media_type="text/csv")
-        response.headers["Content-Disposition"] = f"attachment; filename={molecule_id}_{data_type}.csv"
-        return response
-
-@router.get("/data/export")
+@router.get("/data/export/batch")
 async def get_molecules_data(molecule_ids: str,
                        data_type: str="ml",
                        return_type: str="csv",
@@ -221,6 +183,44 @@ async def get_molecules_data(molecule_ids: str,
         response = StreamingResponse(buffer, media_type="text/csv")
         response.headers["Content-Disposition"] = f"attachment; filename={filename}"
 
+        return response
+
+@router.get("/data/export/{molecule_id}")
+async def export_molecule_data(molecule_id: int,
+                      data_type: str="ml",
+                      db: Session = Depends(deps.get_db)):
+
+    # Check to see if the molecule_id is valid.
+    _valid_molecule_id(molecule_id, db)
+    
+    # Check for valid data type.
+    if data_type.lower() not in ["ml", "dft", "xtb", "xtb_ni"]:
+        raise HTTPException(status_code=400, detail="Invalid data type.")
+    
+    # Use pandas.read_sql_query to get the data.
+    table_name = f"{data_type}_data"
+    query = text(f"""
+        SELECT t.*, m.SMILES
+        FROM {table_name} t
+        JOIN molecule m ON t.molecule_id = m.molecule_id
+        WHERE t.molecule_id = :molecule_id
+    """)
+
+    stmt = query.bindparams(molecule_id=molecule_id)
+
+    df = pd.read_sql_query(stmt, db.bind)
+
+    # Need to do a check here to see the dataframe is empty, if it is we return 204 (executed properly but has no content)
+    if df.empty:
+        return Response(status_code=204)
+    else:
+        df_wide = _pandas_long_to_wide(df)      
+
+        buffer = _pandas_to_buffer(df_wide)
+
+        # Return the buffer as a streaming response.
+        response = StreamingResponse(buffer, media_type="text/csv")
+        response.headers["Content-Disposition"] = f"attachment; filename={molecule_id}_{data_type}.csv"
         return response
                  
 

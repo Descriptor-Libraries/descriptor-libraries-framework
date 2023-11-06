@@ -12,6 +12,23 @@ import FullScreenDialog from '../components/KetcherPopup';
 
 import { substructureSearch, retrieveAllSVGs, dynamicGrid } from '../common/MoleculeUtils';
 
+const extractIdsFromResults = (svg_results) => {
+  return svg_results.map(result => result.molecule_id).join(',');
+}
+
+
+const downloadMoleculeData = (moleculeIDs) => {
+  const a = document.createElement('a');
+  a.href = `/api/molecules/data/export/batch?molecule_ids=${moleculeIDs}`;
+  a.download = true; 
+  a.style.display = 'none';
+
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+
 export default function SearchHook () {
 
     const interval = 15;
@@ -32,7 +49,13 @@ export default function SearchHook () {
     const [ switchCheck, setSwitchCheck ] = useState(true);
     const [ fromKetcher, setFromKetcher ] = useState(false);
     const [ updatedParameters, setUpdatedParameters ] = useState(false);
+    const [ moleculeIDs, setMoleculeIDs ] = useState("");
 
+    // Extract the molecule ids from the results
+    useEffect(() => {
+      setMoleculeIDs(extractIdsFromResults(svg_results));
+    }, [svg_results]);
+  
 
     // Call back function to get the smiles and SMARTS from ketcher
     const ketcherCallBack = (newState) => {
@@ -217,6 +240,7 @@ export default function SearchHook () {
                       <Button disabled={updatedParameters} variant="contained" sx={{ my: 3 }} onClick={ () => loadMore() } >Load More</Button>
 
                   }
+                  <Button variant="contained" sx={{ my: 3 }} onClick={() => downloadMoleculeData(moleculeIDs)}>Download Molecule Data</Button>
                 </Box>
                </Container>  }
             { !isLoading && validSmiles && Object.keys(svg_results).length==0 && <Typography>No results found for SMILES string.</Typography> } 
