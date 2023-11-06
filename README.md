@@ -11,7 +11,7 @@ Running the application locally
 Running the kraken app locally requires installation of Docker and Docker Compose.
 Follow the instructions from Docker to install [Docker Engine](https://docs.docker.com/engine/install/) 
 and install [Docker Compose](https://docs.docker.com/compose/install/>) for your operating system.
-Next, clone the [project repository](https://github.com/janash/kraken-starting) to your local machine.
+Next, clone the [project repository](https://github.com/MolSSI/kraken) to your local machine.
 
 Running the testing app - (self contained)
 ------------------------------------------
