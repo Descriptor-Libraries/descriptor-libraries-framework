@@ -140,8 +140,29 @@ async function retrieveSVG(smiles, molecule_id, substructure = undefined, distan
       return retrieveSVG(item.smiles, item.molecule_id, substructure, item.dist);
     }));
   }
+
+
+const downloadMoleculeData = (moleculeIDs, context=null) => {
+  const a = document.createElement('a');
+  let search_string = `/api/molecules/data/export/batch?molecule_ids=${moleculeIDs}`;
+
+  if (context) {
+    search_string += `&context=${context}`;
+  }
+
+  a.href = search_string;
+  a.download = true; 
+  a.style.display = 'none';
+
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
   
+const extractIdsFromResults = (svg_results) => {
+  return svg_results.map(result => result.molecule_id).join(',');
+}
   
 
 
-export { retrieveSVG, retrieveAllSVGs, dynamicGrid, substructureSearch, neighborPage };
+export { retrieveSVG, retrieveAllSVGs, dynamicGrid, substructureSearch, neighborPage, downloadMoleculeData, extractIdsFromResults };

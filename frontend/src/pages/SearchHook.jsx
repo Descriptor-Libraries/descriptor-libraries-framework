@@ -10,7 +10,7 @@ import Button from '@mui/material/Button';
 
 import FullScreenDialog from '../components/KetcherPopup';
 
-import { substructureSearch, retrieveAllSVGs, dynamicGrid } from '../common/MoleculeUtils';
+import { substructureSearch, retrieveAllSVGs, dynamicGrid, extractIdsFromResults, downloadMoleculeData } from '../common/MoleculeUtils';
 
 export default function SearchHook () {
 
@@ -32,7 +32,13 @@ export default function SearchHook () {
     const [ switchCheck, setSwitchCheck ] = useState(true);
     const [ fromKetcher, setFromKetcher ] = useState(false);
     const [ updatedParameters, setUpdatedParameters ] = useState(false);
+    const [ moleculeIDs, setMoleculeIDs ] = useState("");
 
+    // Extract the molecule ids from the results
+    useEffect(() => {
+      setMoleculeIDs(extractIdsFromResults(svg_results));
+    }, [svg_results]);
+  
 
     // Call back function to get the smiles and SMARTS from ketcher
     const ketcherCallBack = (newState) => {
@@ -189,8 +195,9 @@ export default function SearchHook () {
                     Search
                     </Button>}}
                     />
+            
         </Box>
-        
+
         { toggleRepresentation &&
         <Grid component="label" container alignItems="center" spacing={1} sx={{position: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems:'center'}}>
             <Grid item>SMARTS</Grid>
@@ -204,19 +211,33 @@ export default function SearchHook () {
             <Grid item>SMILES</Grid>
         </Grid>
         }
+      <Box sx={{ display: 'flex', justifyContent: 'center', my: 3 }}>
+                  { isLoadingMore ? <CircularProgress /> 
+                  : 
+                    <>
+                      <Button disabled={updatedParameters} variant="contained" sx={{ my: 3 }} onClick={ () => loadMore() } >Load More</Button>
+                      <Button variant="contained" sx={{ my: 3, ml: 2 }} onClick={() => downloadMoleculeData(moleculeIDs)}>Download Search Results</Button>
+                    </>
+                  }          
+      </Box>
         <Container sx={{display: 'flex', justifyContent: 'center', my: 3}}>
             <Box sx={{ display: 'flex' }}>
              { isLoading && <CircularProgress /> }
              { !isLoading && !validSmiles  && <Typography>Search string is not valid SMILES or SMARTS. Please provide valid SMILES or SMARTS strings.</Typography> }
              { !isLoading && validSmiles && Object.keys(svg_results).length > 0 && 
-             <Container> 
+             <Container>
+              <Container sx={{display: 'flex', justifyContent: 'left', my: 3}}>    
+                  <Typography  sx={{ fontStyle: 'italic' }}>Showing {interval + interval * (searchPage-1)} results.</Typography>
+              </Container> 
                 { dynamicGrid(svg_results)  }
                 <Box sx={{ display: 'flex', justifyContent: 'center', my: 3 }}>
                   { isLoadingMore ? <CircularProgress /> 
                   : 
+                    <>
                       <Button disabled={updatedParameters} variant="contained" sx={{ my: 3 }} onClick={ () => loadMore() } >Load More</Button>
-
-                  }
+                      <Button variant="contained" sx={{ my: 3, ml: 2 }} onClick={() => downloadMoleculeData(moleculeIDs)}>Download Search Results</Button>
+                    </>
+                  }          
                 </Box>
                </Container>  }
             { !isLoading && validSmiles && Object.keys(svg_results).length==0 && <Typography>No results found for SMILES string.</Typography> } 
