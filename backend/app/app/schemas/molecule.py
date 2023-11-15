@@ -19,6 +19,7 @@ class MoleculeData(BaseModel):
     min: Optional[float] = None
     delta: Optional[float] = None
     boltzmann_average: Optional[float] = None
+    std: Optional[float] = None
     vburminconf: Optional[float] = None
 
 class MoleculeSimple(BaseModel):
