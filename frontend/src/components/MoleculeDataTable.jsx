@@ -150,12 +150,17 @@ export default function MoleculeDataTable({ molecule_id, initial_data_type }) {
         { field: 'delta', headerName: 'Delta', filterable: true, headerAlign: 'right', align: 'right', flex: true },
         { field: 'vburminconf', headerName: 'vbur min conf', filterable: true, headerAlign: 'right', align: 'right', flex: true },
         { field: 'boltzmann_average', headerName: 'Boltz', filterable: true, headerAlign: 'right', align: 'right', flex: true },
+        { field: 'std', headerName: 'std', filterable: true, headerAlign: 'right', align: 'right', flex: true}
     ];
     
     // Filter out delta and vburminconf columns for xTB data.
     let displayColumns = columns;
     if (selectedDataType === "xTB Data" || selectedDataType === "xTB_Ni Data") {
         displayColumns = columns.filter(column => column.field !== 'delta' && column.field !== 'vburminconf');
+    }
+
+    else {
+        displayColumns = columns.filter(column => column.field !== 'std');
     }
 
     const rows = moleculeData ? moleculeData
@@ -167,6 +172,7 @@ export default function MoleculeDataTable({ molecule_id, initial_data_type }) {
             delta: item.delta,
             boltzmann_average: item.boltzmann_average,
             vburminconf: item.vburminconf,
+            std: item.std,
         })) : [];
 
     return (
