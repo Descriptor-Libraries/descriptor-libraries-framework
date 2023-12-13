@@ -89,6 +89,7 @@ services:
     container_name: frontend
     volumes:
       - "./frontend/src:/app/src"
+      - "./frontend/public/stats:/app/public/stats"
     build:
       context: .
       dockerfile: frontend.production.dockerfile

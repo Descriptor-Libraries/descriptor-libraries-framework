@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from "react-router-dom";
 
-import { Container, Typography, Box, Grid } from "@mui/material";
+import { Typography, Box, Grid } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
 
 import OriginalKraken from '../common/OriginalKraken';
@@ -12,41 +11,9 @@ import BubbleChartIcon from '@mui/icons-material/BubbleChart';
 //import DownloadIcon from '@mui/icons-material/Download';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import InfoIcon from '@mui/icons-material/Info';
-import StatCard from '../components/SummaryCard';
+import StatsGrid from '../components/StatsGrid';
 import IconLink from '../components/IconLink';
 
-const stats = [
-  {
-    "number": "1,558",
-    "description": "DFT Calculated Ligands"
-  },
-
-  {
-    "number": "300,000+",
-    "description": "ML calculated Ligands"
-  },
-
-  {
-    "number": "576",
-    "description": "unique substituents"
-  },
-  
-  {
-    "number": "190",
-    "description": "DFT-level descriptors"
-  },
-
-  {
-    "number": "21,437",
-    "description": "unique conformers"
-  },
-
-  {
-    "number": "13.8",
-    "description": "average conformers per ligand"
-  }, 
-  
-]
 
 function Home() {
    const [ molData, setMolData ] = useState([]);
@@ -161,14 +128,7 @@ function Home() {
           </Grid>
         </Grid>
      </Box>
-
-    <Container maxWidth="xl" sx={{ display: "flex", flexDirection: "column", alignItems: "center"  }}>
-      <Grid container spacing={2} sx={{ mt: 3 }}>
-            {stats.map((stat, index) => (
-              <StatCard key={index} number={stat.number} caption={stat.description} size={150} />
-            ))}
-      </Grid>
-      </Container>
+     <StatsGrid />
       <Box sx={{ 
         width: '100%',
         height: '80vh', 
