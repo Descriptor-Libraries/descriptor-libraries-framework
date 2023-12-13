@@ -1,12 +1,9 @@
-import React, { useEffect, useState } from 'react';
-
-import { ThemeProvider } from '@mui/material/styles';
+import React, { useState } from 'react';
 
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import Slide from '@mui/material/Slide';
 
-import { Ketcher } from 'ketcher-core';
 //import { convertStructToString } from 'ketcher-core'
 import { ChemicalMimeType } from 'ketcher-core';
 import { StandaloneStructServiceProvider } from 'ketcher-standalone';
@@ -56,6 +53,7 @@ export default function FullScreenDialog({ ketcherCallBack }) {
                   setKetcher(ketcher)
               }}
           />
+          <Button sx={{ my: 2 }} onClick={handleClose}>Close Sketcher</Button>
       </Dialog>
     </div>
   );
