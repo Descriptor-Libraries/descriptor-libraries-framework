@@ -176,6 +176,9 @@ export default function NeighborSearchHook () {
     return (
         <Container maxWidth="lg">
         <Typography variant="h2" textAlign="center">Neighbor Search</Typography>
+        <Box sx={{p:4}}>
+          <Typography textAlign="center">Neighbors are identified by Euclidian distance in 4 principal component space.</Typography>
+        </Box>
 
         <Box display="flex" justifyContent="center" pt={2}>
         <TextField 
