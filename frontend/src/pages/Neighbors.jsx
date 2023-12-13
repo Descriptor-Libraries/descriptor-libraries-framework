@@ -176,7 +176,7 @@ export default function NeighborSearchHook () {
     return (
         <Container maxWidth="lg">
         <Typography variant="h2" textAlign="center">Neighbor Search</Typography>
-        <Box sx={{p:4}}>
+        <Box sx={{pb:1}}>
           <Typography textAlign="center">Neighbors are identified by Euclidian distance in 4 principal component space.</Typography>
         </Box>
 
@@ -210,8 +210,16 @@ export default function NeighborSearchHook () {
                 <Box display="flex" justifyContent="center">
                 {  (isLoading || isLoadingMore) ? <CircularProgress /> :
                   <>
-                      <Button disabled={updatedParameters} variant="contained" sx={{ my: 3 }} onClick={ () => loadMore() } >Load More</Button>
-                      <Button variant="contained" sx={{ my: 3, ml: 2 }} onClick={() => downloadMoleculeData(moleculeIDs, "pca_neighbors")}>Download Search Results</Button>
+                      <Button disabled={updatedParameters} variant="contained" sx={{ my: 3 }} onClick={ () => loadMore() } >
+                        <span style={{ textTransform: 'capitalize', fontSize: '16px' }}>
+                          Load More
+                        </span>
+                      </Button>
+                      <Button variant="contained" sx={{ my: 3, ml: 2 }} onClick={() => downloadMoleculeData(moleculeIDs, "pca_neighbors")}>
+                        <span style={{ textTransform: 'capitalize', fontSize: '16px' }}>
+                          Download Search Results
+                        </span>
+                      </Button>
 
                   </>
                 }
@@ -232,7 +240,11 @@ export default function NeighborSearchHook () {
             {isLoadingMore ? (
               <CircularProgress />
             ) : (
-              <Button disabled={updatedParameters} variant="contained" sx={{ m: 0.5 }} onClick={ () => loadMore() }>Load More</Button> 
+              <Button disabled={updatedParameters} variant="contained" sx={{ m: 0.5 }} onClick={ () => loadMore() }>
+                <span style={{ textTransform: 'capitalize', fontSize: '16px' }}>
+                  Load More
+                </span>
+              </Button> 
             )}
           </Box>
           }
