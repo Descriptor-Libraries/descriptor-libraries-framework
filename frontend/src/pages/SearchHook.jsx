@@ -215,8 +215,16 @@ export default function SearchHook () {
                   { isLoadingMore ? <CircularProgress /> 
                   : 
                     <>
-                      <Button disabled={updatedParameters} variant="contained" sx={{ my: 3 }} onClick={ () => loadMore() } >Load More</Button>
-                      <Button variant="contained" sx={{ my: 3, ml: 2 }} onClick={() => downloadMoleculeData(moleculeIDs)}>Download Search Results</Button>
+                      <Button disabled={updatedParameters} variant="contained" sx={{ my: 3 }} onClick={ () => loadMore() } >
+                      <span style={{ textTransform: 'capitalize', fontSize: '16px' }}>
+                        Load More
+                      </span>
+                      </Button>
+                      <Button variant="contained" sx={{ my: 3, ml: 2 }} onClick={() => downloadMoleculeData(moleculeIDs)}>
+                      <span style={{ textTransform: 'capitalize', fontSize: '16px' }}>
+                        Download Search Results
+                      </span>
+                      </Button>
                     </>
                   }          
       </Box>
@@ -234,8 +242,16 @@ export default function SearchHook () {
                   { isLoadingMore ? <CircularProgress /> 
                   : 
                     <>
-                      <Button disabled={updatedParameters} variant="contained" sx={{ my: 3 }} onClick={ () => loadMore() } >Load More</Button>
-                      <Button variant="contained" sx={{ my: 3, ml: 2 }} onClick={() => downloadMoleculeData(moleculeIDs)}>Download Search Results</Button>
+                      <Button disabled={updatedParameters} variant="contained" sx={{ my: 3 }} onClick={ () => loadMore() } >
+                      <span style={{ textTransform: 'capitalize', fontSize: '16px' }}>
+                        Load More
+                      </span>
+                      </Button>
+                      <Button variant="contained" sx={{ my: 3, ml: 2 }} onClick={() => downloadMoleculeData(moleculeIDs)}>
+                      <span style={{ textTransform: 'capitalize', fontSize: '16px' }}>
+                        Download Search Results
+                      </span>
+                      </Button>
                     </>
                   }          
                 </Box>

@@ -17,6 +17,14 @@ const theme = createTheme({
       main: "#393536",
     }
   },
+
+  typography: {
+    h2: {
+      textAlign: 'center',
+      paddingBottom: '3rem',
+      paddingTop: '3rem',
+    },
+  }
 });
 
 const Search = lazy(() => import('./pages/SearchHook'));

@@ -1,134 +1,147 @@
-import React from 'react';
+import * as React from 'react';
+import PropTypes from 'prop-types';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
+import CssBaseline from '@mui/material/CssBaseline';
+import Divider from '@mui/material/Divider';
+import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import Menu from '@mui/material/Menu';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
 import MenuIcon from '@mui/icons-material/Menu';
-import Container from '@mui/material/Container';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import MenuItem from '@mui/material/MenuItem';
+import { NavLink, useLocation } from 'react-router-dom';
 
-import '../assets/custom.css'
+import { Link } from 'react-router-dom';
 
-import { Link } from 'react-router-dom'
+import OriginalKraken from './OriginalKraken.js'
 
-import OriginalKraken from './OriginalKraken.js';
+const drawerWidth = 240;
 
-const ResponsiveAppBar = ({pages}) => {
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
+function DrawerAppBar(props) {
+  const { window, pages } = props;
+  const [mobileOpen, setMobileOpen] = React.useState(false);
 
-  const handleOpenNavMenu = (event) => {
-    setAnchorElNav(event.currentTarget);
+  const handleDrawerToggle = () => {
+    setMobileOpen(prevState => !prevState);
   };
 
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
+  const location = useLocation();
+
+  const getButtonStyles = (itemPath) => {
+    const isHome = (location.pathname === '/' && itemPath === 'home') || location.pathname === `/${itemPath}`;
+    return isHome ? { backgroundColor: '#ed1c2477', color: '#fff' } : { color: '#fff' };
   };
+  
+
+  const drawer = (
+    <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
+      <Typography variant="h6" sx={{ my: 2 }}>
+        kraken
+      </Typography>
+      <Divider />
+      <List>
+      {Object.keys(pages).map(item => {
+        const itemPath = item.replace(" ", "_").toLowerCase();
+        return (
+          <ListItem key={item} disablePadding>
+            <NavLink 
+              to={itemPath} 
+              style={{ textDecoration: 'none', color: 'inherit' }}
+            >
+              <ListItemButton sx={{ textAlign: 'center' }}>
+                <ListItemText primary={item} />
+              </ListItemButton>
+            </NavLink>
+          </ListItem>
+        );
+      })}
+      <ListItem key="documentation" disablePadding>
+        <Link to="/docs/" id="documentation" className="NavbarLink" reloadDocument style={{ textDecoration: 'none' }} >
+          <ListItemButton sx={{ textAlign: 'center' }}>
+            <ListItemText primary="Documentation" />
+          </ListItemButton>
+        </Link>
+      </ListItem>
+    </List>
+  </Box>
+  );
+
+  const container = window !== undefined ? () => window().document.body : undefined;
 
   return (
-      <AppBar position="static" sx={{mb: 2}} >
-        <Container maxWidth="xl">
-          <Toolbar disableGutters>
-            <OriginalKraken sx={{ display: { xs: 'none', md: 'flex' }, mr: 1, fontSize: '60px' }} />
-            <Typography
-              variant="h6"
-              noWrap
-              component={Link}
-              to="/"
-              sx={{ 
-                display: { xs: 'none', md: 'flex' },
-                fontFamily: 'monospace',
-                fontWeight: 700,
-                letterSpacing: '.3rem',
-                color: 'inherit',
-                textDecoration: 'none',
-              }}
-            >
-              kraken
-            </Typography>
-
-            <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-              <IconButton
-                size="large"
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                onClick={handleOpenNavMenu}
-                color="inherit"
-              >
-                <MenuIcon />
-              </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorElNav}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'left',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'left',
-                }}
-                open={Boolean(anchorElNav)}
-                onClose={handleCloseNavMenu}
-                sx={{
-                  display: { xs: 'block', md: 'none' },
-                }}
-              >
-                {Object.keys(pages).map((page) => (
-                  <MenuItem id={page} key={page} onClick={handleCloseNavMenu}>
-                    <Link to={page.toLowerCase()} id={page} className="NavbarLink"><Typography textAlign="center">{page}</Typography></Link>
-                  </MenuItem>
-                ))}
-              </Menu>
-            </Box>
-            <OriginalKraken sx={{ display: { xs: 'flex', md: 'none' }, mr: 1, fontSize: '60px' }} />
-            <Typography
-              variant="h5"
-              noWrap
-              component={Link}
-              to="/"
-              sx={{
-                mr: 2,
-                display: { xs: 'flex', md: 'none' },
-                flexGrow: 1,
-                fontFamily: 'monospace',
-                fontWeight: 700,
-                letterSpacing: '.3rem',
-                color: 'inherit',
-                textDecoration: 'none',
-              }}
-            >
-              kraken
-            </Typography>
-            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-              {Object.keys(pages).map((page) => (
-                <Link to={page.replace(" ", "_").toLowerCase()} id={page.replace(" ", "_").toLowerCase()} className="NavbarLink"  style={{ textDecoration: 'none' }} >
-                    <Button
-                    key={page}
-                    onClick={handleCloseNavMenu}
-                    sx={{ my: 2, color: 'white', display: 'block' }}
-                  >
-                    {page}
+    <Box sx={{ display: 'flex' }}>
+      <CssBaseline />
+      <AppBar component="nav">
+        <Toolbar>
+        <OriginalKraken sx={{ display: { xs: 'none', md: 'flex' }, mr: 1, fontSize: '60px' }} />
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={handleDrawerToggle}
+            sx={{ mr: 2, display: { sm: 'none' } }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+          >
+            kraken
+          </Typography>
+          <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+            {Object.keys(pages).map(item => {
+              const itemPath = item.replace(" ", "_").toLowerCase();
+              return (
+                <NavLink
+                  to={itemPath}
+                  key={item}
+                  style={{ textDecoration: 'none' }}
+                >
+                  <Button sx={getButtonStyles(itemPath)}>
+                    <span style={{ textTransform: 'capitalize', fontSize: '16px' }}>{item}</span>
                   </Button>
-                </Link>
-              ))}
-
-              <Link to="/docs/" id="documentation" className="NavbarLink" reloadDocument style={{ textDecoration: 'none' }} >
-                  <Button
-                  key="documentation"
-                  sx={{ my: 2, color: 'white', display: 'block' }}>
-                  Documentation
-                </Button>
-              </Link>
-
-            </Box>
-          </Toolbar>
-        </Container>
+                </NavLink>
+              );
+            })}
+            <Link to="/docs/" id="documentation" className="NavbarLink" reloadDocument style={{ textDecoration: 'none' }} >
+              <Button sx={getButtonStyles('documentation')}>
+                <span style={{ textTransform: 'capitalize', fontSize: '16px' }}>Documentation</span>
+              </Button>
+            </Link>
+          </Box>
+        </Toolbar>
       </AppBar>
+      <nav>
+        <Drawer
+          container={container}
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile.
+          }}
+          sx={{
+            display: { xs: 'block', sm: 'none' },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+          }}
+        >
+          {drawer}
+        </Drawer>
+      </nav>
+      <Toolbar />
+    </Box>
   );
+}
+
+DrawerAppBar.propTypes = {
+  window: PropTypes.func, // Injected by the documentation to work in an iframe. You won't need it on your project.
 };
-export default ResponsiveAppBar;
+
+export default DrawerAppBar;

@@ -36,7 +36,9 @@ export default function FullScreenDialog({ ketcherCallBack }) {
   return (
     <div>
         <Button variant="contained" sx={{ mb: 5 }} onClick={handleClickOpen}>
+        <span style={{ textTransform: 'capitalize', fontSize: '16px' }}>
           Open Molecular Sketcher
+        </span>
         </Button>
       <Dialog
         fullWidth={true}
