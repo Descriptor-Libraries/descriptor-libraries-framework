@@ -45,7 +45,6 @@ function Home() {
         .then(data => {
           setName(data[0].name);
           setTagline(data[0].tagline);
-          console.log(name)
         })
         .catch(error => {
             console.error('Error fetching stats:', error);

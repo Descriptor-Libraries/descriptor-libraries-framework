@@ -92,7 +92,7 @@ services:
     container_name: local_frontend
     volumes:
       - "./frontend/src:/app/src"
-      - "./frontend/public/stats:/app/public/stats"
+      - "./frontend/public/content:/app/public/content"
       - "./frontend/public/brand:/app/public/brand"
     build:
       context: .

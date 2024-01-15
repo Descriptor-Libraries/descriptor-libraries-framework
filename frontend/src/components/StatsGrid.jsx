@@ -38,7 +38,7 @@ const StatsGrid = () => {
   const [stats, setStats] = useState(null);
     
   useEffect(() => {
-      fetch('/stats/stats.json')
+      fetch('/content/stats.json')
           .then(response => {
               if (!response.ok) {
                   throw new Error('Network response was not ok');
