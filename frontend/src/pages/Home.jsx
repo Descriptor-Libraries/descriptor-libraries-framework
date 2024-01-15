@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { Typography, Box, Grid } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
 
-import OriginalKraken from '../common/OriginalKraken';
 import Graph from "../components/Graph";
 
 import SearchIcon from '@mui/icons-material/Search';
@@ -14,13 +13,44 @@ import InfoIcon from '@mui/icons-material/Info';
 import StatsGrid from '../components/StatsGrid';
 import IconLink from '../components/IconLink';
 
+import purify from 'dompurify';
+
+const Badge = ({ isMobile }) => {
+  const displayStyle = {
+    maxWidth: isMobile ? '120px' : '240px', // This sets the maximum width of the image
+    height: 'auto' // Maintain aspect ratio
+  };
+
+  return (
+    <img src="/brand/logo.svg" style={displayStyle} alt="logo" />
+  );
+};
+
 
 function Home() {
    const [ molData, setMolData ] = useState([]);
-   const [ components, setComponents ] = useState(["1", "2"]);
-   const [ type, setType ] = useState("umap");
    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+   const [name, setName] = useState("");
+   const [tagline, setTagline] = useState("");
    const theme = useTheme();
+
+   useEffect(() => {
+    fetch('/brand/names.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+          setName(data[0].name);
+          setTagline(data[0].tagline);
+          console.log(name)
+        })
+        .catch(error => {
+            console.error('Error fetching stats:', error);
+        });
+}, []);
 
    useEffect(() => {
     function checkMobile() {
@@ -37,17 +67,14 @@ function Home() {
   }, []); // Empty array means this effect runs once on mount and cleanup on unmount
 
 
-   async function umap(type, components, limit=1000) {
+   async function umap() {
       /**
        * Requests general umap data from the backend.
-       * @param {string} type Type of dimensionality reduction. Can be one of PCA or UMAP.
-       * @param {string} components String of comma separated integers.
-       * @param {number} limit Limit of the search.
        * @return {json}  The response json.
        */
-         let encoded = encodeURIComponent(components);
+         let encoded = encodeURIComponent("1,2");
 
-         const response =  await fetch(`/api/molecules/dimensions/?type=${type}&components=${encoded}&limit=${limit}`)
+         const response =  await fetch(`/api/molecules/dimensions/?type=umap&components=${encoded}&limit=1000`)
       
          if (!response.ok) {
             throw new Error('Invalid Molecule Id')
@@ -64,7 +91,7 @@ function Home() {
        * 
        */
          const fetchData = async () => {
-            const molecule_data = await umap(type, components);
+            const molecule_data = await umap();
             return molecule_data
          }
 
@@ -78,7 +105,7 @@ function Home() {
       }
    useEffect(() => {
       loadData()
-   }, [type]);
+   }, []);
 
   return (
   <>
@@ -96,16 +123,13 @@ function Home() {
             flexDirection: isMobile ? 'column' : 'row',
         }}
     >
-        <OriginalKraken sx={{ color: 'white', fontSize: isMobile ? '120px' : '160px' }} />
+        <Badge isMobile={isMobile} />
         <Typography variant={ isMobile ? "h4" :"h2"} color="white">
-            KRAKEN
+            { name }
         </Typography>
     </Box>
       {
-        <Typography variant={ isMobile ? "subtitle1" :"h5"} color="white" textAlign="center">
-          <b>K</b>olossal vi<b>R</b>tual d<b>A</b>tabase
-                  for mole<b>K</b>ular d<b>E</b>scriptors of orga<b>N</b>ophosphorus
-                  ligands.
+        <Typography variant={ isMobile ? "subtitle1" :"h5"} color="white" textAlign="center" dangerouslySetInnerHTML={{ __html:purify.sanitize(tagline) }} >
         </Typography>
       }
        <Grid container alignItems="center" justifyContent="center" spacing={3} sx={{ mb: 1 }}>
@@ -136,7 +160,7 @@ function Home() {
         alignItems: 'center',  
         justifyContent: 'center', 
       }}>
-  {!isMobile && <Graph molData={molData} componentArray={components} type={type} neighborSearch={false} containerStyle={{ width: '100%', height: '90%' }}></Graph>}
+  {!isMobile && <Graph molData={molData} componentArray={["1", "2"]} neighborSearch={false} containerStyle={{ width: '100%', height: '90%' }}></Graph>}
 </Box>
     </>
   );

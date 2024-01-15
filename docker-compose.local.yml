@@ -93,6 +93,7 @@ services:
     volumes:
       - "./frontend/src:/app/src"
       - "./frontend/public/stats:/app/public/stats"
+      - "./frontend/public/brand:/app/public/brand"
     build:
       context: .
       dockerfile: frontend.development.dockerfile
