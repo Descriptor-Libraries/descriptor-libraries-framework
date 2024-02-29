@@ -18,11 +18,11 @@ import purify from 'dompurify';
 const Badge = ({ isMobile }) => {
   const displayStyle = {
     maxWidth: isMobile ? '120px' : '240px', // This sets the maximum width of the image
-    height: 'auto' // Maintain aspect ratio
+    height: '15vh' // Set the height of the image to 20% of the viewport height (box is 35% of vh)
   };
 
   return (
-    <img src="/brand/logo.svg" style={displayStyle} alt="logo" />
+    <img src={`${import.meta.env.BASE_URL}/brand/logo.svg`} style={displayStyle} alt="logo" />
   );
 };
 
@@ -35,7 +35,7 @@ function Home() {
    const theme = useTheme();
 
    useEffect(() => {
-    fetch('/brand/names.json')
+    fetch(`${import.meta.env.BASE_URL}/brand/names.json`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');

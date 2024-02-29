@@ -10,7 +10,7 @@ function IconLink({ IconElement, text, link, reloadDocument = false }) {
     <Link style={{ textDecoration: "none" }} {...linkProps}>
       <Box textAlign="center">
         <IconButton color="inherit" size="large">
-          {IconElement ? <IconElement sx={{ color: 'white', fontSize: 40 }}/> : <SearchIcon sx={{ color: 'white', fontSize: 40 }}/>}
+          {IconElement ? <IconElement sx={{ color: 'white', fontSize: "5vh" }}/> : <SearchIcon sx={{ color: 'white', fontSize: "5vh" }}/>}
         </IconButton>
         <Typography color="white" textAlign="center">
           {text}

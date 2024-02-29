@@ -38,7 +38,7 @@ const StatsGrid = () => {
   const [stats, setStats] = useState(null);
     
   useEffect(() => {
-      fetch('/content/stats.json')
+      fetch(`${import.meta.env.BASE_URL}/content/stats.json`)
           .then(response => {
               if (!response.ok) {
                   throw new Error('Network response was not ok');

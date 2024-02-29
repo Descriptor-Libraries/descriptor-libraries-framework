@@ -54,7 +54,7 @@ const MarkdownPage =({ markdown_file }) => {
 
 const Library_Details = () => {
     return (
-        <MarkdownPage markdown_file="/content/library_details.md" />
+        <MarkdownPage markdown_file={`${import.meta.env.BASE_URL}/content/library_details.md`} />
     );
 };
 

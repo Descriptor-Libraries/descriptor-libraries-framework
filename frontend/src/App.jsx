@@ -55,7 +55,7 @@ function App() {
     <>
     <Box sx={{ display: 'flex', flexDirection: 'column'}}>
       <ThemeProvider theme={theme}>
-        <Router>
+        <Router basename={`${import.meta.env.BASE_URL}`}>
             <Content />
         </Router>
       </ThemeProvider>
