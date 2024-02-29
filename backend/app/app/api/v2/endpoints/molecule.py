@@ -100,7 +100,7 @@ def valid_smiles(smiles):
 
     return smiles
 
-@router.get("/data/{molecule_id}", response_model=List[schemas.MoleculeData])
+@router.get("/data/{molecule_id}", response_model=Any)
 async def get_molecule_data(molecule_id: int,
                             data_type: str="ml",
                             db: Session = Depends(deps.get_db)):
@@ -120,8 +120,12 @@ async def get_molecule_data(molecule_id: int,
     stmt = query.bindparams(molecule_id=molecule_id)
 
     results = db.execute(stmt).fetchall()
+
+    # Hacky way to get each row as a dictionary.
+    # do this to generalize for different data sets - column names may vary.
+    list_of_dicts = [row._asdict() for row in results]
     
-    return results
+    return list_of_dicts
 
 @router.get("/data/export/batch")
 async def get_molecules_data(molecule_ids: str,
@@ -289,10 +293,6 @@ def get_a_single_molecule(molecule_id: int, db: Session = Depends(deps.get_db)):
         smiles=molecule.smiles,
         molecular_weight=molecule.molecular_weight,
         conformers_id=[c.conformer_id for c in molecule.conformer_collection],
-        dft_data=molecule.dft_data,
-        xtb_data=molecule.xtb_data,
-        xtb_ni_data=molecule.xtb_ni_data,
-        ml_data=molecule.ml_data,
     )
     return response
 

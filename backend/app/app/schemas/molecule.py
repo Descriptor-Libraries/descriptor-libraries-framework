@@ -8,10 +8,6 @@ class Molecule(BaseModel):
     smiles: str
     molecular_weight: Optional[float] = None
     conformers_id: List[Optional[int]]
-    dft_data: Optional[Dict] = None
-    xtb_data: Optional[Dict] = None
-    xtb_ni_data: Optional[Dict] = None
-    ml_data: Optional[Dict] = None
 
 class MoleculeData(BaseModel):
     property: str
