@@ -73,7 +73,7 @@ function Home() {
        */
          let encoded = encodeURIComponent("1,2");
 
-         const response =  await fetch(`/api/molecules/dimensions/?type=umap&components=${encoded}&limit=1000`)
+         const response =  await fetch(`/api${import.meta.env.BASE_URL}/molecules/dimensions/?type=umap&components=${encoded}&limit=1000`)
       
          if (!response.ok) {
             throw new Error('Invalid Molecule Id')

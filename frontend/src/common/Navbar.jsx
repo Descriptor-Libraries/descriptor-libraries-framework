@@ -24,7 +24,7 @@ const Badge = ({display}) => {
     display: display,
     mr: 1,
     fontSize: '60px', 
-    maxWidth: '80px',
+    maxHeight: '70px',
   };
 
   return (

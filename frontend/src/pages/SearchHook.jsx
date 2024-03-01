@@ -16,7 +16,7 @@ export default function SearchHook () {
 
     const interval = 15;
 
-    const [ searchString, setSearch ] = useState('PC=C');
+    const [ searchString, setSearch ] = useState('C=C');
     const [ skip, setSkip ] = useState(0);
     const [ results, setResults ] = useState([]);
     const [ validSmiles, setValidSmiles ] = useState(true);

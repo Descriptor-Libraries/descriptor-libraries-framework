@@ -17,7 +17,7 @@ const Item = styled(Paper)(({ theme }) => ({
 async function substructureSearch(substructure, limit=48, skip=0, signal) {
     let encoded = encodeURIComponent(substructure);
     
-    const response =  await fetch(`/api/molecules/search/?substructure=${encoded}&skip=${skip}&limit=${limit}`, {signal: signal})
+    const response =  await fetch(`/api${import.meta.env.BASE_URL}/molecules/search/?substructure=${encoded}&skip=${skip}&limit=${limit}`, {signal: signal})
 
     if (!response.ok) {
         throw new Error('Invalid SMILES')
@@ -37,7 +37,7 @@ function moleculePage(molecule_id) {
   // website name. Need the first and third elements (0, 2) to redirect to the molecule endpoint below. This is so that regardless of which page we are on, we can redirect to the
   // molecule page.
   let og_url = window.location.href.split("/");
-  let url = og_url[0] + "//" + og_url[2] + "/molecule/" + molecule_id;
+  let url = og_url[0] + "//" + og_url[2] + `${import.meta.env.BASE_URL}/molecule/` + molecule_id;
   window.open(url, "_blank", "noreferrer");
 }
 
@@ -49,7 +49,7 @@ function neighborPage(molecule_id) {
   // Gets the original url for the window and splits it into its components. The first element will always be http(s):, second will always be empty, third will always be 
   // website name. Need the first and third elements (0, 2) to redirect to the neighboar endpoint below. 
   let og_url = window.location.href.split("/");
-  let url = og_url[0] + "//" + og_url[2] + "/neighbors/" + molecule_id;
+  let url = og_url[0] + "//" + og_url[2] + `${import.meta.env.BASE_URL}/neighbors/` + molecule_id;
   window.open(url, "_blank", "noreferrer");
 }
 
@@ -156,7 +156,7 @@ async function retrieveSVG(smiles, molecule_id, substructure = undefined, distan
 
 const downloadMoleculeData = (moleculeIDs, context=null) => {
   const a = document.createElement('a');
-  let search_string = `/api/molecules/data/export/batch?molecule_ids=${moleculeIDs}`;
+  let search_string = `/api${import.meta.env.BASE_URL}/molecules/data/export/batch?molecule_ids=${moleculeIDs}`;
 
   if (context) {
     search_string += `&context=${context}`;
