@@ -35,7 +35,7 @@ const Badge = ({display}) => {
 // Adapted from MUI documentation
 // Responsive App Bbar with Drawer - https://mui.com/material-ui/react-app-bar/#responsive-app-bar-with-drawer
 function DrawerAppBar(props) {
-  const { window, pages } = props;
+  const { navwindow, pages } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [name, setName] = useState("");
 
@@ -90,7 +90,7 @@ function DrawerAppBar(props) {
         );
       })}
       <ListItem key="documentation" disablePadding>
-        <Link to="/docs/" id="documentation" className="NavbarLink" reloadDocument style={{ textDecoration: 'none' }} >
+        <Link to={window.location.origin + '/docs'} id="documentation" className="NavbarLink" reloadDocument style={{ textDecoration: 'none' }} >
           <ListItemButton sx={{ textAlign: 'center' }}>
             <ListItemText primary="Documentation" />
           </ListItemButton>
@@ -100,7 +100,7 @@ function DrawerAppBar(props) {
   </Box>
   );
 
-  const container = window !== undefined ? () => window().document.body : undefined;
+  const container = navwindow !== undefined ? () => navwindow().document.body : undefined;
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -139,7 +139,7 @@ function DrawerAppBar(props) {
                 </NavLink>
               );
             })}
-            <Link to="/docs/" id="documentation" className="NavbarLink" reloadDocument style={{ textDecoration: 'none' }} >
+            <Link to={window.location.origin + '/docs'}  id="documentation" className="NavbarLink" reloadDocument style={{ textDecoration: 'none' }} >
               <Button sx={getButtonStyles('documentation')}>
                 <span style={{ textTransform: 'capitalize', fontSize: '16px' }}>Documentation</span>
               </Button>
@@ -170,7 +170,7 @@ function DrawerAppBar(props) {
 }
 
 DrawerAppBar.propTypes = {
-  window: PropTypes.func, // Injected by the documentation to work in an iframe. You won't need it on your project.
+  window: PropTypes.func, 
 };
 
 export default DrawerAppBar;

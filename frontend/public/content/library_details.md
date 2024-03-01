@@ -1,7 +1,7 @@
 # Library Details
 
 <div class="centered-container">
-     <img src="/content/kraken-workflow.png" alt="Kraken Workflow" class="responsive-image">
+     <img src="/kraken/content/kraken-workflow.png" alt="Kraken Workflow" class="responsive-image">
 </div>
 
 ## Conformational Searching
