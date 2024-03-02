@@ -29,33 +29,29 @@ services:
       - "traefik.http.routers.api.service=api@internal"
 
   local_database:
-    image: 'mcs07/postgres-rdkit'
+    image: 'rdkit-postgres:latest'
     container_name: local_database
     shm_size: '4gb'
     environment:
       POSTGRES_SERVER: database
       POSTGRES_USER: postgres
       POSTGRES_PASSWD: "$postgresPWD"
-      POSTGRES_DB: postgres
     ports:
       - "5432:5432"
     volumes:
-      - "kraken-postgres:/var/lib/postgresql/data"
+      - "postgres16:/var/lib/postgresql/data"
       - "pr3:/home/db"
     healthcheck:
-      test: ["CMD-SHELL", "psql -U postgres -d postgres -c 'SELECT molecule_id FROM molecule LIMIT 1;' || exit 1"]
+      test: ["CMD-SHELL", "psql -U postgres -d kraken_data -c 'SELECT molecule_id FROM molecule LIMIT 1;' || exit 1"]
       interval: 5s
       timeout: 2s
       retries: 5
-    environment:
-      POSTGRES_HOST_AUTH_METHOD: trust
-      POSTGRES_DB: postgres
     networks:
       - local-db
 
-  local_backend:
+  kraken_backend:
     image: 'phosphines-backend:latest'
-    container_name: local_backend
+    container_name: kraken_backend
     build:
       context: ./backend
       dockerfile: backend.dockerfile
@@ -65,7 +61,8 @@ services:
       POSTGRES_SERVER: local_database
       POSTGRES_USER: postgres
       POSTGRES_PASSWD: testing-password
-      POSTGRES_DB: postgres
+      POSTGRES_DB: kraken_data
+      API_PREFIX: kraken
     entrypoint: bash prestart.sh
     depends_on:
       local_database:
@@ -75,8 +72,34 @@ services:
       - local-db
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`localhost`) && PathPrefix(`/api`)"
-      - "traefik.http.services.backend.loadbalancer.server.port=8080"
+      - "traefik.http.routers.kraken_backend.rule=Host(`localhost`) && PathPrefix(`/api/kraken`)"
+      - "traefik.http.services.kraken_backend.loadbalancer.server.port=8080"
+
+  acids_backend:
+    image: 'phosphines-backend:latest'
+    container_name: acids_backend
+    build:
+      context: ./backend
+      dockerfile: backend.dockerfile
+    volumes:
+      - "./backend/app:/app"
+    environment:
+      POSTGRES_SERVER: local_database
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWD: testing-password
+      POSTGRES_DB: acids_data
+      API_PREFIX: acids
+    entrypoint: bash prestart.sh
+    depends_on:
+      local_database:
+        condition: service_healthy
+    networks:
+      - local-web
+      - local-db
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.acids_backend.rule=Host(`localhost`) && PathPrefix(`/api/acids`)"
+      - "traefik.http.services.acids_backend.loadbalancer.server.port=8080"
 
   local_cdk-depict:
     image: 'simolecule/cdkdepict:latest'
@@ -87,13 +110,15 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.cdk-depict.rule=Host(`localhost`) && PathPrefix(`/depict`)"
 
-  local_frontend:
+  kraken_frontend:
     image: 'phosphines-frontend:latest'
-    container_name: local_frontend
+    container_name: kraken_frontend
     volumes:
       - "./frontend/src:/app/src"
       - "./frontend/public/content:/app/public/content"
       - "./frontend/public/brand:/app/public/brand"
+    environment:
+      - VITE_BASE_URL=/kraken
     build:
       context: .
       dockerfile: frontend.development.dockerfile
@@ -102,8 +127,28 @@ services:
     entrypoint: npm start
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`localhost`)"
+      - "traefik.http.routers.frontend.rule=Host(`localhost`) && PathPrefix(`/kraken`)"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+
+  acids_frontend:
+    image: 'phosphines-frontend:latest'
+    container_name: acids_frontend
+    volumes:
+      - "./frontend/src:/app/src"
+      - "./../acids-library/public/content:/app/public/content"
+      - "./../acids-library/public/brand:/app/public/brand"
+    environment:
+      - VITE_BASE_URL=/acids
+    build:
+      context: .
+      dockerfile: frontend.development.dockerfile
+    networks:
+      - local-web
+    entrypoint: npm start
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend-acids.rule=Host(`localhost`) && PathPrefix(`/acids`)"
+      - "traefik.http.services.frontend-acids.loadbalancer.server.port=3000"
 
   local_documentation:
     image: "phosphines-docs:latest"
@@ -130,5 +175,7 @@ volumes:
   kraken-postgres:
       external: true
   pr3:
+      external: true
+  postgres16:
       external: true
 
