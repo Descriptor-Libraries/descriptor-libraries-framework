@@ -56,7 +56,7 @@ const Graphv2 = ({ molData, componentArray, type, neighborSearch, containerStyle
                 return {
                     x: molArray.map(mol => mol.components[xIndex]),
                     y: molArray.map(mol => mol.components[yIndex]),
-                    text: molArray.map(mol => encodeURIComponent(mol.smiles)),
+                    text: molArray.map(mol => encodeURIComponent(mol.smiles) + "," + mol.molecule_id),
                     hovertemplate: "( %{x}, %{y})",
                     hovermode: "closest",
                     mode: 'markers',
@@ -133,6 +133,7 @@ const Graphv2 = ({ molData, componentArray, type, neighborSearch, containerStyle
             // Gets the original url for the window and splits it into its components. The first element will always be http(s):, second will always be empty, third will always be 
             // website name. Need the first and third elements (0, 2) to redirect to the molecule endpoint below. This is so that regardless of which page we are on, we can redirect to the
             // molecule page.
+            
             let og_url = window.location.href.split("/");
             let molecule_id = event.points[0].text.split(",")[1];
             let url = og_url[0] + "//" + og_url[2] + `${import.meta.env.BASE_URL}/molecule/` + molecule_id;
