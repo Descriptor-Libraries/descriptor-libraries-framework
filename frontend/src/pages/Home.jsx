@@ -4,6 +4,7 @@ import { Typography, Box, Grid } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
 
 import Graph from "../components/Graph";
+import Graphv2 from '../components/Graphv2';  
 
 import SearchIcon from '@mui/icons-material/Search';
 import BubbleChartIcon from '@mui/icons-material/BubbleChart';
@@ -159,7 +160,7 @@ function Home() {
         alignItems: 'center',  
         justifyContent: 'center', 
       }}>
-  {!isMobile && <Graph molData={molData} componentArray={["1", "2"]} neighborSearch={false} containerStyle={{ width: '100%', height: '90%' }}></Graph>}
+  {!isMobile && <Graphv2 molData={molData} componentArray={["1", "2"]} neighborSearch={false} containerStyle={{ width: '100%', height: '90%' }}></Graphv2>}
 </Box>
     </>
   );
