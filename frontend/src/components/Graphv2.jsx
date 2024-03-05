@@ -157,7 +157,7 @@ const Graphv2 = ({ molData, componentArray, type, neighborSearch, containerStyle
                         style: {width: '100%', height: '100%'},
                         xaxis: {
                         title: {
-                            text: axis_dict[type + componentArray[xIndex]],
+                            text: 'umap1',
                             font: {
                             size: 18,
                             color: '#7f7f7f'
@@ -167,7 +167,7 @@ const Graphv2 = ({ molData, componentArray, type, neighborSearch, containerStyle
 
                         yaxis: {
                             title: {
-                            text: axis_dict[type + componentArray[yIndex]],
+                            text: 'umap2',
                             font: {
                                 size: 18,
                                 color: '#7f7f7f'
