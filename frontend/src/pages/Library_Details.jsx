@@ -54,7 +54,7 @@ const MarkdownPage =({ markdown_file }) => {
 
 const Library_Details = () => {
     return (
-        <MarkdownPage markdown_file={`${document.location.pathname.split('/')[1]}/content/library_details.md`} />
+        <MarkdownPage markdown_file={`/${document.location.pathname.split('/')[1]}/content/library_details.md`} />
     );
 };
 

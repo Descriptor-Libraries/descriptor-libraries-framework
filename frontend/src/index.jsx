@@ -8,7 +8,7 @@ import reportWebVitals from "./reportWebVitals";
 function setLinkIcon() {
   const link = document.createElement('link');
   link.rel = 'icon';
-  link.href = `${process.env.VITE_BASE_URL}/brand/favicon.ico`;
+  link.href = `/${document.location.pathname.split('/')[1]}/brand/favicon.ico`;
   document.head.appendChild(link);
 
 }
@@ -16,11 +16,11 @@ function setLinkIcon() {
 function setSiteManifest() {
   const link = document.createElement('link');
   link.rel = 'manifest';
-  link.href = `${process.env.VITE_BASE_URL}/manifest.json`;
+  link.href = `/${document.location.pathname.split('/')[1]}/manifest.json`;
 }
 
 function setAppBrand() {
-  fetch(`${process.env.VITE_BASE_URL}/brand/names.json`)
+  fetch(`/${document.location.pathname.split('/')[1]}/brand/names.json`)
   .then(response => response.json()) 
   .then(data => {
     // Update the site title
