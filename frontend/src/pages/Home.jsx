@@ -23,7 +23,7 @@ const Badge = ({ isMobile }) => {
   };
 
   return (
-    <img src={`${import.meta.env.BASE_URL}/brand/logo.svg`} style={displayStyle} alt="logo" />
+    <img src={`/${document.location.pathname.split('/')[1]}/brand/logo.svg`} style={displayStyle} alt="logo" />
   );
 };
 
@@ -36,7 +36,7 @@ function Home() {
    const theme = useTheme();
 
    useEffect(() => {
-    fetch(`${import.meta.env.BASE_URL}/brand/names.json`)
+    fetch(`/${document.location.pathname.split('/')[1]}/brand/names.json`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -74,7 +74,7 @@ function Home() {
        */
          let encoded = encodeURIComponent("1,2");
 
-         const response =  await fetch(`/api${import.meta.env.BASE_URL}/molecules/dimensions/?type=umap&components=${encoded}&limit=1000`)
+         const response =  await fetch(`/api/${document.location.pathname.split('/')[1]}/molecules/dimensions/?type=umap&components=${encoded}&limit=1000`)
       
          if (!response.ok) {
             throw new Error('Invalid Molecule Id')

@@ -18,7 +18,7 @@ async function molecule(molecule_id, signal) {
     * @param {number} molecule_id Id of the molecule to search on.
     * @param {AbortSignal} signal Abortsignal object.
     */
-      const response =  await fetch(`/api${import.meta.env.BASE_URL}/molecules/${molecule_id}`, {signal: signal})
+      const response =  await fetch(`/api/${document.location.pathname.split('/')[1]}/molecules/${molecule_id}`, {signal: signal})
    
       if (!response.ok) {
          throw new Error('Invalid Molecule Id')
@@ -41,7 +41,7 @@ async function dimensionality(molecule_id, type, components, signal, limit=10) {
     */
       let encoded = encodeURIComponent(components);
 
-      const response =  await fetch(`/api${import.meta.env.BASE_URL}/molecules/${molecule_id}/neighbors/?type=${type}&components=${encoded}&skip=0&limit=${limit}`, {signal: signal})
+      const response =  await fetch(`/api/${document.location.pathname.split('/')[1]}/molecules/${molecule_id}/neighbors/?type=${type}&components=${encoded}&skip=0&limit=${limit}`, {signal: signal})
    
       if (!response.ok) {
          throw new Error('Invalid Molecule Id')
@@ -61,7 +61,7 @@ async function identifiers(smiles, signal) {
     */
       let encoded = encodeURIComponent(smiles);
 
-      const response =  await fetch(`/api${import.meta.env.BASE_URL}/molecules/identifiers/?smiles=${encoded}`, {signal: signal})
+      const response =  await fetch(`/api/${document.location.pathname.split('/')[1]}/molecules/identifiers/?smiles=${encoded}`, {signal: signal})
    
       if (!response.ok) {
          throw new Error('Invalid Molecule Smiles')
@@ -215,7 +215,7 @@ export default function MoleculeInfo() {
                   </FormControl>
                      <Box display="flex" justifyContent="center" alignItems="center">
                      <NGLStage width="700px" height="600px" >
-                        <Component path={`/api${import.meta.env.BASE_URL}/conformers/export/`+ conformer + ".sdf"} />
+                        <Component path={`/api/${document.location.pathname.split('/')[1]}/conformers/export/`+ conformer + ".sdf"} />
                      </NGLStage>
                   </Box>
                </Container>

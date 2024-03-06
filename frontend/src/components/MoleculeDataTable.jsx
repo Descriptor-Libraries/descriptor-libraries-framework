@@ -19,7 +19,7 @@ const dataTypeMapping = {
 
 async function retrieveData(molecule_id, data_type="ml") {
     try {
-        const response = await fetch(`/api${import.meta.env.BASE_URL}/molecules/data/${molecule_id}?data_type=${data_type}`);
+        const response = await fetch(`/api/${window.AppConfig.BASE_URL}/molecules/data/${molecule_id}?data_type=${data_type}`);
         
         // If the status code is 200 we have data for the data type and we can return it, if it is 204 there is no data and we just return null
         if (response.status === 200) {
@@ -37,7 +37,7 @@ async function retrieveData(molecule_id, data_type="ml") {
 
 async function downloadData(molecule_id, data_type) {
     try {
-        const response = await fetch(`/api${import.meta.env.BASE_URL}/molecules/data/export/${molecule_id}?data_type=${data_type}`);
+        const response = await fetch(`/api/${window.AppConfig.BASE_URL}/molecules/data/export/${molecule_id}?data_type=${data_type}`);
         
         if(response.status === 200) {
             const blob = await response.blob();

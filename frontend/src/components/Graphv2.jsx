@@ -21,7 +21,7 @@ const Graphv2 = ({ molData, componentArray, type, neighborSearch, containerStyle
         
 
         useEffect(() => {
-            fetch(`${import.meta.env.BASE_URL}/brand/patterns.json`)
+            fetch(`/${document.location.pathname.split('/')[1]}/brand/patterns.json`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
@@ -136,7 +136,7 @@ const Graphv2 = ({ molData, componentArray, type, neighborSearch, containerStyle
             
             let og_url = window.location.href.split("/");
             let molecule_id = event.points[0].text.split(",")[1];
-            let url = og_url[0] + "//" + og_url[2] + `${import.meta.env.BASE_URL}/molecule/` + molecule_id;
+            let url = og_url[0] + "//" + og_url[2] + `/${document.location.pathname.split('/')[1]}/molecule/` + molecule_id;
             if (molecule_id !== undefined) {
                 window.open(url, "_blank", "noreferrer");
             }

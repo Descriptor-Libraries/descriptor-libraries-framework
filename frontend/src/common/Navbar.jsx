@@ -28,7 +28,7 @@ const Badge = ({display}) => {
   };
 
   return (
-    <Box component="img" src={`${import.meta.env.BASE_URL}/brand/logo.svg`} sx={displayStyle} alt="logo" />
+    <Box component="img" src={`/${document.location.pathname.split('/')[1]}/brand/logo.svg`} sx={displayStyle} alt="logo" />
   );
 };
 
@@ -40,7 +40,7 @@ function DrawerAppBar(props) {
   const [name, setName] = useState("");
 
    useEffect(() => {
-    fetch(`${import.meta.env.BASE_URL}/brand/names.json`)
+    fetch(`/${document.location.pathname.split('/')[1]}/brand/names.json`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');

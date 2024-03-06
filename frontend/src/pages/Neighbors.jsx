@@ -27,7 +27,7 @@ async function NeighborSearch(molecule_id, type="pca", components="1,2,3,4", lim
    */
     let encoded = encodeURIComponent(components);
 
-    const response =  await fetch(`/api${import.meta.env.BASE_URL}/molecules/${molecule_id}/neighbors/?type=${type}&components=${encoded}&skip=${skip}&limit=${limit}`, {signal: signal})
+    const response =  await fetch(`/api/${document.location.pathname.split('/')[1]}/molecules/${molecule_id}/neighbors/?type=${type}&components=${encoded}&skip=${skip}&limit=${limit}`, {signal: signal})
 
     if (!response.ok) {
         throw new Error('Invalid Molecule Id')
