@@ -12,6 +12,42 @@ import MoleculeDataTable from "../components/MoleculeDataTable";
 
 import { neighborPage } from "../common/MoleculeUtils";
 
+const MoleculeCard = ({ molData, identifierData }) => {
+   // Merging molData and identifierData objects and removing 'conformers_id'
+  const combinedData = {
+   ...molData,
+   ...identifierData,
+ };
+ delete combinedData.conformers_id; // Removing the 'conformers_id' key
+
+ // Function to format keys to title case
+ const toTitleCase = (str) => {
+   return str.replace(/_/g, ' ').replace(/\w\S*/g, (txt) => {
+     return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+   });
+ };
+
+ // Conditionally formatting values (e.g., for molecular_weight)
+ const formattedValue = (key, value) => {
+   if (key === 'molecular_weight') {
+     return value.toFixed(2);
+   }
+   return value;
+ };
+
+ return (
+   <div>
+     {Object.entries(combinedData)
+       .filter(([key, value]) => value != null && value !== '') // Filtering out null or empty values
+       .map(([key, value]) => (
+       <Typography key={key} align='left'>
+         <strong>{toTitleCase(key)}:</strong> {formattedValue(key, value)}
+       </Typography>
+     ))}
+   </div>
+ );
+};
+
 async function molecule(molecule_id, signal) {
    /**
     * Requests general umap or pca data from the backend.
@@ -182,11 +218,7 @@ export default function MoleculeInfo() {
                   {Object.keys(molData).length > 0 && 
                         <Card>
                            <CardContent>
-                           <Typography align='left'> <strong>SMILES:</strong> {molData.smiles} </Typography>
-                           <Typography align='left'> <strong>kraken Ligand ID:</strong> {molData.molecule_id} </Typography>
-                           <Typography align='left'> <strong>InChI:</strong> {identifierData.InChI} </Typography>
-                           <Typography align='left'> <strong>InChIKey:</strong> {identifierData.InChIKey} </Typography>
-                           <Typography align='left'> <strong>Molecular Weight:</strong> {molData.molecular_weight.toFixed(2)} </Typography>
+                            <MoleculeCard molData={molData} identifierData={identifierData} />
                            <Box display="flex" justifyContent="center">
                               <Button variant="contained" sx={{ m: 0.5 }} onClick={() => neighborPage(params.molid)}>View Molecule Neighbors</Button>
                            </Box>
