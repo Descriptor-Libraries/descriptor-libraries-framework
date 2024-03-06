@@ -288,10 +288,17 @@ def get_a_single_molecule(molecule_id: int, db: Session = Depends(deps.get_db)):
         .one()
     )
 
+    # for databases where there are no compound names, set the compound name to None
+    try: 
+        molecule.compound_name
+    except AttributeError:
+        molecule.compound_name = None
+
     response = schemas.Molecule(
         molecule_id=molecule.molecule_id,
         smiles=molecule.smiles,
         molecular_weight=molecule.molecular_weight,
+        compound_name=molecule.compound_name,
         conformers_id=[c.conformer_id for c in molecule.conformer_collection],
     )
     return response
