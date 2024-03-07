@@ -104,7 +104,7 @@ def valid_smiles(smiles):
 async def get_data_types(db: Session = Depends(deps.get_db)):
     query = text("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';")
     results = db.execute(query).fetchall()
-    return [x[0] for x in results if "data" in x[0]]
+    return {"available_types": [x[0] for x in results if "data" in x[0]] }
 
 
 @router.get("/{molecule_id}/data_types", response_model=Any)

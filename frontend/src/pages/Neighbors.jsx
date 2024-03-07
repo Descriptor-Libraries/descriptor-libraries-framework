@@ -7,11 +7,11 @@ import { useParams } from "react-router-dom";
 
 import Button from '@mui/material/Button';
 
+import DropDownButton from '../components/DataDownloadButton';
+
 import Graph from '../components/Graph'
 
-import { retrieveAllSVGs, dynamicGrid, extractIdsFromResults, downloadMoleculeData } from '../common/MoleculeUtils';
-
-
+import { retrieveAllSVGs, dynamicGrid, extractIdsFromResults } from '../common/MoleculeUtils';
 
 
 async function NeighborSearch(molecule_id, type="pca", components="1,2,3,4", limit=48, skip=0, signal) {
@@ -60,6 +60,24 @@ export default function NeighborSearchHook () {
     const [ searchToggle, setSearchToggle ] = useState(true);
     const [ isMobile, setIsMobile ] = useState(window.innerWidth < 768);
     const [ moleculeIDs, setMoleculeIDs ] = useState("");
+    const [ availableDataTypes, setAvailableDataTypes ] = useState([]);
+
+    const reverseMapping = {
+      "ml_data": "ML Data",
+      "dft_data": "DFT Data",
+      "xtb_data": "xTB Data",
+      "xtb_ni_data": "xTB_Ni Data"
+  };
+  
+  
+    useEffect(() => {
+      fetch(`/api/${document.location.pathname.split('/')[1]}/molecules/data_types/`)
+      .then(response => response.json())
+      .then(data => {
+        const translatedDataTypes = data["available_types"].map(key => reverseMapping[key] || key);
+        setAvailableDataTypes(translatedDataTypes);
+      });
+  }, []);
 
     // Extract the molecule ids from the results
     useEffect(() => {
@@ -215,12 +233,7 @@ export default function NeighborSearchHook () {
                           Load More
                         </span>
                       </Button>
-                      <Button variant="contained" sx={{ my: 3, ml: 2 }} onClick={() => downloadMoleculeData(moleculeIDs, "pca_neighbors")}>
-                        <span style={{ textTransform: 'capitalize', fontSize: '16px' }}>
-                          Download Search Results
-                        </span>
-                      </Button>
-
+                      <DropDownButton molecule_ids={moleculeIDs} dataTypes={availableDataTypes} />
                   </>
                 }
                 </Box>

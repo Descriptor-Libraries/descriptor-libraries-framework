@@ -154,9 +154,9 @@ async function retrieveSVG(smiles, molecule_id, substructure = undefined, distan
   }
 
 
-const downloadMoleculeData = (moleculeIDs, context=null) => {
+const downloadMoleculeData = (moleculeIDs, data_type="ml", context=null) => {
   const a = document.createElement('a');
-  let search_string = `/api/${document.location.pathname.split('/')[1]}/molecules/data/export/batch?molecule_ids=${moleculeIDs}`;
+  let search_string = `/api/${document.location.pathname.split('/')[1]}/molecules/data/export/batch?molecule_ids=${moleculeIDs}&data_type=${data_type}`;
 
   if (context) {
     search_string += `&context=${context}`;
