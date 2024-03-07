@@ -100,6 +100,34 @@ def valid_smiles(smiles):
 
     return smiles
 
+@router.get("/data_types", response_model=Any)
+async def get_data_types(db: Session = Depends(deps.get_db)):
+    query = text("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';")
+    results = db.execute(query).fetchall()
+    return [x[0] for x in results if "data" in x[0]]
+
+
+@router.get("/{molecule_id}/data_types", response_model=Any)
+async def get_molecule_data_types(molecule_id: int, db: Session = Depends(deps.get_db)):
+    # First, fetch all table names that have 'data' in their name
+    query_tables = text("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name LIKE '%data%';")
+    tables = db.execute(query_tables).fetchall()
+
+    # Prepare a dictionary to store the results
+    results = {}
+
+    # Loop through each table to check for the molecule_id
+    for table in tables:
+        table_name = table[0]
+        # Assuming the column storing molecule IDs is named 'molecule_id' in all tables.
+        # You might need to adjust this according to your database schema.
+        query_check = text(f"SELECT EXISTS(SELECT 1 FROM {table_name} WHERE molecule_id = :molecule_id) AS exists;")
+        exists = db.execute(query_check, {"molecule_id": molecule_id}).fetchone()[0]
+        results[table_name] = exists
+
+    return results
+
+
 @router.get("/data/{molecule_id}", response_model=Any)
 async def get_molecule_data(molecule_id: int,
                             data_type: str="ml",

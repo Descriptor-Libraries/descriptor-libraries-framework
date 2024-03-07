@@ -16,6 +16,24 @@ const dataTypeMapping = {
     "xTB_Ni Data": "xtb_ni"
 };
 
+const reverseMapping = {
+    "ml_data": "ML Data",
+    "dft_data": "DFT Data",
+    "xtb_data": "xTB Data",
+    "xtb_ni_data": "xTB_Ni Data"
+};
+
+async function retrieveMoleculeDataTypes(molecule_id) {
+    try {
+        const response = await fetch(`/api/${document.location.pathname.split('/')[1]}/molecules/${molecule_id}/data_types`);
+        if (response.ok) {
+            const data = await response.json();
+            return data;
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 async function retrieveData(molecule_id, data_type="ml") {
     try {
@@ -56,24 +74,27 @@ async function downloadData(molecule_id, data_type) {
 }
 
 
-function CustomFooter({ selectedDataType, setSelectedDataType, moleculeID, download }) {
+function CustomFooter({ availableDataTypes, selectedDataType, setSelectedDataType, moleculeID, download }) {
     const handleChange = (event) => {
-      setSelectedDataType(event.target.value);
+        setSelectedDataType(event.target.value);
     };
-  
+
     return (
-      <GridFooterContainer sx= {{ overflowX: 'auto', whiteSpace: 'nowrap' }}>
-        <Select
-          value={selectedDataType}
-          onChange={handleChange}
-          displayEmpty
-          sx={{ marginLeft: '8px', marginRight: '16px', height: '40px', verticalAlign: 'middle' }}
-        >
-          <MenuItem value="ML Data">ML Data</MenuItem>
-          <MenuItem value="DFT Data">DFT Data</MenuItem>
-          <MenuItem value="xTB Data">xTB Data</MenuItem>
-          <MenuItem value="xTB_Ni Data">xTB_Ni Data</MenuItem>
-        </Select>
+        <GridFooterContainer sx= {{ overflowX: 'auto', whiteSpace: 'nowrap' }}>
+            <Select
+                value={selectedDataType}
+                onChange={handleChange}
+                displayEmpty
+                sx={{ marginLeft: '8px', marginRight: '16px', height: '40px', verticalAlign: 'middle' }}
+            >   
+                
+                {
+                    Object.entries(availableDataTypes).filter(([key, value]) => value)
+                        .map((type) =>(
+                            <MenuItem key={reverseMapping[type[0]]} value={reverseMapping[type[0]]}>{reverseMapping[type[0]]}</MenuItem>
+                        ))
+                }
+            </Select>
         <ResponsiveButton expandedButtonContent={"Download CSV"}  
                             collapsedButtonContent={<span><DownloadIcon /> CSV</span>}
                             disabled={!download} 
@@ -118,9 +139,10 @@ const generateColumns = (data) => {
 export default function MoleculeDataTable({ molecule_id, initial_data_type }) {
     const [moleculeData, setMoleculeData] = useState(null);
     const [data_type, setDataType] = useState(initial_data_type);
-    const [selectedDataType, setSelectedDataType] = useState("ML Data"); // Set the default value to "ML Data"
+    const [selectedDataType, setSelectedDataType] = useState("DFT Data"); // Set the default value to "ML Data"
     const [moleculeID, setMoleculeID] = useState(molecule_id);
     const [download, setDownload] = useState(true); // Allow CSV download
+    const [availableDataTypes, setAvailableDataTypes] = useState([]);
 
     useEffect(() => {
         async function fetchData() {
@@ -143,6 +165,18 @@ export default function MoleculeDataTable({ molecule_id, initial_data_type }) {
         fetchData();
     }, [moleculeID, selectedDataType]);
 
+    useEffect(() => {
+        async function fetchData() {
+            const dataTypes = await retrieveMoleculeDataTypes(moleculeID);
+            console.log(dataTypes);
+            setAvailableDataTypes(dataTypes);
+        }
+
+        fetchData();
+        
+    }
+    , [moleculeID]);
+
     const columns = generateColumns(moleculeData);
 
     const rows = moleculeData ? moleculeData
@@ -158,7 +192,7 @@ export default function MoleculeDataTable({ molecule_id, initial_data_type }) {
                 columns={columns}
                 components={{ Footer: CustomFooter, NoRowsOverlay: CustomNoRowsOverlay }}
                 componentsProps={{
-                    footer: { selectedDataType, setSelectedDataType, moleculeID, download },
+                    footer: { availableDataTypes, selectedDataType, setSelectedDataType, moleculeID, download },
                     noRowsOverlay: { selectedDataType },
                 }}
                 initialState={{
