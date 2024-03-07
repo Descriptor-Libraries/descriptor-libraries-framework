@@ -46,7 +46,7 @@ export default function SearchHook () {
   
   
     useEffect(() => {
-      fetch(`/api/${document.location.pathname.split('/')[1]}/molecules/data_types/`)
+      fetch(`/api/${document.location.pathname.split('/')[1]}/molecules/data_types`)
       .then(response => response.json())
       .then(data => {
         const translatedDataTypes = data["available_types"].map(key => reverseMapping[key] || key);
