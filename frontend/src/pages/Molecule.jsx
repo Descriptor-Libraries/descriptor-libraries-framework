@@ -120,6 +120,7 @@ export default function MoleculeInfo() {
    const [ svg, setSvg ] = useState({});
    const [ allConformers, setAllConformers ] = useState([]);
    const [ conformer, setConformer ] = useState("");
+   const [ conformerCluster, setConformerCluster ] = useState([]);
    const [ width, setWidth ] = useState(window.innerWidth);
 
    useEffect(() => {
@@ -203,6 +204,22 @@ export default function MoleculeInfo() {
       [ params ]
    );
 
+   useEffect(() => {
+      const controller = new AbortController();
+      const signal = controller.signal;
+      fetch(`/api/${document.location.pathname.split('/')[1]}/conformers/data/` + conformer, {signal: signal})
+      .then(response => response.json())
+      .then(data => {
+         if (data.cluster) { 
+             setConformerCluster(data.cluster);
+         } else {
+             setConformerCluster(false); 
+         }
+      })
+      
+   }, [conformer]);
+  
+
    return (
       <Container maxWidth="xl">
          <Grid container alignItems="center" justifyContent="center" spacing={2}>
@@ -245,6 +262,9 @@ export default function MoleculeInfo() {
                         ))}
                      </Select>
                   </FormControl>
+                  <Typography variant="caption" align="center" style={{ visibility: conformerCluster ? 'visible' : 'hidden' }}>
+                     This conformer ensemble was clustered.
+                  </Typography>
                      <Box display="flex" justifyContent="center" alignItems="center">
                      <NGLStage width="700px" height="600px" >
                         <Component path={`/api/${document.location.pathname.split('/')[1]}/conformers/export/`+ conformer + ".sdf"} />
