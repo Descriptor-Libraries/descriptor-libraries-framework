@@ -50,22 +50,6 @@ def _pandas_to_buffer(df):
 
     return buffer
 
-def _valid_molecule_id(molecule_id, db):
-
-    # Generalized - get max molecule id.
-    query = text(f"SELECT MAX(molecule_id) FROM molecule;")
-    max_molecule_id = db.execute(query).fetchall()[0][0]
-
-    # Check to see if the molecule_id is within range.
-    if molecule_id > max_molecule_id:
-        raise HTTPException(status_code=404, detail=f"Molecule with ID supplied not found, the maximum ID is {max_molecule_id}")
-    
-    # Check to see if the molecule_id is within range.
-    if molecule_id <= 0:
-        raise HTTPException(status_code=500)
-
-    return 
-
 def valid_smiles(smiles):
     """Check to see if a smile string is valid to represent a molecule.
 
@@ -108,7 +92,7 @@ async def get_data_types(db: Session = Depends(deps.get_db)):
 
 
 @router.get("/{molecule_id}/data_types", response_model=Any)
-async def get_molecule_data_types(molecule_id: int, db: Session = Depends(deps.get_db)):
+async def get_molecule_data_types(molecule_id: int | str, db: Session = Depends(deps.get_db)):
     # First, fetch all table names that have 'data' in their name
     query_tables = text("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name LIKE '%data%';")
     tables = db.execute(query_tables).fetchall()
@@ -127,9 +111,8 @@ async def get_molecule_data_types(molecule_id: int, db: Session = Depends(deps.g
 
     return results
 
-
 @router.get("/data/{molecule_id}", response_model=Any)
-async def get_molecule_data(molecule_id: int,
+async def get_molecule_data(molecule_id: int | str,
                             data_type: str="ml",
                             db: Session = Depends(deps.get_db)):
     
@@ -177,9 +160,6 @@ async def get_molecules_data(molecule_ids: str,
         if context.lower() not in ["substructure", "pca_neighbors", "umap_neighbors"]:
             raise HTTPException(status_code=400, detail="Invalid context.")
 
-    # Check to see if all molecule ids are valid.
-    [ _valid_molecule_id(int(x), db) for x in molecule_ids.split(",") ]
-
     # Check for valid data type.
     if data_type.lower() not in ["ml", "dft", "xtb", "xtb_ni"]:
         raise HTTPException(status_code=400, detail="Invalid data type.")
@@ -222,8 +202,6 @@ async def export_molecule_data(molecule_id: int,
                       data_type: str="ml",
                       db: Session = Depends(deps.get_db)):
 
-    # Check to see if the molecule_id is valid.
-    _valid_molecule_id(molecule_id, db)
     
     # Check for valid data type.
     if data_type.lower() not in ["ml", "dft", "xtb", "xtb_ni"]:
@@ -306,9 +284,8 @@ def get_molecule_umap(
 
 
 @router.get("/{molecule_id}", response_model=schemas.Molecule)
-def get_a_single_molecule(molecule_id: int, db: Session = Depends(deps.get_db)):
+def get_a_single_molecule(molecule_id: int | str, db: Session = Depends(deps.get_db)):
 
-    _valid_molecule_id(molecule_id, db)
 
     molecule = (
         db.query(models.molecule)
@@ -370,7 +347,7 @@ def search_molecules(
 
 @router.get("/{molecule_id}/neighbors/", response_model=List[schemas.MoleculeNeighbors])
 def search_neighbors(
-    molecule_id: int,
+    molecule_id: int | str,
     type: str = "pca",
     components: Optional[str] = None,
     skip: int = 1,
@@ -379,8 +356,6 @@ def search_neighbors(
 ):
 
     type = type.lower()
-
-    _valid_molecule_id(molecule_id, db)
     
     # Check for valid neighbor type.
     if type not in ["pca", "umap"]:
