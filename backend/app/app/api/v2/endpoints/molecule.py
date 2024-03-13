@@ -298,10 +298,9 @@ def get_a_single_molecule(molecule_id: int | str, db: Session = Depends(deps.get
     try:
         conformers = molecule.conformer_collection
     except:
-        sql = "SELECT * FROM conformers WHERE molecule_id = :molecule_id"
-        result = db.execute(sql, {"molecule_id": molecule_id})
-        conformers = result.fetchall()
-
+        sql = text("SELECT * FROM conformers WHERE molecule_id = :molecule_id")
+        stmt = sql.bindparams(molecule_id=molecule_id)
+        conformers = db.execute(stmt).fetchall()
 
     # for databases where there are no compound names, set the compound name to None
     try: 
