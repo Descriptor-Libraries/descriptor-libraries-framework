@@ -18,11 +18,19 @@ def get_conformer_and_format(conformer_id, format, db):
         return "Not implemented yet"
 
     try:
-        coords, elements = (
-            db.query(models.conformer.coords, models.conformer.elements)
-            .filter(models.conformer.conformer_id == conformer_id)
-            .one()
-        )
+        query = text("""
+            SELECT coords, elements
+            FROM conformer
+            WHERE conformer_id = :conformer_id
+        """)
+
+        stmt = query.bindparams(conformer_id=conformer_id)
+
+        result = db.execute(stmt).fetchone()
+
+        coords = result.coords
+        elements = result.elements
+        
     except:
         return None
 
