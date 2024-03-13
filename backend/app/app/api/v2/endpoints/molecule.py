@@ -372,7 +372,7 @@ def search_neighbors(
 
     # Set defaults for components
     if type == "pca" and components is None:
-        components = "1,2,3,4"
+        components = "1,2,3"
 
     # Set defaults for components
     if type == "umap" and components is None:
