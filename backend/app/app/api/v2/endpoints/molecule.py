@@ -145,14 +145,8 @@ async def get_molecules_data(molecule_ids: str,
                        context: Optional[str]=None,
                        db: Session = Depends(deps.get_db)):
     
-    
-    # Sanitize molecule ids
-    int_check = [x.strip().isdigit() for x in molecule_ids.split(",")]
 
-    if not all(int_check):
-        raise HTTPException(status_code=400, detail="Invalid molecule ids.")
-    
-    molecule_ids_list = [int(x) for x in molecule_ids.split(",")]
+    molecule_ids_list = [ x.strip() for x in molecule_ids.split(",")]
     first_molecule_id = molecule_ids_list[0]
     num_molecules = len(molecule_ids_list)
 
@@ -170,14 +164,18 @@ async def get_molecules_data(molecule_ids: str,
     # Use pandas.read_sql_query to get the data.
     table_name = f"{data_type}_data"
 
+    # Generating a safe query with placeholders
+    placeholders = ', '.join([':id' + str(i) for i in range(len(molecule_ids_list))])
+    query_parameters = {'id' + str(i): mid for i, mid in enumerate(molecule_ids_list)}
+
     query = text(f"""
         SELECT t.*, m.SMILES
         FROM {table_name} t
         JOIN molecule m ON t.molecule_id = m.molecule_id
-        WHERE t.molecule_id IN ({molecule_ids})
+        WHERE t.molecule_id IN ({placeholders})
     """)
 
-    df = pd.read_sql_query(query, db.bind)
+    df = pd.read_sql_query(query, db.bind, params=query_parameters)
 
     df_wide = _pandas_long_to_wide(df)      
 
@@ -198,7 +196,7 @@ async def get_molecules_data(molecule_ids: str,
         return response
 
 @router.get("/data/export/{molecule_id}")
-async def export_molecule_data(molecule_id: int,
+async def export_molecule_data(molecule_id: int | str,
                       data_type: str="ml",
                       db: Session = Depends(deps.get_db)):
 
