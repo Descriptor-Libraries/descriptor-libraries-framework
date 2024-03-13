@@ -129,7 +129,7 @@ export default function NeighborSearchHook () {
        * @param {AbortSignal} signal Abortsignal object.
        */
         const fetchData = async () => {
-            const molecule_data = await NeighborSearch(moleculeid, "pca", "1,2,3,4", interval, skip, signal);
+            const molecule_data = await NeighborSearch(moleculeid, "pca", "1,2,3", interval, skip, signal);
             const svg_data = await retrieveAllSVGs(molecule_data, signal);
 
             return [ molecule_data, svg_data ]
@@ -195,7 +195,7 @@ export default function NeighborSearchHook () {
         <Container maxWidth="lg">
         <Typography variant="h2" textAlign="center">Neighbor Search</Typography>
         <Box sx={{pb:1}}>
-          <Typography textAlign="center">Neighbors are identified by Euclidian distance in 4 principal component space.</Typography>
+          <Typography textAlign="center">Neighbors are identified by Euclidian distance in 3 principal component space.</Typography>
         </Box>
 
         <Box display="flex" justifyContent="center" pt={2}>
