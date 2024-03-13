@@ -7,7 +7,7 @@ class Molecule(BaseModel):
     molecule_id: int | str
     smiles: str
     molecular_weight: Optional[float] = None
-    conformers_id: List[Optional[int]]
+    conformers_id: List[Optional[int | str]]
     compound_name: Optional[str] = None
 
 class MoleculeData(BaseModel):

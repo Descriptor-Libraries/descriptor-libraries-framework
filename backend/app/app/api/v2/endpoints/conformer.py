@@ -38,7 +38,7 @@ def get_conformer_and_format(conformer_id, format, db):
 
 @router.get("/export/{format}/{conformer_id}", response_class=PlainTextResponse)
 def export_conformer(
-    conformer_id: int = 0,
+    conformer_id: int | str,
     format: str = "xyz",
     db: Session = Depends(deps.get_db),
 ):
@@ -51,10 +51,10 @@ def format_for_ngl(
     db: Session = Depends(deps.get_db),
 ):
     conformer_id, format = filename.split(".")
-    return get_conformer_and_format(int(conformer_id), format, db)
+    return get_conformer_and_format(conformer_id, format, db)
 
 @router.get("/data/{conformer_id}", response_model=Any)
-def get_conformer_data(conformer_id: int = 0, db: Session = Depends(deps.get_db)):
+def get_conformer_data(conformer_id: int | str, db: Session = Depends(deps.get_db)):
 
     query = text(f"""
         SELECT *
@@ -73,7 +73,7 @@ def get_conformer_data(conformer_id: int = 0, db: Session = Depends(deps.get_db)
     return data
 
 @router.get("/others_id/{conformer_id}")
-def get_other_conformers_id(conformer_id: int = 0, db: Session = Depends(deps.get_db)):
+def get_other_conformers_id(conformer_id: int | str, db: Session = Depends(deps.get_db)):
     sql = text(
         (
             "select conformer_id from conformer "

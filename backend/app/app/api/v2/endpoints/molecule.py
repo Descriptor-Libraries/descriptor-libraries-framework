@@ -291,6 +291,16 @@ def get_a_single_molecule(molecule_id: int | str, db: Session = Depends(deps.get
         .one()
     )
 
+    if not molecule:
+        raise HTTPException(status_code=404, detail="Molecule not found")
+
+    # Attempt to fetch conformers associated with this molecule from the conformer view
+    try:
+        conformers = molecule.conformer_collection
+    except:
+        conformers = db.query(models.Conformer).filter(models.Conformer.molecule_id == molecule_id).all()
+
+
     # for databases where there are no compound names, set the compound name to None
     try: 
         molecule.compound_name
@@ -302,7 +312,7 @@ def get_a_single_molecule(molecule_id: int | str, db: Session = Depends(deps.get
         smiles=molecule.smiles,
         molecular_weight=molecule.molecular_weight,
         compound_name=molecule.compound_name,
-        conformers_id=[c.conformer_id for c in molecule.conformer_collection],
+        conformers_id=[c.conformer_id for c in conformers],
     )
     return response
 
