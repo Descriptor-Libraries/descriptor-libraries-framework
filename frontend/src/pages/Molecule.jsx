@@ -158,7 +158,7 @@ export default function MoleculeInfo() {
          const fetchData = async () => {
             const molecule_data = await molecule(molid, signal);
             const umap_neighbor_data = await dimensionality(molid, "umap", ["1", "2"], signal);
-            const pca_neighbor_data = await dimensionality(molid, "pca", ["1", "2", "3", "4"], signal);
+            const pca_neighbor_data = await dimensionality(molid, "pca", ["1", "2", "3"], signal);
             const svg_data = await retrieveSVG(molecule_data.smiles, signal);
             const identifier_data = await identifiers(molecule_data.smiles, signal);
             return [ molecule_data, umap_neighbor_data, pca_neighbor_data, svg_data, identifier_data ]
