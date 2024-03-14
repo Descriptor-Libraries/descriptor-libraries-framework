@@ -89,13 +89,16 @@ function DrawerAppBar(props) {
           </ListItem>
         );
       })}
+      {/*}
       <ListItem key="documentation" disablePadding>
-        <Link to={window.location.origin + '/docs'} id="documentation" className="NavbarLink" reloadDocument style={{ textDecoration: 'none' }} >
+       <Link to={window.location.origin + '/docs'} id="documentation" className="NavbarLink" reloadDocument style={{ textDecoration: 'none' }} >
           <ListItemButton sx={{ textAlign: 'center' }}>
             <ListItemText primary="Documentation" />
           </ListItemButton>
         </Link>
+        
       </ListItem>
+      */}
     </List>
   </Box>
   );
@@ -139,11 +142,13 @@ function DrawerAppBar(props) {
                 </NavLink>
               );
             })}
+            {/*
             <Link to={window.location.origin + '/docs'}  id="documentation" className="NavbarLink" reloadDocument style={{ textDecoration: 'none' }} >
               <Button sx={getButtonStyles('documentation')}>
                 <span style={{ textTransform: 'capitalize', fontSize: '16px' }}>Documentation</span>
               </Button>
             </Link>
+            */}
           </Box>
         </Toolbar>
       </AppBar>
