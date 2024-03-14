@@ -146,10 +146,11 @@ function Home() {
             <Grid item>
               <IconLink IconElement={DownloadIcon} text="Download" link="/download"></IconLink>
             </Grid> 
-            */}
+           
           <Grid item>
             <IconLink IconElement={AutoStoriesIcon} text="Documentation" link="/docs" reloadDocument></IconLink>
           </Grid>
+          */}
         </Grid>
      </Box>
      <StatsGrid />

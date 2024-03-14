@@ -13,6 +13,16 @@ import Graph from '../components/Graph'
 
 import { retrieveAllSVGs, dynamicGrid, extractIdsFromResults } from '../common/MoleculeUtils';
 
+async function fetchInitialMoleculeId() {
+  const response = await fetch(`/api/${document.location.pathname.split('/')[1]}/molecules/first_id`);
+  if (!response.ok) {
+      throw new Error('Network response was not ok');
+  }
+  const result = await response.json();
+  const initial_id = result["first_molecule_id"];
+  return initial_id;
+}
+
 
 async function NeighborSearch(molecule_id, type="pca", components="1,2,3,4", limit=48, skip=0, signal) {
   /**
@@ -48,7 +58,7 @@ export default function NeighborSearchHook () {
     const params = useParams();
     const interval = 15;
     
-    const [ moleculeid, setMoleculeID ] = useState(params.molid || 1);
+    const [ moleculeid, setMoleculeID ] = useState();
     const [ skip, setSkip ] = useState(0);
     const [ validMolecule, setValidMolecule ] = useState(true);
     const [ svg_results, setSVGResults ] = useState([])
@@ -68,7 +78,26 @@ export default function NeighborSearchHook () {
       "xtb_data": "xTB Data",
       "xtb_ni_data": "xTB_Ni Data"
   };
-  
+
+  useEffect(() => {
+    const init = async () => {
+        try {
+            // Check if there's a molid in the URL params
+            if (params.molid) {
+                setMoleculeID(params.molid);
+            } else {
+                // Fetch the initial molecule ID from the endpoint
+                const initialId = await fetchInitialMoleculeId();
+                setMoleculeID(initialId);
+            }
+        } catch (error) {
+            console.error('Failed to initialize molecule ID:', error);
+            // Handle error (e.g., set state to show an error message)
+        }
+    };
+
+    init();
+    }, [params.molid]); // Depend on params.molid so this effect re-runs if the URL parameter changes
   
     useEffect(() => {
       fetch(`/api/${document.location.pathname.split('/')[1]}/molecules/data_types`)
@@ -188,7 +217,7 @@ export default function NeighborSearchHook () {
       }
     },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [ searchToggle ]
+      [ searchToggle, moleculeid ]
     ); 
 
     return (
@@ -203,7 +232,8 @@ export default function NeighborSearchHook () {
                   style = {{width: 350}}
                   sx={{ m: 0.5}}
                   id="search-outline" 
-                  label="Enter a Molecule ID to Search" 
+                  label="" 
+                  helperText="Enter a molecule ID to search for neighbors."
                   variant="outlined"
                   value= {moleculeid} 
                   onKeyDown = { (e) => _handleKeyDown(e) }

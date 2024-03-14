@@ -84,6 +84,12 @@ def valid_smiles(smiles):
 
     return smiles
 
+@router.get("/first_id", response_model=Any)
+async def get_first_molecule_id(db: Session = Depends(deps.get_db)):
+    query = text("SELECT molecule_id FROM molecule ORDER BY molecule_id LIMIT 1;")
+    result = db.execute(query).fetchone()
+    return {"first_molecule_id": result[0]}
+
 @router.get("/data_types", response_model=Any)
 async def get_data_types(db: Session = Depends(deps.get_db)):
     query = text("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';")

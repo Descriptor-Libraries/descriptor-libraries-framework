@@ -1,7 +1,12 @@
-FROM node:latest as react-build
+FROM node:alpine as react-build
 
 WORKDIR /app/
-ADD ./frontend /app/
-EXPOSE 3000
+
+COPY ./frontend/package.json ./frontend/yarn.lock /app/
+
 RUN yarn install
-RUN npm run build
+
+COPY ./frontend /app/
+
+RUN npm run build && \
+    npm cache clean --force
