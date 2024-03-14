@@ -8,11 +8,13 @@ import Graphv2 from '../components/Graphv2';
 
 import SearchIcon from '@mui/icons-material/Search';
 import BubbleChartIcon from '@mui/icons-material/BubbleChart';
-//import DownloadIcon from '@mui/icons-material/Download';
-import AutoStoriesIcon from '@mui/icons-material/AutoStories';
+import DownloadIcon from '@mui/icons-material/Download';
+//import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import InfoIcon from '@mui/icons-material/Info';
 import StatsGrid from '../components/StatsGrid';
 import IconLink from '../components/IconLink';
+
+import CheckFileAndDownloadIcon from '../components/FileDownload';
 
 import purify from 'dompurify';
 
@@ -142,11 +144,8 @@ function Home() {
           <Grid item>
             <IconLink IconElement={InfoIcon} text="Library Details" link="/library_details"></IconLink>
           </Grid>
-          {/* Hide until we're ready to add
-            <Grid item>
-              <IconLink IconElement={DownloadIcon} text="Download" link="/download"></IconLink>
-            </Grid> 
-           
+          <CheckFileAndDownloadIcon />
+        {/* Hide until we're ready to add
           <Grid item>
             <IconLink IconElement={AutoStoriesIcon} text="Documentation" link="/docs" reloadDocument></IconLink>
           </Grid>

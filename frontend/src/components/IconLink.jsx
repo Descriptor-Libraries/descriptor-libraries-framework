@@ -3,11 +3,19 @@ import { Link } from 'react-router-dom';
 import { Typography, Box, IconButton } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 
-function IconLink({ IconElement, text, link, reloadDocument = false }) {
-  const linkProps = reloadDocument ? { to: link, reloadDocument } : { to: link };
+function IconLink({ IconElement, text, link, isDownload = false }) {
+  // Conditionally set props based on whether this is a download link
+  const linkAttributes = isDownload ? {
+    href: link,
+    download: true
+  } : {
+    to: link
+  };
+
+  const LinkComponent = isDownload ? 'a' : Link;
 
   return (
-    <Link style={{ textDecoration: "none" }} {...linkProps}>
+    <LinkComponent style={{ textDecoration: "none" }} {...linkAttributes}>
       <Box textAlign="center">
         <IconButton color="inherit" size="large">
           {IconElement ? <IconElement sx={{ color: 'white', fontSize: "5vh" }}/> : <SearchIcon sx={{ color: 'white', fontSize: "5vh" }}/>}
@@ -16,8 +24,8 @@ function IconLink({ IconElement, text, link, reloadDocument = false }) {
           {text}
         </Typography>
       </Box>
-    </Link>
-  )
+    </LinkComponent>
+  );
 }
 
 export default IconLink;
