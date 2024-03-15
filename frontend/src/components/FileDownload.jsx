@@ -28,7 +28,7 @@ const CheckFileAndDownloadIcon = () => {
   return (
     <Grid item>
       {isSpreadsheet  && 
-        <IconLink IconElement={DownloadIcon} text="Download" isDownload={true} link={`/${document.location.pathname.split('/')[1]}/data/${document.location.pathname.split('/')[1]}_library.xlsx`}></IconLink>}
+        <IconLink IconElement={DownloadIcon} text="Download" isDownload={true} link={`/${document.location.pathname.split('/')[1]}/content/${document.location.pathname.split('/')[1]}_library.xlsx`}></IconLink>}
     </Grid>
   );
 };
