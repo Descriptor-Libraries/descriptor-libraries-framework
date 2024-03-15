@@ -12,5 +12,6 @@ export const AppRoutes = ({ pages }) => (
     ))}
     <Route path="/molecule/:molid" element={<MoleculeInfo />} />
     <Route path="/neighbors/:molid?" element={<NeighborSearchHook />} />
+    <Route path="*" status={404}/>
   </Routes>
 );
