@@ -30,6 +30,9 @@ services:
   descriptor_database:
     image: 'rdkit-postgres:latest'
     container_name: descriptor_database
+    build:
+      context: ./database
+      dockerfile: Dockerfile
     shm_size: '4gb'
     environment:
       POSTGRES_SERVER: database
@@ -51,7 +54,7 @@ services:
     container_name: kraken_backend
     build:
       context: ./backend
-      dockerfile: backend.dockerfile
+      dockerfile: Dockerfile
     volumes:
       - "./backend/app:/app"
     environment:
