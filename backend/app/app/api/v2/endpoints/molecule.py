@@ -231,14 +231,26 @@ async def get_data(smiles: str, data_type: str="ml", db: Session = Depends(deps.
     return result
 
 @router.get("/data/export/batch")
-async def get_molecules_data(molecule_ids: str,
+async def get_molecules_data(molecule_ids: Optional[str]=None,
+                       molecule_smiles: Optional[str]=None,
                        data_type: str="ml",
                        return_type: str="csv",
                        context: Optional[str]=None,
                        db: Session = Depends(deps.get_db)):
     
+    if molecule_ids is None and molecule_smiles is None:
+        raise HTTPException(status_code=400, detail="No molecule IDs or SMILES provided.")
+    
+    if molecule_ids is not None and molecule_smiles is not None:
+        raise HTTPException(status_code=400, detail="Provide either molecule IDs or SMILES, not both.")
+    
+    if molecule_smiles:
+        molecule_smiles_list = [ x.strip() for x in molecule_smiles.split(",")]
+        molecule_ids_list = [_get_id_from_smiles(smiles, db) for smiles in molecule_smiles_list]
 
-    molecule_ids_list = [ x.strip() for x in molecule_ids.split(",")]
+    if molecule_ids:
+        molecule_ids_list = [ x.strip() for x in molecule_ids.split(",")]
+
     first_molecule_id = molecule_ids_list[0]
     num_molecules = len(molecule_ids_list)
 
