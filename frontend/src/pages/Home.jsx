@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { Typography, Box, Grid } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
 
-import Graph from "../components/Graph";
 import Graphv2 from '../components/Graphv2';  
 
 import SearchIcon from '@mui/icons-material/Search';
@@ -35,24 +34,31 @@ function Home() {
    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
    const [name, setName] = useState("");
    const [tagline, setTagline] = useState("");
+   const [visType, setVisType] = useState(""); 
    const theme = useTheme();
 
    useEffect(() => {
-    fetch(`/${document.location.pathname.split('/')[1]}/brand/names.json`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-          setName(data[0].name);
-          setTagline(data[0].tagline);
-        })
-        .catch(error => {
-            console.error('Error fetching stats:', error);
-        });
-}, []);
+    async function initialize() {
+
+      // First get the configuration
+      const response = await fetch(`/${document.location.pathname.split('/')[1]}/brand/names.json`);
+      const data = await response.json();
+      
+      // Set the basic info
+      setName(data[0].name);
+      setTagline(data[0].tagline);
+      setVisType(data[0]?.default_display ? 
+        (data[0].default_display === 'pca' ? 'pc' : data[0].default_display) 
+        : 'umap'
+      );
+
+      // Then get the molecule data
+      const molecule_data = await dimensions(data[0]?.default_display ?? 'umap');
+      setMolData(molecule_data);
+    }
+  
+    initialize().catch(error => console.error(error));
+  }, []); // Run once on mount
 
    useEffect(() => {
     function checkMobile() {
@@ -69,14 +75,14 @@ function Home() {
   }, []); // Empty array means this effect runs once on mount and cleanup on unmount
 
 
-   async function umap() {
+   async function dimensions(componentType) {
       /**
        * Requests general umap data from the backend.
        * @return {json}  The response json.
        */
          let encoded = encodeURIComponent("1,2");
 
-         const response =  await fetch(`/api/${document.location.pathname.split('/')[1]}/molecules/dimensions/?type=umap&components=${encoded}&limit=10000`)
+         const response =  await fetch(`/api/${document.location.pathname.split('/')[1]}/molecules/dimensions/?type=${componentType}&components=${encoded}&limit=10000`)
       
          if (!response.ok) {
             throw new Error('Invalid Molecule Id')
@@ -86,28 +92,6 @@ function Home() {
             return await response.json()
          }
    }
-
-   function loadData() {
-      /**
-       * Main driver function which loads the data.
-       * 
-       */
-         const fetchData = async () => {
-            const molecule_data = await umap();
-            return molecule_data
-         }
-
-         fetchData()
-         .catch( (error) => {
-            console.log(error) 
-         })
-         .then( (items )=> {   
-            setMolData(items);   
-      })
-      }
-   useEffect(() => {
-      loadData()
-   }, []);
 
   return (
   <>
@@ -160,7 +144,7 @@ function Home() {
         alignItems: 'center',  
         justifyContent: 'center', 
       }}>
-  {!isMobile && <Graphv2 molData={molData} componentArray={["1", "2"]} neighborSearch={false} containerStyle={{ width: '100%', height: '90%' }}></Graphv2>}
+  {!isMobile && <Graphv2 molData={molData} componentType={visType} containerStyle={{ width: '100%', height: '90%' }}></Graphv2>}
 </Box>
     </>
   );

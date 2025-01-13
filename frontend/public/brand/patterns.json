@@ -1,0 +1,40 @@
+[
+    {
+        "other": {
+            "name": "other",
+            "color": "#a4876e"
+        },
+        "pc3": {
+            "name": "P[C]<sub>3</sub>",
+            "color": "#fb7986"
+        },
+        "pcn": {
+            "name": "P[C]<sub>n</sub>[N]<sub>m</sub>",
+            "color": "#d792d0"
+        },
+        "pco": {
+            "name": "P[C]<sub>n</sub>[O]<sub>m</sub>",
+            "color": "#0a9dc7"
+        },
+        "phal": {
+            "name": "PF<sub>n</sub>[R]<sub>m</sub>",
+            "color": "#a9d04e"
+        },
+        "pn3": {
+            "name": "P[N]<sub>3</sub>",
+            "color": "#eded49"
+        },
+        "po3": {
+            "name": "P[O]<sub>3</sub>",
+            "color": "#ffb152"
+        },
+        "pon": {
+            "name": "P[O]<sub>n</sub>[N]<sub>m</sub>",
+            "color": "#b6ddf6"
+        },
+        "psi": {
+            "name": "P[S]<sub>n</sub>[I]<sub>m</sub>",
+            "color": "#b1b1ae"
+        }
+    }
+]

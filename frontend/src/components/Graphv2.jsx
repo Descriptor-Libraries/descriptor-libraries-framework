@@ -2,12 +2,8 @@ import React, { useEffect, useState } from 'react';
 import Plot from 'react-plotly.js';
 
 import { Container } from "@mui/material";
-import { TextField } from '@mui/material';
-import MenuItem from '@mui/material/MenuItem';
 
-
-
-const Graphv2 = ({ molData, componentArray, type, neighborSearch, containerStyle=null }) => {
+const Graphv2 = ({ molData, componentType="umap", containerStyle=null }) => {
         // Set the x and y indices to the first 2 values in the component array.
         const [ xIndex, setXIndex ] = useState(0);
         const [ yIndex, setYIndex ] = useState(1);
@@ -15,11 +11,7 @@ const Graphv2 = ({ molData, componentArray, type, neighborSearch, containerStyle
         const [ plotData, setPlotData ] = useState([])
         const [showLegend, setShowLegend] = useState(false);
 
-        const symbols = [0, 1, 2, 13, 14, 15, 16, 17, 18];
-        // Still need to be genericized
-        const axis_dict = {"pca1": "pc1", "pca2": "pc2", "pca3": "pc3", "pca4": "pc4", "umap1": "umap1", "umap2": "umap2"};
-        
-
+        // Set component type and fetch patterns once at mount - we don't expect these to change during component lifecycle
         useEffect(() => {
             fetch(`/${document.location.pathname.split('/')[1]}/brand/patterns.json`)
                 .then(response => {
@@ -158,7 +150,7 @@ const Graphv2 = ({ molData, componentArray, type, neighborSearch, containerStyle
                         style: {width: '100%', height: '100%'},
                         xaxis: {
                         title: {
-                            text: 'umap1',
+                            text: componentType + '1',
                             font: {
                             size: 18,
                             color: '#7f7f7f'
@@ -168,7 +160,7 @@ const Graphv2 = ({ molData, componentArray, type, neighborSearch, containerStyle
 
                         yaxis: {
                             title: {
-                            text: 'umap2',
+                            text:  componentType + '2',
                             font: {
                                 size: 18,
                                 color: '#7f7f7f'
