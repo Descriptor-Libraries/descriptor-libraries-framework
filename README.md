@@ -26,10 +26,42 @@ The application supports multiple molecular libraries through a namespace-based 
 - UI path: set `VITE_BASE_URL=/<section>` (e.g., `/acids`).
 - API path: set `API_PREFIX=<section>` so the backend serves `/api/<section>` (docs at `/api/<section>/docs`).
 
-Running the Application Locally
-================================
+Running the Demo Application
+=============================
 
-Coming soon - Docker Compose configurations for local development and testing are currently being refreshed.
+A minimal demo version is available with 10 sample cyanoarene molecules to test the application locally.
+
+## Quick Start
+
+1. **Start the demo**:
+   ```bash
+   docker-compose up --build
+   ```
+
+2. **Access the application**:
+   - **Web App**: http://localhost:9080/demo
+   - **API Docs**: http://localhost:9080/api/demo/docs
+   - **Traefik Dashboard**: http://localhost:9081
+   - **Database**: localhost:5433 (user: postgres, password: postgres, db: demo_data)
+
+3. **Stop the application**:
+   ```bash
+   docker-compose down
+   ```
+
+## What's Included in the Demo
+
+- **10 Cyanoarene Molecules**: Representative sample with SMILES, 3D coordinates, PCA/UMAP projections
+- **DFT Properties**: HOMO, LUMO, dipole moment, chemical hardness (η)
+- **Chemical Search**: RDKit-powered substructure and similarity search
+- **Interactive UI**: Browse, search, and visualize molecular data
+
+The database automatically initializes with demo data on first run.
+
+Running the Application for Production
+======================================
+
+Coming soon - Production deployment configurations are being updated.
 
 Testing
 =======

@@ -1,11 +1,7 @@
-version: '3'
-
 services:
-  local_reverse-proxy:
-    # The official v2 Traefik docker image
+  reverse-proxy:
     image: traefik:v2.8
-    # Enables the web UI and tells Traefik to listen to docker
-    container_name: local_reverse_proxy
+    container_name: demo_reverse_proxy
     command: 
       - --api.insecure=true 
       - --api.dashboard=true
@@ -13,117 +9,98 @@ services:
       - --providers.docker
       - --entrypoints.web.address=:80
     ports:
-      # The HTTP port
-      - "80:80"
-      # The Web UI (enabled by --api.insecure=true)
-      - "8080:8080"
+      - "127.0.0.1:9080:80"
+      - "127.0.0.1:9081:8080"
     volumes:
-      # So that Traefik can listen to the Docker events
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
-      - local-web
-      - local-db
+      - demo-web
+      - demo-db
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.api.service=api@internal"
 
-  descriptor_database:
-    image: 'rdkit-postgres:latest'
-    container_name: descriptor_database
+  database:
     build:
       context: ./database
       dockerfile: Dockerfile
-    shm_size: '4gb'
+    container_name: demo_database
+    shm_size: '2gb'
     environment:
-      POSTGRES_SERVER: database
       POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: demo_data
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5433:5432"
     volumes:
-      - "postgres16:/var/lib/postgresql/data"
+      - demo_postgres:/var/lib/postgresql/data
+      - ./tests/demo_data/csv:/docker-entrypoint-initdb.d/csv:ro
+      - ./database/init-db.sql:/docker-entrypoint-initdb.d/01-init-db.sql:ro
+      - ./database/load-data.sql:/docker-entrypoint-initdb.d/02-load-data.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "psql -U postgres -d kraken_data -c 'SELECT molecule_id FROM molecule LIMIT 1;' || exit 1"]
-      interval: 5s
-      timeout: 2s
+      test: ["CMD-SHELL", "psql -U postgres -d demo_data -c 'SELECT molecule_id FROM molecule LIMIT 1;' || exit 1"]
+      interval: 10s
+      timeout: 5s
       retries: 5
+      start_period: 30s
     networks:
-      - local-db
+      - demo-db
 
-  descriptor_backend:
-    image: 'descriptor-backend:latest'
-    container_name: kraken_backend
+  backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    volumes:
-      - "./backend/app:/app"
+    container_name: demo_backend
     environment:
-      POSTGRES_SERVER: descriptor_database
+      POSTGRES_SERVER: database
       POSTGRES_USER: postgres
-      POSTGRES_DB: kraken_data
-      API_PREFIX: kraken
-    entrypoint: bash prestart.sh
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: demo_data
+      API_PREFIX: demo
+    ports:
+      - "127.0.0.1:9000:8080"
     depends_on:
-      descriptor_database:
+      database:
         condition: service_healthy
     networks:
-      - local-web
-      - local-db
+      - demo-web
+      - demo-db
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.kraken_backend.rule=Host(`localhost`) && PathPrefix(`/api/kraken`)"
-      - "traefik.http.services.kraken_backend.loadbalancer.server.port=8080"
+      - "traefik.http.routers.demo_backend.rule=Host(`localhost`) && PathPrefix(`/api/demo`)"
+      - "traefik.http.services.demo_backend.loadbalancer.server.port=8080"
 
-  local_cdk-depict:
+  cdk-depict:
     image: 'simolecule/cdkdepict:latest'
-    container_name: local_cdk-depcit
+    container_name: demo_cdk_depict
     networks:
-      - local-web
+      - demo-web
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.cdk-depict.rule=Host(`localhost`) && PathPrefix(`/depict`)"
 
-  descriptor_frontend:
-    image: 'descriptor-frontend:latest'
-    container_name: kraken_frontend
-    volumes:
-      - "./frontend/src:/app/src"
-      - "./frontend/public:/app/public"
-    environment:
-      - VITE_BASE_URL=/descriptor
+  frontend:
     build:
       context: .
-      dockerfile: frontend.development.dockerfile
+      dockerfile: ./frontend/Dockerfile
+    container_name: demo_frontend
+    environment:
+      - VITE_BASE_URL=/demo
+    ports:
+      - "127.0.0.1:9003:3000"
     networks:
-      - local-web
-    entrypoint: npm run start
+      - demo-web
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`localhost`) && PathPrefix(`/descriptor`)"
-      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
-
-  local_documentation:
-    image: "phosphines-docs:latest"
-    container_name: local_documentation
-    build:
-      context: ./docs
-      dockerfile: docs.dockerfile
-    entrypoint: bash start.sh
-    volumes:
-      - "./docs:/docs"
-    networks:
-      - local-web
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.documentation.rule=Host(`localhost`) && PathPrefix(`/docs`)"
-      - "traefik.http.services.documentation.loadbalancer.server.port=5000"
-    
+      - "traefik.http.routers.demo_frontend.rule=Host(`localhost`) && PathPrefix(`/demo`)"
+      - "traefik.http.services.demo_frontend.loadbalancer.server.port=3000"
 
 networks:
-  local-web:
-  local-db:
+  demo-web:
+    name: demo-web
+  demo-db:
+    name: demo-db
 
 volumes:
-  postgres16:
-      external: true
-
+  demo_postgres:
+    name: demo_postgres
