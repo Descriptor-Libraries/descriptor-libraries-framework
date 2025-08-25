@@ -7,6 +7,7 @@ import io
 from typing import List, Optional, Any
 
 import pandas as pd
+import requests
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse, Response
@@ -554,10 +555,32 @@ def get_molecule_dimensions(
     return results
 
 @router.get("/identifiers/", response_model=List[schemas.MoleculeIdentifiers])
-def get_identifiers(smiles: str):
-    # Check to see if the smiles is valid
+def get_identifiers(smiles: str, db: Session = Depends(deps.get_db)):
     smiles = valid_smiles(smiles)
     mol = Chem.MolFromSmiles(smiles)
     InChI = Chem.MolToInchi(mol)
     InChIKey = Chem.MolToInchiKey(mol)
-    return [{'smiles': smiles, 'InChI': InChI, 'InChIKey': InChIKey}]
+
+    result = {'smiles': smiles, 'InChI': InChI, 'InChIKey': InChIKey}
+
+    query = text("SELECT pubchem_id FROM molecule WHERE canonical_smiles=:smiles")
+    row = db.execute(query, {"smiles": smiles}).fetchone()
+
+    pubchem_id = int(row[0]) if row and row[0] is not None else None
+
+    if pubchem_id is None:
+        try:
+            url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/inchikey/{InChIKey}/JSON"
+            response = requests.get(url, timeout=5)
+            response.raise_for_status()
+            data = response.json()
+            pubchem_id = int(data["PC_Compounds"][0]["id"]["id"]["cid"])
+        except (requests.RequestException, KeyError, ValueError):
+            pubchem_id = None
+
+    result['PubChemCID'] = pubchem_id
+    result['PubChemURL'] = (
+        f"https://pubchem.ncbi.nlm.nih.gov/compound/{pubchem_id}" if pubchem_id else None
+    )
+
+    return [result]

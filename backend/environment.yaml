@@ -1,7 +1,6 @@
 name: base
 channels:
   - conda-forge
-  - defaults
 dependencies:
   - python
   - rdkit
@@ -13,5 +12,6 @@ dependencies:
   - pandas
   - tenacity 
   - uvicorn 
+  - requests
   - curl 
   - openbabel
