@@ -65,28 +65,40 @@ async function molecule(molecule_id, signal) {
       }
 }
 
-async function dimensionality(molecule_id, type, components, signal, limit=10) {
+async function dimensionality(molecule_id, type, components, signal, limit = 10) {
    /**
-    * Requests general umap or pca data from the backend.
+    * Requests general UMAP or PCA data from the backend.
     * @param {number} molecule_id Id of the molecule to search on.
     * @param {string} type Type of dimensionality reduction. Can be one of PCA or UMAP.
-    * @param {string} components String of comma separated integers.
-    * @param {AbortSignal} signal Abortsignal object.
+    * @param {string} components String of comma-separated integers.
+    * @param {AbortSignal} signal AbortSignal object.
     * @param {number} limit Limit of the search.
-    * @return {json}  The response json.
+    * @return {json|null} The response JSON or null if there is no UMAP.
     */
-      let encoded = encodeURIComponent(components);
+   let encoded = encodeURIComponent(components);
 
-      const response =  await fetch(`/api/${document.location.pathname.split('/')[1]}/molecules/${molecule_id}/neighbors/?type=${type}&components=${encoded}&skip=0&limit=${limit}`, {signal: signal})
-   
+   try {
+      const response = await fetch(
+         `/api/${document.location.pathname.split('/')[1]}/molecules/${molecule_id}/neighbors/?type=${type}&components=${encoded}&skip=0&limit=${limit}`,
+         { signal: signal }
+      );
+
       if (!response.ok) {
-         throw new Error('Invalid Molecule Id')
+         // If the status code is 500 (or another specific error), handle gracefully
+         if (response.status === 500) {
+            console.warn('No data available');
+            return null; 
+         }
+         throw new Error('Invalid Molecule Id or other response error');
       }
-   
-      else {
-         return await response.json()
-      }
+
+      return await response.json();
+   } catch (error) {
+      console.error('Error in dimensionality function:', error);
+      throw error; // Re-throw if needed, or handle in a specific way
+   }
 }
+
 
 async function identifiers(smiles, signal) {
    /**
@@ -145,7 +157,7 @@ export default function MoleculeInfo() {
          setNeighborData(umapNeighborData);
       }
       else {
-         setComponents(["1", "2", "3", "4"]);
+         setComponents(["1", "2"]);
          setNeighborData(pcaNeighborData);
       }
    }
@@ -158,7 +170,7 @@ export default function MoleculeInfo() {
          const fetchData = async () => {
             const molecule_data = await molecule(molid, signal);
             const umap_neighbor_data = await dimensionality(molid, "umap", ["1", "2"], signal);
-            const pca_neighbor_data = await dimensionality(molid, "pca", ["1", "2", "3"], signal);
+            const pca_neighbor_data = await dimensionality(molid, "pca", ["1", "2"], signal);
             const svg_data = await retrieveSVG(molecule_data.smiles, signal);
             const identifier_data = await identifiers(molecule_data.smiles, signal);
             return [ molecule_data, umap_neighbor_data, pca_neighbor_data, svg_data, identifier_data ]
