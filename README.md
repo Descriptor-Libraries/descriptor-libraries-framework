@@ -15,16 +15,31 @@ The app is built with FastAPI (a Python web framework) for the backend and React
 
 ## Architecture Overview
 
-The application supports multiple molecular libraries through a namespace-based architecture:
-- Each library gets its own URL path (e.g., `/acids`, `/bases`, `/kraken`)
-- Custom branding and content per library (logos, color schemes, text)
-- Shared backend infrastructure with library-specific API endpoints (e.g., `/api/acids`)
-- Path-based routing through a reverse proxy (incoming requests are directed based on the URL path)
+The application supports multiple molecular libraries through a **namespace-based architecture**:
 
-## Configuration & Paths
+### How Namespaces Work
+Each library is deployed as a separate instance with its own namespace:
+- **URL Namespace**: Each library gets its own URL path (e.g., `/acids`, `/cyanoarenes`, `/demo`)
+- **API Namespace**: Backend serves at `/api/<namespace>` (e.g., `/api/acids/molecules`)
+- **Database Isolation**: Each library has its own database (e.g., `acids_data`, `demo_data`)
+- **Custom Branding**: Library-specific logos, colors, and content
 
-- UI path: set `VITE_BASE_URL=/<section>` (e.g., `/acids`).
-- API path: set `API_PREFIX=<section>` so the backend serves `/api/<section>` (docs at `/api/<section>/docs`).
+### Configuration Pattern
+Libraries are configured through environment variables:
+- **Frontend**: `VITE_BASE_URL=/<namespace>` (e.g., `/demo`)
+- **Backend**: `API_PREFIX=<namespace>` (e.g., `demo`)  
+- **Database**: `POSTGRES_DB=<namespace>_data` (e.g., `demo_data`)
+
+### URL Routing
+- **Frontend**: Served at `/<namespace>` (e.g., `/demo`)
+- **API**: Served at `/api/<namespace>` (e.g., `/api/demo`)
+- **Documentation**: Available at `/api/<namespace>/docs`
+
+### Production Deployment
+See `production/prod_config.yml` for examples of how multiple libraries (acids, anilines, etc.) are deployed as separate services with:
+- Shared Docker images but different configurations
+- Traefik reverse proxy routing based on URL paths
+- Library-specific databases and branding assets
 
 Running the Demo Application
 =============================
@@ -35,7 +50,7 @@ A minimal demo version is available with 10 sample cyanoarene molecules to test 
 
 1. **Start the demo**:
    ```bash
-   docker-compose up --build
+   docker compose up
    ```
 
 2. **Access the application**:
@@ -46,7 +61,7 @@ A minimal demo version is available with 10 sample cyanoarene molecules to test 
 
 3. **Stop the application**:
    ```bash
-   docker-compose down
+   docker compose down
    ```
 
 ## What's Included in the Demo

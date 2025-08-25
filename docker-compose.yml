@@ -33,7 +33,6 @@ services:
     ports:
       - "127.0.0.1:5433:5432"
     volumes:
-      - demo_postgres:/var/lib/postgresql/data
       - ./tests/demo_data/csv:/docker-entrypoint-initdb.d/csv:ro
       - ./database/init-db.sql:/docker-entrypoint-initdb.d/01-init-db.sql:ro
       - ./database/load-data.sql:/docker-entrypoint-initdb.d/02-load-data.sql:ro
@@ -54,9 +53,10 @@ services:
     environment:
       POSTGRES_SERVER: database
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWD: postgres
       POSTGRES_DB: demo_data
       API_PREFIX: demo
+    entrypoint: bash prestart.sh
     ports:
       - "127.0.0.1:9000:8080"
     depends_on:
@@ -86,6 +86,7 @@ services:
     container_name: demo_frontend
     environment:
       - VITE_BASE_URL=/demo
+    entrypoint: ash renameBase-dev.sh
     ports:
       - "127.0.0.1:9003:3000"
     networks:
