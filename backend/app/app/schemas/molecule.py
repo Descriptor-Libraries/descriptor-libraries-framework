@@ -40,3 +40,4 @@ class MoleculeIdentifiers(BaseModel):
     smiles: str
     InChI: str
     InChIKey: str
+    PubChemCID: Optional[int]
