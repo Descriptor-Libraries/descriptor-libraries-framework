@@ -18,13 +18,13 @@ export default function SearchHook () {
 
     const interval = 15;
 
-    const [ searchString, setSearch ] = useState('C=C');
+    const [ searchString, setSearch ] = useState('');
     const [ skip, setSkip ] = useState(0);
     const [ results, setResults ] = useState([]);
     const [ validSmiles, setValidSmiles ] = useState(true);
     const [ svg_results, setSVGResults ] = useState([])
     const [ searchPage, setSearchPage ] = useState(1);
-    const [ isLoading, setIsLoading ] = useState(true);
+    const [ isLoading, setIsLoading ] = useState(false);
     const [ searchToggle, setSearchToggle ] = useState(true);
     const [ isLoadingMore, setIsLoadingMore ] = useState(false);
     const [ smiles, setSmiles ] = useState('PC=C');
@@ -54,6 +54,29 @@ export default function SearchHook () {
       });
   }, []);
 
+  // Load default SMILES from branding configuration
+  useEffect(() => {
+    fetch(`/${document.location.pathname.split('/')[1]}/brand/names.json`)
+      .then(response => response.json())
+      .then(data => {
+        if (data && data[0] && data[0].default_smiles) {
+          const defaultSmiles = data[0].default_smiles;
+          setSearch(defaultSmiles);
+          setSmiles(defaultSmiles);
+        } else {
+          // Fallback to hardcoded default if branding fails
+          setSearch('C=C');
+          setSmiles('C=C');
+        }
+      })
+      .catch(error => {
+        console.log('Could not load default SMILES from branding config:', error);
+        // Fallback to hardcoded default
+        setSearch('C=C');
+        setSmiles('C=C');
+      });
+  }, []);
+
     // Extract the molecule ids from the results
     useEffect(() => {
       setMoleculeIDs(extractIdsFromResults(svg_results));
@@ -62,8 +85,11 @@ export default function SearchHook () {
 
     // Call back function to get the smiles and SMARTS from ketcher
     const ketcherCallBack = (newState) => {
+        console.log('Ketcher callback received:', newState);
+        console.log('Current representation:', representation);
+        console.log('Current searchString before update:', searchString);
 
-        if (newState[0] != '') {
+        if (newState[0] && newState[0].trim() !== '') {
           // Set the smiles and SMARTS for the current molecule
           setSmiles(newState[0]);
           setSMARTS(newState[1]);
@@ -72,15 +98,18 @@ export default function SearchHook () {
           setFromKetcher(true);
           
           if (representation === "smiles"){
+              console.log('Setting search to SMILES:', newState[0]);
               setSearch(newState[0]);
           }
           else if (representation === "SMARTS"){
+              console.log('Setting search to SMARTS:', newState[1]);
               setSearch(newState[1]);
           }
           setToggleRepresentation(true);
 
-          // Perform search with new structure.
-          newSearch();
+          // Search will be triggered automatically by searchString dependency
+        } else {
+          console.log('Empty structure received from Ketcher');
         }
       };
       
@@ -115,10 +144,15 @@ export default function SearchHook () {
         setSearchPage(1);
         setSVGResults([]);
         setResults([]);
-        // Just need to toggle this to make sure it toggles
-        // so that effect will be triggered
         setIsLoading(true);
-        setSearchToggle(!searchToggle);
+        
+        // Force a search by triggering the search effect
+        // Since searchString dependency handles this, we just need to ensure it fires
+        const controller = new AbortController();
+        const signal = controller.signal;
+        
+        setUpdatedParameters(false);
+        loadImages(signal);
     }
  
     function loadImages(signal) {
@@ -131,14 +165,6 @@ export default function SearchHook () {
         }
 
         fetchData()
-        .catch( (error) => {
-            console.log(error)
-            setValidSmiles(false);
-            setResults([]);
-            setSVGResults([])
-            setIsLoading(false)
-            setIsLoadingMore(false) 
-        } )
         .then( (items )=> {
             if (searchPage == 1) {
             setSVGResults(items[1]);
@@ -155,6 +181,14 @@ export default function SearchHook () {
             setValidSmiles(true);
 
           })
+        .catch( (error) => {
+            console.log(error)
+            setValidSmiles(false);
+            setResults([]);
+            setSVGResults([])
+            setIsLoading(false)
+            setIsLoadingMore(false) 
+        } )
 
     }
 
@@ -166,10 +200,14 @@ export default function SearchHook () {
     // initial load of data
     // and load when search changes. 
     useEffect( ( ) => {
+        // Only run search if we have a search string
+        if (!searchString) return;
+        
         const controller = new AbortController();
         const signal = controller.signal;
 
         setUpdatedParameters(false);
+        setIsLoading(true);
         loadImages(signal);
         
         return () => {
@@ -177,7 +215,7 @@ export default function SearchHook () {
         }
       },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [ searchToggle ] 
+        [ searchString ] 
     );
 
       const _handleKeyDown = useCallback(
