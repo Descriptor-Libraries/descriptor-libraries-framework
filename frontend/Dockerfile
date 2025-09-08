@@ -4,7 +4,7 @@ WORKDIR /app/
 
 COPY ./frontend/package.json ./frontend/yarn.lock /app/
 
-RUN yarn install --frozen-lockfile
+RUN yarn install
 
 COPY ./frontend /app/
 

@@ -13,9 +13,9 @@
     "@testing-library/user-event": "^13.2.1",
     "cors": "^2.8.5",
     "dompurify": "^3.0.8",
-    "ketcher-core": "^2.8.0",
-    "ketcher-react": "^2.10.0",
-    "ketcher-standalone": "^2.8.0",
+    "ketcher-core": "*",
+    "ketcher-react": "*", 
+    "ketcher-standalone": "*",
     "miew": "^0.10.1",
     "ngl": "^2.1.1",
     "plotly.js": "^2.14.0",
@@ -23,6 +23,7 @@
     "react-dom": "^18.2.0",
     "react-markdown": "^9.0.1",
     "react-plotly.js": "^2.6.0",
+    "raphael": "^2.3.0",
     "react-router-dom": "^6.4.1",
     "react-scripts": "^5.0.1",
     "rehype-raw": "^7.0.0",
@@ -56,9 +57,11 @@
     ]
   },
   "devDependencies": {
+    "@rollup/plugin-replace": "^5.0.2",
     "@vitejs/plugin-react": "^4.0.2",
     "vite": "^4.4.2",
     "vite-plugin-node-polyfills": "^0.9.0",
+    "vite-plugin-raw": "^1.0.3",
     "vite-plugin-svgr": "^3.2.0",
     "vite-tsconfig-paths": "^4.2.0"
   }
