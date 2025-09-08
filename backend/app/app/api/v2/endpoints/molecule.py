@@ -12,7 +12,7 @@ import requests
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse, Response
 from rdkit import Chem
-from sqlalchemy import exc, text
+from sqlalchemy import exc, text, inspect
 from sqlalchemy.orm import Session
 
 from app import schemas
@@ -563,11 +563,24 @@ def get_identifiers(smiles: str, db: Session = Depends(deps.get_db)):
 
     result = {'smiles': smiles, 'InChI': InChI, 'InChIKey': InChIKey}
 
-    query = text("SELECT pubchem_id FROM molecule WHERE canonical_smiles=:smiles")
-    row = db.execute(query, {"smiles": smiles}).fetchone()
+    try:
+        insp = inspect(db.bind)
+        has_pubchem_col = "pubchem_id" in {c["name"] for c in insp.get_columns("molecule")}
+    except Exception:
+        # If inspection fails for any reason, assume column might not exist and skip querying it.
+        has_pubchem_col = False
 
-    pubchem_id = int(row[0]) if row and row[0] is not None else None
+    pubchem_id = None
 
+    # --- Only query if the column exists ---
+    if has_pubchem_col:
+        row = db.execute(
+            text("SELECT pubchem_id FROM molecule WHERE canonical_smiles = :smiles"),
+            {"smiles": smiles},
+        ).fetchone()
+        pubchem_id = int(row[0]) if row and row[0] is not None else None
+
+    # --- Fallback to PubChem if not in DB or column missing ---
     if pubchem_id is None:
         try:
             url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/inchikey/{InChIKey}/JSON"
@@ -578,9 +591,8 @@ def get_identifiers(smiles: str, db: Session = Depends(deps.get_db)):
         except (requests.RequestException, KeyError, ValueError):
             pubchem_id = None
 
-    result['PubChemCID'] = pubchem_id
-    result['PubChemURL'] = (
+    result["PubChemCID"] = pubchem_id
+    result["PubChemURL"] = (
         f"https://pubchem.ncbi.nlm.nih.gov/compound/{pubchem_id}" if pubchem_id else None
     )
-
     return [result]

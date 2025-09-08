@@ -1,16 +1,18 @@
+version: "3.9"
+
 services:
   reverse-proxy:
     image: traefik:v2.8
     container_name: demo_reverse_proxy
-    command: 
-      - --api.insecure=true 
+    command:
+      - --api.insecure=true
       - --api.dashboard=true
       - --api.debug=true
       - --providers.docker
       - --entrypoints.web.address=:80
     ports:
-      - "127.0.0.1:9080:80"
-      - "127.0.0.1:9081:8080"
+      - "80:80"
+      - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
@@ -23,15 +25,17 @@ services:
   database:
     build:
       context: ./database
-      dockerfile: Dockerfile
     container_name: demo_database
-    shm_size: '2gb'
+    shm_size: "2gb"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: demo_data
     ports:
       - "127.0.0.1:5433:5432"
+    # Ephemeral DB: lives in RAM, rebuilt on each start
+    tmpfs:
+      - /var/lib/postgresql/data
     volumes:
       - ./tests/demo_data/csv:/docker-entrypoint-initdb.d/csv:ro
       - ./database/init-db.sql:/docker-entrypoint-initdb.d/01-init-db.sql:ro
@@ -53,12 +57,15 @@ services:
     environment:
       POSTGRES_SERVER: database
       POSTGRES_USER: postgres
-      POSTGRES_PASSWD: postgres
+      POSTGRES_PASSWD: postgres   
       POSTGRES_DB: demo_data
       API_PREFIX: demo
-    entrypoint: bash prestart.sh
-    ports:
-      - "127.0.0.1:9000:8080"
+    entrypoint: bash prestart.sh 
+    # If prestart.sh doesn't exec the server, this container will exit.
+    # You can still pass args to prestart.sh via command: ["--any-flags"]
+    working_dir: /app
+    volumes:
+      - ./backend/app:/app
     depends_on:
       database:
         condition: service_healthy
@@ -71,7 +78,7 @@ services:
       - "traefik.http.services.demo_backend.loadbalancer.server.port=8080"
 
   cdk-depict:
-    image: 'simolecule/cdkdepict:latest'
+    image: simolecule/cdkdepict:latest
     container_name: demo_cdk_depict
     networks:
       - demo-web
@@ -86,22 +93,20 @@ services:
     container_name: demo_frontend
     environment:
       - VITE_BASE_URL=/demo
-    entrypoint: ash renameBase-dev.sh
-    ports:
-      - "127.0.0.1:9003:3000"
+    entrypoint: ash renameBase.sh
+    volumes:
+      - "./tests/demo_data/public:/app/public"
+      - "./frontend/src:/app/src"
     networks:
       - demo-web
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.demo_frontend.rule=Host(`localhost`) && PathPrefix(`/demo`)"
       - "traefik.http.services.demo_frontend.loadbalancer.server.port=3000"
+    # Live-reload mounts now enabled above for development
 
 networks:
   demo-web:
     name: demo-web
   demo-db:
     name: demo-db
-
-volumes:
-  demo_postgres:
-    name: demo_postgres

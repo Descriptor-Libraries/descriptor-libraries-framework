@@ -1,0 +1,30 @@
+[{
+    "number": "10",
+    "description": "Sample Molecules"
+  },
+
+  {
+    "number": "2",
+    "description": "Dimensionality Reduction Methods"
+  },
+
+  {
+    "number": "4",
+    "description": "DFT Properties"
+  },
+  
+  {
+    "number": "100%",
+    "description": "Chemical Search Coverage"
+  },
+
+  {
+    "number": "3D",
+    "description": "Interactive Visualization"
+  },
+
+  {
+    "number": "Multi",
+    "description": "Export Formats"
+  }
+]

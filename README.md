@@ -4,62 +4,27 @@ This repository provides a web application for displaying molecule library infor
 
 The app is built with FastAPI (a Python web framework) for the backend and React (a JavaScript UI library) for the frontend, deployed as Docker containers that connect to a PostgreSQL database with the RDKit extension for chemistry operations, containing molecule and conformer information.
 
-## Tech Stack
-
-- **Backend**: FastAPI on Uvicorn (high-performance Python web server), SQLAlchemy (automap; reflects tables at runtime), Pydantic Settings (configuration management), Alembic (database migration tool)
-- **Database**: PostgreSQL with the RDKit extension (adds chemistry-specific functions like structure searching)
-- **Frontend**: React + Vite (fast build tool) with MUI (Material-UI components), Plotly (interactive graphs), Ketcher (molecule editor), built to static files and served by a small Node server (`server.js`)
-- **Reverse proxy**: Traefik v2 for HTTPS certificates and path-based routing (directing URLs to the right service)
-- **Depictions**: CDK Depict service for converting SMILES notation (text representation of molecules) to images
-- **Containers**: Docker for packaging all services; Docker Compose for local/dev orchestration
-
-## Architecture Overview
-
-The application supports multiple molecular libraries through a **namespace-based architecture**:
-
-### How Namespaces Work
-Each library is deployed as a separate instance with its own namespace:
-- **URL Namespace**: Each library gets its own URL path (e.g., `/acids`, `/cyanoarenes`, `/demo`)
-- **API Namespace**: Backend serves at `/api/<namespace>` (e.g., `/api/acids/molecules`)
-- **Database Isolation**: Each library has its own database (e.g., `acids_data`, `demo_data`)
-- **Custom Branding**: Library-specific logos, colors, and content
-
-### Configuration Pattern
-Libraries are configured through environment variables:
-- **Frontend**: `VITE_BASE_URL=/<namespace>` (e.g., `/demo`)
-- **Backend**: `API_PREFIX=<namespace>` (e.g., `demo`)  
-- **Database**: `POSTGRES_DB=<namespace>_data` (e.g., `demo_data`)
-
-### URL Routing
-- **Frontend**: Served at `/<namespace>` (e.g., `/demo`)
-- **API**: Served at `/api/<namespace>` (e.g., `/api/demo`)
-- **Documentation**: Available at `/api/<namespace>/docs`
-
-### Production Deployment
-See `production/prod_config.yml` for examples of how multiple libraries (acids, anilines, etc.) are deployed as separate services with:
-- Shared Docker images but different configurations
-- Traefik reverse proxy routing based on URL paths
-- Library-specific databases and branding assets
-
-Running the Demo Application
-=============================
-
-A minimal demo version is available with 10 sample cyanoarene molecules to test the application locally.
-
 ## Quick Start
 
-1. **Start the demo**:
+A minimal demo version is available with 10 sample cyanoarene molecules to test the application locally. To start, clone the repository
+
+1. **Clone the repository**
+   ```baseh
+   git clone https://github.com/Descriptor-Libraries/descriptor-libraries-framework.git
+   cd descriptor-libraries-framework
+   ```
+2. **Start the demo**:
    ```bash
    docker compose up
    ```
 
-2. **Access the application**:
-   - **Web App**: http://localhost:9080/demo
-   - **API Docs**: http://localhost:9080/api/demo/docs
-   - **Traefik Dashboard**: http://localhost:9081
+3. **Access the application**:
+   - **Web App**: http://localhost/demo
+   - **API Docs**: http://localhost/api/demo/docs
+   - **Traefik Dashboard**: http://localhost:8080
    - **Database**: localhost:5433 (user: postgres, password: postgres, db: demo_data)
 
-3. **Stop the application**:
+4. **Stop the application**:
    ```bash
    docker compose down
    ```
@@ -71,7 +36,46 @@ A minimal demo version is available with 10 sample cyanoarene molecules to test 
 - **Chemical Search**: RDKit-powered substructure and similarity search
 - **Interactive UI**: Browse, search, and visualize molecular data
 
-The database automatically initializes with demo data on first run.
+The database automatically initializes with demo data on first run (the Postgres container creates `demo_data` and runs bundled init scripts to create the schema and load CSVs
+
+
+## Tech Stack and Architecture
+
+- **Backend**: FastAPI on Uvicorn (high-performance Python web server), SQLAlchemy, Pydantic Settings (configuration management)
+- **Database**: PostgreSQL with the RDKit extension
+- **Frontend**: React + Vite (build tool) with MUI (Material-UI components), Plotly (interactive graphs), Ketcher (molecule editor), built to static files and served by a small Node server (`server.js`)
+- **Reverse proxy**: Traefik v2 for HTTPS certificates and path-based routing (directing URLs to the right service)
+- **Depictions**: CDK Depict service for converting SMILES notation to images
+- **Containers**: Docker for packaging all services; Docker Compose for local/dev orchestration
+
+### How Namespaces Work
+The application supports multiple molecular libraries through a **namespace-based architecture**. Each library is deployed as a separate instance with its own namespace:
+- **URL Namespace**: Each library gets its own URL path (e.g., `/acids`, `/cyanoarenes`, `/demo`)
+- **API Namespace**: Backend serves at `/api/<namespace>` (e.g., `/api/acids/molecules`)
+- **Database Isolation**: Each library has its own database (e.g., `acids_data`, `demo_data`)
+- **Custom Branding**: Library-specific logos, colors, and content
+
+### Configuration Pattern
+Libraries are configured through environment variables. The frontend uses `VITE_BASE_URL=/<namespace>` (like `/demo`), the backend uses `API_PREFIX=<namespace>` (like `demo`), and each gets its own database with `POSTGRES_DB=<namespace>_data` (like `demo_data`). This creates clean URL routing where frontends are served at `/<namespace>`, APIs at `/api/<namespace>`, and documentation at `/api/<namespace>/docs`.
+
+### Service Components
+
+The Docker Compose deployment consists of these services, each with specialized startup processes:
+
+- **reverse-proxy (Traefik)**: Entrypoint starts Traefik with dashboard and routes requests to services based on URL
+- **database (PostgreSQL + RDKit)**: Entrypoint initializes PostgreSQL; on first start creates the demo database and runs bundled SQL to set up tables and load demo data
+- **backend (FastAPI)**: Entrypoint runs `prestart.sh`, which prepares the Python environment and starts the API with auto-reload
+- **cdk-depict**: Entrypoint starts the depiction service used to render molecule images
+- **frontend (React)**: Entrypoint runs `renameBase-dev.sh`, which updates the app's base path (e.g., `/demo`) and starts the dev server
+
+### Frontend Base Path Handling
+
+The `renameBase-dev.sh` script is essential for multi-tenant support. It replaces the placeholder `/base_url` in generated files with the value of `VITE_BASE_URL`, allowing the frontend to work under namespace paths like `/demo` instead of only at the site root `/`. After adjusting links and asset paths, it starts the development server so routes and static assets resolve correctly behind the reverse proxy.
+Running the Demo Application
+=============================
+
+
+
 
 Running the Application for Production
 ======================================

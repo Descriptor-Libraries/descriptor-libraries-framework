@@ -1,6 +1,3 @@
--- Create database for demo
-CREATE DATABASE demo_data;
-
 -- Connect to demo database
 \c demo_data;
 

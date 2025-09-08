@@ -1,0 +1,9 @@
+[
+    {
+        "name": "DEMO",
+        "tagline": "Demonstration of the Molecular Library Web Application",
+        "title": "Demo Library",
+        "prefix": "",
+        "default_smiles": "C#N"
+    }
+]
