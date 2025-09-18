@@ -1,0 +1,67 @@
+container_name: demo_database
+database:
+  name: demo_data
+  drop_database: true
+
+extensions:
+  - cube
+  - rdkit
+
+property_sets:
+  dft:
+    table_name: public.dft_data
+    columns:
+      - name: molecule_id
+        type: text
+        nullable: false
+      - name: property
+        type: text
+        nullable: false
+      - name: boltz
+        type: numeric
+      - name: high_E
+        type: numeric
+      - name: low_E
+        type: numeric
+    molecule_fk: true
+    primary_key:
+      - molecule_id
+      - property
+    indexes:
+      - "CREATE INDEX IF NOT EXISTS dft_data_property_idx ON {table} USING btree (property);"
+
+schema_files:
+  - /docker-entrypoint-initdb.d/01-init-db.sql
+
+tables:
+  - name: public.molecule
+    csv_path: /docker-entrypoint-initdb.d/csv/molecule.csv
+    columns:
+      - molecule_id
+      - smiles
+      - canonical_smiles
+      - pca
+      - umap
+    post_sql:
+      - "UPDATE public.molecule SET mol = mol_from_smiles(smiles::cstring) WHERE mol IS NULL;"
+      - "UPDATE public.molecule SET morganbv = morganbv_fp(mol) WHERE mol IS NOT NULL AND morganbv IS NULL;"
+      - "UPDATE public.molecule SET molecular_weight = mol_amw(mol) WHERE molecular_weight IS NULL;"
+
+  - name: public.conformer
+    csv_path: /docker-entrypoint-initdb.d/csv/conformer.csv
+    columns:
+      - molecule_id
+      - elements
+      - coords
+      - basis
+      - program
+      - method
+      - cluster
+
+  - property_set: dft
+    csv_path: /docker-entrypoint-initdb.d/csv/dft_data.csv
+    post_sql:
+      - "ANALYZE public.dft_data;"
+
+post_import_sql:
+  - "ANALYZE;"

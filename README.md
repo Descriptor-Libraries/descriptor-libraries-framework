@@ -80,7 +80,32 @@ Running the Demo Application
 Running the Application for Production
 ======================================
 
-Coming soon - Production deployment configurations are being updated.
+The production deployment mirrors the demo stack but keeps the PostgreSQL database
+persistent and mounts a shared scratch directory for imports. Key differences:
+
+- **Database image**: Build the Postgres + RDKit image that lives in `database/Dockerfile`
+  and tag it (e.g., `docker build -t rdkit-postgres -f database/Dockerfile .`).
+- **Persistent volumes**: Instead of the demo `tmpfs` database, mount the production
+  storage so data survives restarts:
+
+  ```yaml
+  descriptor_database:
+    image: rdkit-postgres
+    shm_size: "4gb"
+    volumes:
+      - "/PATH/TO/PERSISTENT_DB:/var/lib/postgresql/data"
+      - "/PATH/TO/SHARED_SCRATCH:/scratch"
+  ```
+
+  The first volume keeps the Postgres data directory on durable storage (e.g.,
+  `/mnt/largestore1/descriptor-libraries/descriptor_postgres`). The `/scratch` mount makes
+  large CSVs and schema dumps available inside the container for the import tooling (e.g.,
+  `/mnt/largestore1/janash/ccas`). Adjust the host paths to match your environment.
+- **Backups and imports**: Use the `data_import/import_dataset.py` helper (with the YAML
+  configs under `data_import/configs/`) to load new libraries or refresh an existing one.
+
+Other services (reverse proxy, backend, frontend, depiction) run as in the demo compose
+file. Ensure Traefik routes remain consistent with the namespaces you expose publicly.
 
 Testing
 =======

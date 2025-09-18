@@ -588,4 +588,7 @@ tags
 # Ignoring local yml file
 # docker-compose.local.yml
 
+# Python cache directories
+__pycache__/
+
 # End of https://www.gitignore.io/api/osx,vim,react,linux,macos,python,pycharm,reactnative,sublimetext

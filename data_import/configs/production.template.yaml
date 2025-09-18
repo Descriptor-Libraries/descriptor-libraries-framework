@@ -1,0 +1,110 @@
+# CSV and schema files referenced below assume the database container has a
+# `/scratch` mount pointing at your shared storage (e.g. /PATH/TO/SHARED_SCRATCH:/scratch).
+container_name: descriptor-libraries-descriptor_database-1
+database:
+  name: REPLACE_WITH_DATABASE_NAME
+  drop_database: false
+
+extensions:
+  - cube
+  - rdkit
+
+property_sets:
+  dft:
+    table_name: public.dft_data
+    columns:
+      - name: molecule_id
+        type: text
+        nullable: false
+      - name: property
+        type: text
+        nullable: false
+      - name: max
+        type: numeric
+      - name: min
+        type: numeric
+      - name: low_e
+        type: numeric
+      - name: boltz
+        type: numeric
+        csv: Boltz
+    primary_key:
+      - molecule_id
+      - property
+    indexes:
+      - "CREATE INDEX IF NOT EXISTS dft_data_property_idx ON {table} USING btree (property);"
+
+  qikprop:
+    table_name: public.qikprop_data
+    columns:
+      - name: molecule_id
+        type: text
+        nullable: false
+      - name: property
+        type: text
+        nullable: false
+      - name: value
+        type: numeric
+    primary_key:
+      - molecule_id
+      - property
+    molecule_fk_on_delete: CASCADE
+
+  ml:
+    table_name: public.ml_data
+    columns:
+      - name: molecule_id
+        type: text
+        nullable: false
+      - name: property
+        type: text
+        nullable: false
+      - name: value
+        type: numeric
+      - name: uncertainty
+        type: numeric
+        nullable: true
+    primary_key:
+      - molecule_id
+      - property
+
+schema_files:
+  - /scratch/schema_dump.sql
+
+tables:
+  - name: public.molecule
+    csv_path: /scratch/Quinone_MolSSI_Library_Files/quinone_molecule_table_final.csv
+    columns:
+      - molecule_id
+      - smiles
+      - pubchem_id
+      - canonical_smiles
+      - pca
+    pre_sql:
+      - "ALTER TABLE IF EXISTS public.molecule ADD COLUMN IF NOT EXISTS pubchem_id text;"
+    post_sql:
+      - "UPDATE public.molecule SET mol = mol_from_smiles(smiles) WHERE mol IS NULL;"
+      - "UPDATE public.molecule SET morganbv = morganbv_fp(mol) WHERE mol IS NOT NULL AND morganbv IS NULL;"
+
+  - name: public.conformer
+    csv_path: /scratch/Quinone_MolSSI_Library_Files/quinone_conformers_table.csv
+    columns:
+      - molecule_id
+      - elements
+      - coords
+      - basis
+      - program
+      - method
+      - cluster
+
+  - property_set: dft
+    csv_path: /scratch/Quinone_MolSSI_Library_Files/quinone_dft_properties_long.csv
+
+  - property_set: qikprop
+    csv_path: /scratch/path/to/qikprop.csv
+
+  - property_set: ml
+    csv_path: /scratch/path/to/ml.csv
+
+post_import_sql:
+  - "ANALYZE;"
