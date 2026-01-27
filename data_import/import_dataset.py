@@ -79,6 +79,15 @@ def run_sql(container: str, db: str, sql: str) -> None:
 
 def run_sql_file(container: str, db: str, file_path: str) -> None:
     print(f"Applying SQL file on {db}: {file_path}")
+    # Verify file exists inside container first
+    check_cmd = ["docker", "exec", container, "test", "-f", file_path]
+    try:
+        subprocess.run(check_cmd, check=True, capture_output=True)
+    except subprocess.CalledProcessError:
+        raise ConfigError(
+            f"Schema file not found in container {container}: {file_path}. "
+            f"Verify the mount point and path are correct (e.g., /scratch points to /mnt/largestore1/...)."
+        )
     docker_exec_psql(container, db, ["-f", file_path])
 
 
@@ -126,14 +135,14 @@ def ensure_database(container: str, db_conf: Dict[str, Any]) -> None:
         run_sql(container, maintenance_db, terminate_sql)
         run_sql(container, maintenance_db, f"DROP DATABASE IF EXISTS {quote_ident(db_name)};")
 
-    create_sql = (
-        "DO $$BEGIN IF NOT EXISTS (SELECT FROM pg_database WHERE datname = '"
-        + sql_literal(db_name)
-        + "') THEN CREATE DATABASE "
-        + quote_ident(db_name)
-        + "; END IF; END$$;"
-    )
-    run_sql(container, maintenance_db, create_sql)
+    # Try to create database; ignore error if already exists
+    create_sql = f"CREATE DATABASE {quote_ident(db_name)};"
+    print(f"Creating database {db_name} if it does not exist")
+    try:
+        docker_exec_psql(container, maintenance_db, ["-c", create_sql])
+    except subprocess.CalledProcessError:
+        # Database already exists, which is fine
+        print(f"Database {db_name} already exists, skipping creation")
 
     owner = db_conf.get("owner")
     if owner:
@@ -167,13 +176,13 @@ def ensure_property_table(
     db_name: str,
     table_name: str,
     definition: Dict[str, Any],
-) -> List[str]:
+) -> List[tuple[str, str]]:
     columns = definition.get("columns")
     if not columns:
         raise ConfigError(f"Property set for table '{table_name}' must define columns")
 
     create_lines: List[str] = []
-    copy_columns: List[str] = []
+    copy_columns: List[tuple[str, str]] = []  # (db_col_name, csv_col_name)
 
     for col in columns:
         if isinstance(col, str):
@@ -203,7 +212,7 @@ def ensure_property_table(
         if default is not None:
             column_sql += f" DEFAULT {default}"
         create_lines.append(column_sql)
-        copy_columns.append(column_name)
+        copy_columns.append((column_name, csv_name))
 
     primary_key = definition.get("primary_key") or []
     if primary_key:
@@ -220,9 +229,9 @@ def ensure_property_table(
     # Optional molecule_id foreign key
     molecule_fk_enabled = definition.get(
         "molecule_fk",
-        any(col_name == "molecule_id" for col_name in copy_columns),
+        any(col_name == "molecule_id" for col_name, _ in copy_columns),
     )
-    if molecule_fk_enabled and "molecule_id" in copy_columns:
+    if molecule_fk_enabled and any(col_name == "molecule_id" for col_name, _ in copy_columns):
         constraint_name = f"{_table_basename(table_name)}_molecule_id_fkey"
         table_regclass = f"'{table_name}'::regclass"
         fk_sql = (
@@ -249,13 +258,15 @@ def ensure_property_table(
     return copy_columns
 
 
-def _normalize_columns(columns: List[Any], table_name: str) -> List[str]:
-    result: List[str] = []
+def _normalize_columns(columns: List[Any], table_name: str) -> List[tuple[str, str]]:
+    result: List[tuple[str, str]] = []
     for col in columns:
         if isinstance(col, str):
-            result.append(col)
+            result.append((col, col))
         elif isinstance(col, dict) and "name" in col:
-            result.append(col["name"])
+            db_name = col["name"]
+            csv_name = col.get("csv", db_name)
+            result.append((db_name, csv_name))
         else:
             raise ConfigError(
                 f"Invalid column entry in table '{table_name}'. Use string names or objects with 'name'."
@@ -293,10 +304,11 @@ def copy_into_table(container: str, db_name: str, table_conf: Dict[str, Any]) ->
 
     copy_options = table_conf.get("copy_options", "FORMAT csv, HEADER true")
 
-    column_list = ", ".join(quote_ident(col) for col in copy_columns)
+    # Build column list using CSV column names
+    csv_column_list = ", ".join(quote_ident(csv_name) for _, csv_name in copy_columns)
     escaped_path = csv_path.replace("'", "''")
     copy_sql = (
-        f"\\copy {qualified_identifier(table_name)} ({column_list}) FROM '{escaped_path}' WITH ({copy_options});"
+        f"\\copy {qualified_identifier(table_name)} ({csv_column_list}) FROM '{escaped_path}' WITH ({copy_options});"
     )
 
     print(f"Copying data into {table_name} from {csv_path}")
