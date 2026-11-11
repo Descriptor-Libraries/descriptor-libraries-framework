@@ -13,9 +13,10 @@
     "@testing-library/user-event": "^13.2.1",
     "cors": "^2.8.5",
     "dompurify": "^3.0.8",
-    "ketcher-core": "*",
-    "ketcher-react": "*", 
-    "ketcher-standalone": "*",
+    "express": "^4.18.3",
+    "ketcher-core": "3.5.0",
+    "ketcher-react": "3.5.0",
+    "ketcher-standalone": "3.5.0",
     "miew": "^0.10.1",
     "ngl": "^2.1.1",
     "plotly.js": "^2.14.0",
@@ -55,6 +56,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "resolutions": {
+    "ketcher-core": "3.5.0"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "^5.0.2",
