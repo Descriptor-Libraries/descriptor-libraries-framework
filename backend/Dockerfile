@@ -14,3 +14,21 @@ WORKDIR /app/
 ADD ./app /app/
 # --no-deps: every dependency comes from the lock file, never from PyPI at build time.
 RUN pip install --no-deps -e .
+
+# What this image contains. Pass these at build time; they are reported by
+# GET /api/<library>/version and recorded as image labels. They come last so
+# that changing them does not invalidate the dependency layer above.
+ARG VERSION=dev
+ARG GIT_SHA=unknown
+ARG BUILD_DATE=unknown
+ENV APP_VERSION=${VERSION} \
+    APP_GIT_SHA=${GIT_SHA} \
+    APP_BUILD_DATE=${BUILD_DATE}
+LABEL org.opencontainers.image.version=${VERSION} \
+      org.opencontainers.image.revision=${GIT_SHA} \
+      org.opencontainers.image.created=${BUILD_DATE} \
+      org.opencontainers.image.source="https://github.com/Descriptor-Libraries/descriptor-libraries-framework" \
+      org.opencontainers.image.url="https://github.com/Descriptor-Libraries/descriptor-libraries-framework" \
+      org.opencontainers.image.title="descriptor-backend" \
+      org.opencontainers.image.licenses="BSD-3-Clause" \
+      org.opencontainers.image.description="Descriptor Libraries backend API (FastAPI + RDKit)"

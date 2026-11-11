@@ -104,6 +104,19 @@ persistent and mounts a shared scratch directory for imports. Key differences:
 - **Backups and imports**: Use the `data_import/import_dataset.py` helper (with the YAML
   configs under `data_import/configs/`) to load new libraries or refresh an existing one.
 
+- **Backend image**: Build from a clean, tagged checkout and pass the version details, which
+  the API then reports at `/api/<namespace>/version`:
+
+  ```bash
+  docker build -t descriptor-backend:v2026.11.0 \
+    --build-arg VERSION=v2026.11.0 \
+    --build-arg GIT_SHA="$(git rev-parse --short HEAD)" \
+    --build-arg BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    backend
+  ```
+
+  Without these arguments the endpoint reports `dev` / `unknown`.
+
 Other services (reverse proxy, backend, frontend, depiction) run as in the demo compose
 file. Ensure Traefik routes remain consistent with the namespaces you expose publicly.
 
