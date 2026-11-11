@@ -14,7 +14,7 @@ app = FastAPI(
     title=core.config.settings.PROJECT_NAME + " " + name,
     openapi_url=f"/api/{name}/openapi.json",
     docs_url=f"/api/{name}/docs",
-    redoc=None
+    redoc_url=None
 )
 
 # default API endpoints

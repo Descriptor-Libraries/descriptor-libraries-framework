@@ -1,17 +1,25 @@
+# Human-edited input for the backend environment.
+# The image is NOT built from this file: it is built from the lock file
+# conda-linux-64.lock, which records the exact packages resolved from it.
+# After changing anything here, regenerate the lock with ./update-lock.sh
+# and commit both files.
 name: base
 channels:
   - conda-forge
 dependencies:
-  - python
-  - rdkit
+  # Pinned series. Changing any of these can change results or break start-up,
+  # so bump them deliberately and re-run the comparison against production.
+  - python=3.12
+  - rdkit=2025.03      # canonical SMILES depend on the RDKit version
+  - sqlalchemy=2.0     # 2.1 switches the default PostgreSQL driver to psycopg 3
+  - pandas=2.3         # builds the csv/json exports
+  - pydantic=2
   - fastapi
   - pydantic-settings
-  - alembic 
-  - psycopg2-binary 
-  - sqlalchemy 
-  - pandas
-  - tenacity 
-  - uvicorn 
+  - alembic
+  - psycopg2-binary
+  - tenacity
+  - uvicorn
   - requests
-  - curl 
+  - curl
   - openbabel
