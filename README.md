@@ -64,7 +64,7 @@ The Docker Compose deployment consists of these services, each with specialized 
 
 - **reverse-proxy (Traefik)**: Entrypoint starts Traefik with dashboard and routes requests to services based on URL
 - **database (PostgreSQL + RDKit)**: Entrypoint initializes PostgreSQL; on first start creates the demo database and runs bundled SQL to set up tables and load demo data
-- **backend (FastAPI)**: Entrypoint runs `prestart.sh`, which prepares the Python environment and starts the API with auto-reload
+- **backend (FastAPI)**: Entrypoint runs `prestart.sh`, which prepares the Python environment and starts the API (the demo Compose file passes `--reload` for auto-reload; production runs it without)
 - **cdk-depict**: Entrypoint starts the depiction service used to render molecule images
 - **frontend (React)**: Entrypoint runs `renameBase-dev.sh`, which updates the app's base path (e.g., `/demo`) and starts the dev server
 
