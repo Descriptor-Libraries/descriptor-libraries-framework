@@ -83,6 +83,7 @@ The Docker Compose deployment consists of these services, each with specialized 
 ### Frontend Base Path Handling
 
 The `renameBase-dev.sh` script is essential for multi-tenant support. It replaces the placeholder `/base_url` in generated files with the value of `VITE_BASE_URL`, allowing the frontend to work under namespace paths like `/demo` instead of only at the site root `/`. After adjusting links and asset paths, it starts the development server so routes and static assets resolve correctly behind the reverse proxy.
+
 Running the Demo Application
 =============================
 
