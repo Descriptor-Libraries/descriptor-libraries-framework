@@ -1,7 +1,7 @@
 import Graph from "../components/Graph"
 import React, { useEffect, useState } from 'react';
 import { useParams } from "react-router-dom";
-import { Box, Grid, Container, TextField, MenuItem, Card, CardContent, Select, InputLabel, FormControl, ThemeProvider} from "@mui/material";
+import { Box, Grid, Container, TextField, MenuItem, Card, CardContent, Select, InputLabel, FormControl } from "@mui/material";
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { CircularProgress } from "@mui/material";

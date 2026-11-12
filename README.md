@@ -151,6 +151,12 @@ API_URL=http://localhost/api/demo pytest tests
 Tests marked `xfail` describe requests the API currently answers with an error; see the
 notes at the top of `tests/test_backend.py`.
 
+The frontend has a lint check. It fails on errors and lists warnings:
+
+```bash
+cd frontend && yarn install --frozen-lockfile && npm run lint
+```
+
 Acknowledgements
 ----------------
 

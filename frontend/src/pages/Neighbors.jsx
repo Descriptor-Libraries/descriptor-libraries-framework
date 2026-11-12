@@ -199,7 +199,6 @@ export default function NeighborSearchHook () {
     function _handleKeyDown(event) {
       if (event.key === "Enter") {
         newSearch();
-        updateGraphComponentProps();
       }
     }
 

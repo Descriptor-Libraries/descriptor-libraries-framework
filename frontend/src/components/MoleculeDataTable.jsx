@@ -3,7 +3,6 @@ import { DataGrid, GridFooterContainer, GridFooter } from "@mui/x-data-grid";
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import { Select, MenuItem } from '@mui/material';
-import Button from '@mui/material/Button';
 import DownloadIcon from '@mui/icons-material/Download';
 
 import ResponsiveButton from './ResponsiveButton'; 
