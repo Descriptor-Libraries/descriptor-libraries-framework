@@ -123,7 +123,33 @@ file. Ensure Traefik routes remain consistent with the namespaces you expose pub
 Testing
 =======
 
-Coming soon - Test suite updates for the namespace-aware architecture are in progress.
+The backend API tests need only Docker. One command builds the backend, loads two
+small test libraries, runs the tests and returns their exit code:
+
+```bash
+docker compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from tests
+docker compose -f docker-compose.test.yml down -v
+```
+
+No ports are published on the host, so this can run next to the demo or any other stack.
+
+The two libraries are built from `tests/demo_data` and served by the same backend image:
+
+| Library | Molecule IDs | `pubchem_id` column | Data |
+|---|---|---|---|
+| `demo` | text (`aryl-1` ...) | no | DFT |
+| `numeric` (`tests/fixtures/numeric-ids.sql`) | integer | yes | DFT and ML |
+
+To run the tests against an API that is already running, such as the demo above, set its
+address (tests that need the second library are skipped):
+
+```bash
+pip install pytest requests
+API_URL=http://localhost/api/demo pytest tests
+```
+
+Tests marked `xfail` describe requests the API currently answers with an error; see the
+notes at the top of `tests/test_backend.py`.
 
 Acknowledgements
 ----------------
