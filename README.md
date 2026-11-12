@@ -58,6 +58,18 @@ The application supports multiple molecular libraries through a **namespace-base
 ### Configuration Pattern
 Libraries are configured through environment variables. The frontend uses `VITE_BASE_URL=/<namespace>` (like `/demo`), the backend uses `API_PREFIX=<namespace>` (like `demo`), and each gets its own database with `POSTGRES_DB=<namespace>_data` (like `demo_data`). This creates clean URL routing where frontends are served at `/<namespace>`, APIs at `/api/<namespace>`, and documentation at `/api/<namespace>/docs`.
 
+### Library Settings in `names.json`
+
+Each library's `public/brand/names.json` holds its name, tagline and title, plus these optional keys:
+
+| Key | Meaning | When left out |
+|---|---|---|
+| `default_smiles` | Structure pre-filled on the search page | `C=C` |
+| `default_display` | Projection on the home page plot: `"pca"` or `"umap"` | `umap` |
+| `neighbor_components` | Principal components the neighbor search measures distance in, for example `"1,2"` | The backend uses the first three, or the first two if the library has only two |
+
+Changing `neighbor_components` changes which molecules are listed as neighbors.
+
 ### Service Components
 
 The Docker Compose deployment consists of these services, each with specialized startup processes:

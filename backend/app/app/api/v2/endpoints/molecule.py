@@ -146,6 +146,24 @@ def _get_id_from_smiles(smiles, db):
     return molecule_id
 
 
+def _max_dimensions(type, db):
+    """Number of dimensions stored for `type` ("pca" or "umap"), read from one record."""
+    query = text(
+        f"SELECT cube_dim({type}) FROM molecule WHERE {type} IS NOT NULL LIMIT 1"
+    )
+    return db.execute(query).fetchall()[0][0]
+
+
+def _default_components(type, max_dims):
+    """Components used when a request does not name any.
+
+    PCA uses the first three, or the first two when the library has only two.
+    UMAP uses the first two. Returned as a string like "1,2,3".
+    """
+    wanted = 3 if type == "pca" else 2
+    return ",".join(str(i) for i in range(1, min(wanted, max_dims) + 1))
+
+
 def valid_smiles(smiles):
     """Check to see if a smile string is valid to represent a molecule.
 
@@ -471,13 +489,10 @@ def search_neighbors(
     if type not in ["pca", "umap"]:
         raise HTTPException(status_code=400, detail="Invalid neighbor type.")
 
-    # Set defaults for components
-    if type == "pca" and components is None:
-        components = "1,2,3"
+    max_dims = _max_dimensions(type, db)
 
-    # Set defaults for components
-    if type == "umap" and components is None:
-        components = "1,2"
+    if components is None:
+        components = _default_components(type, max_dims)
 
     # Check correct format
     components_list = []
@@ -489,13 +504,6 @@ def search_neighbors(
                 status_code=400,
                 detail="Components must be a string of integers separated by commas",
             )
-
-    # Generalized - get max number of components for type by getting one record
-    query = text(
-        f"SELECT cube_dim({type}) FROM molecule WHERE {type} IS NOT NULL LIMIT 1"
-    )
-
-    max_dims = db.execute(query).fetchall()[0][0]
 
     # Check to see if the pca components requested are valid
     components_list.sort()
@@ -580,13 +588,10 @@ def get_molecule_dimensions(
             # Create where clause
             where_clause += " AND pat = :category"
 
-    # Set defaults for components
-    if type == "pca" and components is None:
-        components = "1,2,3"
+    max_dims = _max_dimensions(type, db)
 
-    # Set defaults for components
-    if type == "umap" and components is None:
-        components = "1,2"
+    if components is None:
+        components = _default_components(type, max_dims)
 
     # Check correct format
     components_list = []
@@ -598,13 +603,6 @@ def get_molecule_dimensions(
                 status_code=400,
                 detail="Components must be a string of integers separated by commas.",
             )
-
-    # Generalized - get max number of components for type by getting one record
-    query = text(
-        f"SELECT cube_dim({type}) FROM molecule WHERE {type} IS NOT NULL LIMIT 1"
-    )
-
-    max_dims = db.execute(query).fetchall()[0][0]
 
     # Check to see if the pca components requested are valid
     components_list.sort()

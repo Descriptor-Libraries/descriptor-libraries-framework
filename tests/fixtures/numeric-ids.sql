@@ -1,6 +1,6 @@
 -- Second test library, built from the same demo CSV files, with the shape most
--- production libraries have: integer molecule IDs, a pubchem_id column and
--- ML data next to the DFT data. The demo library (string IDs, no pubchem_id)
+-- production libraries have: integer molecule IDs, a pubchem_id column,
+-- ML data next to the DFT data and more than two PCA dimensions. The demo library (string IDs, no pubchem_id)
 -- covers the other shape.
 CREATE DATABASE test_numeric;
 \c test_numeric;
@@ -57,8 +57,12 @@ CREATE TEMP TABLE dft_in (molecule_id text, property text, boltz numeric, high_E
 \copy conformer_in FROM '/docker-entrypoint-initdb.d/csv/conformer.csv' WITH (FORMAT csv, HEADER);
 \copy dft_in FROM '/docker-entrypoint-initdb.d/csv/dft_data.csv' WITH (FORMAT csv, HEADER);
 
+-- The demo data has 2 PCA dimensions. This library gets 4, so that requests for
+-- three components can be tested: dimensions 3 and 4 are made up from the UMAP values.
 INSERT INTO public.molecule (molecule_id, smiles, canonical_smiles, pca, umap)
-    SELECT replace(molecule_id, 'aryl-', '')::integer, smiles, canonical_smiles, pca, umap FROM molecule_in;
+    SELECT replace(molecule_id, 'aryl-', '')::integer, smiles, canonical_smiles,
+           cube(ARRAY[pca->1, pca->2, (umap->1) / 3, (umap->2) / 3]), umap
+    FROM molecule_in;
 
 INSERT INTO public.conformer (molecule_id, elements, coords, basis, program, method, cluster)
     SELECT replace(molecule_id, 'aryl-', '')::integer, elements, coords, basis, program, method, cluster

@@ -5,9 +5,10 @@ They run against two small libraries built from tests/demo_data (see conftest.py
 and docker-compose.test.yml):
 
     demo     string IDs ("aryl-1" ... "aryl-10"), no pubchem_id column, DFT data only
-    numeric  integer IDs (1 ... 10), a pubchem_id column, ML data for molecules 1-5
+    numeric  integer IDs (1 ... 10), a pubchem_id column, ML data for molecules 1-5,
+             4 PCA dimensions
 
-Both have 10 cyanoarenes, one conformer each, and 2 PCA and 2 UMAP dimensions.
+Both have 10 cyanoarenes, one conformer each and 2 UMAP dimensions; demo has 2 PCA dimensions.
 
 Tests marked `xfail(strict=True)` describe what the API should do where it
 currently answers 500. They are reminders: when one of those is fixed the test
@@ -308,15 +309,43 @@ def test_neighbors_paging(lib):
     "params",
     [
         {"type": "bad", "components": "1"},
-        {"type": "pca", "components": "1,2,3"},
-        {"type": "pca", "components": "3"},
+        {"type": "pca", "components": "1,2,3,4,5"},
+        {"type": "pca", "components": "5"},
         {"type": "umap", "components": "3"},
-        # With no components the backend asks for PCA 1,2,3; these libraries have 2.
-        {"type": "pca"},
+        {"type": "pca", "components": "1,x"},
     ],
 )
 def test_neighbors_invalid_parameters(lib, params):
     assert lib.get(f"/molecules/{lib.id(1)}/neighbors/", **params).status_code == 400
+
+
+def test_neighbors_more_components_than_the_library_has(demo):
+    assert demo.get("/molecules/aryl-1/neighbors/", type="pca", components="1,2,3").status_code == 400
+
+
+# With no components in the request the backend chooses: the first three PCA
+# components, or the first two when the library has only two.
+
+def test_neighbors_default_pca_components_with_two_dimensions(demo):
+    r = demo.get("/molecules/aryl-1/neighbors/", type="pca", limit=5)
+    assert r.status_code == 200
+    assert all(len(row["components"]) == 2 for row in r.json())
+    assert r.json() == demo.get("/molecules/aryl-1/neighbors/", type="pca", components="1,2", limit=5).json()
+
+
+def test_neighbors_default_pca_components_with_more_dimensions(numeric):
+    r = numeric.get("/molecules/1/neighbors/", type="pca", limit=5)
+    assert r.status_code == 200
+    assert all(len(row["components"]) == 3 for row in r.json())
+    assert r.json() == numeric.get("/molecules/1/neighbors/", type="pca", components="1,2,3", limit=5).json()
+
+
+def test_neighbors_two_and_three_components_differ(numeric):
+    # A library can keep two components by asking for them (names.json: neighbor_components).
+    two = numeric.get("/molecules/1/neighbors/", type="pca", components="1,2", limit=9).json()
+    three = numeric.get("/molecules/1/neighbors/", type="pca", limit=9).json()
+    assert all(len(row["components"]) == 2 for row in two)
+    assert [row["molecule_id"] for row in two] != [row["molecule_id"] for row in three]
 
 
 def test_neighbors_default_umap_components(lib):
@@ -339,10 +368,16 @@ def test_dimensions_values(lib):
 
 
 @pytest.mark.parametrize(
-    "params", [{"type": "bad", "components": "1"}, {"type": "pca", "components": "3"}, {"type": "pca"}]
+    "params", [{"type": "bad", "components": "1"}, {"type": "pca", "components": "5"}, {"type": "umap", "components": "3"}]
 )
 def test_dimensions_invalid_parameters(lib, params):
     assert lib.get("/molecules/dimensions/", **params).status_code == 400
+
+
+def test_dimensions_default_components(demo, numeric):
+    assert len(demo.get("/molecules/dimensions/", type="pca").json()[0]["components"]) == 2
+    assert len(numeric.get("/molecules/dimensions/", type="pca").json()[0]["components"]) == 3
+    assert len(numeric.get("/molecules/dimensions/", type="umap").json()[0]["components"]) == 2
 
 
 @known_500

@@ -11,7 +11,7 @@ import DropDownButton from '../components/DataDownloadButton';
 
 import Graph from '../components/Graph'
 
-import { retrieveAllSVGs, dynamicGrid, extractIdsFromResults } from '../common/MoleculeUtils';
+import { retrieveAllSVGs, dynamicGrid, extractIdsFromResults, fetchPcaNeighbors, pcaComponentNames } from '../common/MoleculeUtils';
 
 async function fetchInitialMoleculeId() {
   const response = await fetch(`/api/${document.location.pathname.split('/')[1]}/molecules/first_id`);
@@ -24,20 +24,16 @@ async function fetchInitialMoleculeId() {
 }
 
 
-async function NeighborSearch(molecule_id, type="pca", components="1,2", limit=48, skip=0, signal) {
+async function NeighborSearch(molecule_id, limit=48, skip=0, signal) {
   /**
-   * Requests neighbor data on the molecule from the backend.
+   * Requests PCA neighbor data on the molecule from the backend.
    * @param {number} molecule_id Id of the molecule to query.
-   * @param {string} type Type of dimensionality reduction. Can be one of PCA or UMAP.
-   * @param {string} components String of comma separated integers.
    * @param {number} limit Limit of the search.
    * @param {number} skip How many values to skip.
    * @param {AbortSignal} signal Abortsignal object.
    * @return {json}  The response json.
    */
-    let encoded = encodeURIComponent(components);
-
-    const response =  await fetch(`/api/${document.location.pathname.split('/')[1]}/molecules/${molecule_id}/neighbors/?type=${type}&components=${encoded}&skip=${skip}&limit=${limit}`, {signal: signal})
+    const response = await fetchPcaNeighbors(molecule_id, limit, skip, signal);
 
     if (!response.ok) {
         throw new Error('Invalid Molecule Id')
@@ -71,6 +67,8 @@ export default function NeighborSearchHook () {
     const [ isMobile, setIsMobile ] = useState(window.innerWidth < 768);
     const [ moleculeIDs, setMoleculeIDs ] = useState("");
     const [ availableDataTypes, setAvailableDataTypes ] = useState([]);
+    // Which principal components the neighbors were found in; known once the first result arrives.
+    const [ pcaComponents, setPcaComponents ] = useState([]);
 
     const reverseMapping = {
       "ml_data": "ML Data",
@@ -157,11 +155,17 @@ export default function NeighborSearchHook () {
        * Main driver function which loads the neighbors for a molecule requested by the user.
        * @param {AbortSignal} signal Abortsignal object.
        */
-        const fetchData = async () => {
-            const molecule_data = await NeighborSearch(moleculeid, "pca", "1,2", interval, skip, signal);
-            const svg_data = await retrieveAllSVGs(molecule_data, signal);
+        // On the first render the molecule ID is not known yet; there is nothing to ask for.
+        if (moleculeid === undefined) {
+            return;
+        }
 
-            return [ molecule_data, svg_data ]
+        const fetchData = async () => {
+            const molecule_data = await NeighborSearch(moleculeid, interval, skip, signal);
+            const svg_data = await retrieveAllSVGs(molecule_data, signal);
+            const component_names = await pcaComponentNames(molecule_data);
+
+            return [ molecule_data, svg_data, component_names ]
         }
 
         fetchData()
@@ -173,6 +177,13 @@ export default function NeighborSearchHook () {
             setIsLoadingMore(false) 
         } )
         .then( (items )=> {
+
+            // The request failed; the catch above has already updated the page.
+            if (!items) {
+                return;
+            }
+
+            setPcaComponents(items[2]);
 
             if (searchPage == 1) {
             setMolData(items[0]);
@@ -223,7 +234,7 @@ export default function NeighborSearchHook () {
         <Container maxWidth="lg">
         <Typography variant="h2" textAlign="center">Neighbor Search</Typography>
         <Box sx={{pb:1}}>
-          <Typography textAlign="center">Neighbors are identified by Euclidian distance in 2 principal component space.</Typography>
+          <Typography textAlign="center">Neighbors are identified by Euclidian distance in {pcaComponents.length > 0 ? `${pcaComponents.length} ` : ''}principal component space.</Typography>
         </Box>
 
         <Box display="flex" justifyContent="center" pt={2}>
@@ -252,7 +263,7 @@ export default function NeighborSearchHook () {
             !isLoading && validMolecule && Object.keys(svg_results).length > 0 && 
              <Container> 
               <Box display="flex" justifyContent="center">
-                {!isMobile && <Container sx={{ display: 'flex', minHeight: 500, maxHeight: 750, marginBottom: '64px'}}>{ <Graph molData={molData} componentArray={["1", "2", "3", "4"]} type="pca" neighborSearch={true}></Graph> }</Container> }
+                {!isMobile && <Container sx={{ display: 'flex', minHeight: 500, maxHeight: 750, marginBottom: '64px'}}>{ <Graph molData={molData} componentArray={pcaComponents} type="pca" neighborSearch={true}></Graph> }</Container> }
                 </Box>
                 <Box display="flex" justifyContent="center">
                 {  (isLoading || isLoadingMore) ? <CircularProgress /> :
