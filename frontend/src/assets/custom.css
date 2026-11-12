@@ -35,3 +35,9 @@ body, html {
   height: auto;
   background-color: white;
 }
+
+.footer_version {
+  font-size: 0.75rem;
+  color: #6b6b6b;
+  margin-top: 0;
+}

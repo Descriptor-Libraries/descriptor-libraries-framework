@@ -15,11 +15,15 @@ RUN npm run build && \
     npm cache clean --force
 
 # What this image contains. Pass these at build time; they are recorded as
-# image labels. They come last so that changing them does not invalidate the
+# image labels and in dist/version.json. They come last so that changing them does not invalidate the
 # layers above.
 ARG VERSION=dev
 ARG GIT_SHA=unknown
 ARG BUILD_DATE=unknown
+
+# The page footer reads this file to show which frontend version is running.
+RUN printf '{"version":"%s","git_sha":"%s","build_date":"%s"}\n' "${VERSION}" "${GIT_SHA}" "${BUILD_DATE}" > /app/dist/version.json
+
 LABEL org.opencontainers.image.version=${VERSION} \
       org.opencontainers.image.revision=${GIT_SHA} \
       org.opencontainers.image.created=${BUILD_DATE} \
