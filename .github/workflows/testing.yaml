@@ -2,46 +2,22 @@ name: Testing
 
 on:
   push:
-    branches: [ "update", "add-testing" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "update" ]
+    branches: [ "main" ]
 
 jobs:
 
-  build:
+  backend:
 
     runs-on: ubuntu-latest
 
     steps:
-  # need checkout before using compose-action
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
-    - uses: conda-incubator/setup-miniconda@v2
-      with:
-        python-version: 3.11
-        environment-file: tests/testing.yaml
-        channels: conda-forge,defaults
-        activate-environment: test
-        auto-update-conda: false
-        auto-activate-base: false
-        show-channel-urls: true
+    - name: Run the backend API tests
+      run: docker compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from tests
 
-    - uses: isbang/compose-action@v1.4.1
-      with:
-        compose-file: "./docker-compose.test.yml"
-        #down-flags: "--volumes"
-        services: |
-          test_database
-          test_backend
-          test_reverse-proxy
-
-    - name: populate db
-      # conda setup requires this special shell
-      shell: bash -l {0}
-      run: |
-        sudo apt-get install -y postgresql
-        psql -U postgres -h localhost -f tests/db/test_db_small.sql
-    
-    - name: run tests
-      shell: bash -l {0}
-      run: pytest -v
+    - name: Stop the test stack
+      if: always()
+      run: docker compose -f docker-compose.test.yml down -v
