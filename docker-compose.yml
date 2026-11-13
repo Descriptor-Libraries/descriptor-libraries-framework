@@ -60,9 +60,8 @@ services:
       POSTGRES_PASSWD: postgres   
       POSTGRES_DB: demo_data
       API_PREFIX: demo
-    entrypoint: bash prestart.sh 
-    # If prestart.sh doesn't exec the server, this container will exit.
-    # You can still pass args to prestart.sh via command: ["--any-flags"]
+    # Development: start with auto-reload. Production runs `bash prestart.sh` with no arguments.
+    entrypoint: bash prestart.sh --reload
     working_dir: /app
     volumes:
       - ./backend/app:/app

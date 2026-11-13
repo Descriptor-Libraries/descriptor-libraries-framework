@@ -26,7 +26,13 @@ export default defineConfig(({ mode }) => {
       port: 3000,
     },
     define: {
-      'process.env': process.env // have to do this for ketcher 
+      // Ketcher reads `process.env.*` in the browser. Give it only the values it
+      // needs. Never pass the whole `process.env` here: that would copy every
+      // environment variable of the build machine into the public bundle.
+      'process.env': JSON.stringify({
+        NODE_ENV: mode === 'production' ? 'production' : 'development',
+        PUBLIC_URL: '',
+      }),
     },
     build: {
       commonjsOptions: {

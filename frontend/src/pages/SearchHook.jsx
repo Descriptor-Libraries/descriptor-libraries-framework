@@ -10,7 +10,7 @@ import Button from '@mui/material/Button';
 
 import FullScreenDialog from '../components/KetcherPopup';
 
-import { substructureSearch, retrieveAllSVGs, dynamicGrid, extractIdsFromResults, downloadMoleculeData } from '../common/MoleculeUtils';
+import { substructureSearch, retrieveAllSVGs, dynamicGrid, extractIdsFromResults } from '../common/MoleculeUtils';
 
 import DropDownButton from '../components/DataDownloadButton';
 

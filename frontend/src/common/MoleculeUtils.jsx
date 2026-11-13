@@ -28,6 +28,73 @@ async function substructureSearch(substructure, limit=48, skip=0, signal) {
     }
 }
 
+// Read once per page load; see neighborComponentsSetting().
+let neighborComponentsPromise;
+
+function neighborComponentsSetting() {
+  /**
+   * The library's own choice of principal components for the neighbor search: the optional
+   * "neighbor_components" key in brand/names.json, for example "1,2".
+   * @return {Promise<string|null>} The setting, or null when the library leaves the choice to the backend.
+   */
+  if (!neighborComponentsPromise) {
+    neighborComponentsPromise = fetch(`/${document.location.pathname.split('/')[1]}/brand/names.json`)
+      .then(response => response.json())
+      .then(data => {
+        const value = data && data[0] && data[0].neighbor_components;
+        const cleaned = typeof value === 'string' ? value.replace(/\s/g, '') : '';
+        return /^\d+(,\d+)*$/.test(cleaned) ? cleaned : null;
+      })
+      .catch(() => null);
+  }
+  return neighborComponentsPromise;
+}
+
+async function fetchPcaNeighbors(molecule_id, limit, skip, signal) {
+  /**
+   * Requests the PCA neighbors of a molecule.
+   * Which components are used: the library's "neighbor_components" setting if it has one;
+   * otherwise the backend decides (the first three, or two if the library only has two).
+   * @param {number|string} molecule_id Id of the molecule to query.
+   * @param {number} limit Limit of the search.
+   * @param {number} skip How many values to skip.
+   * @param {AbortSignal} signal Abortsignal object.
+   * @return {Response} The fetch response.
+   */
+  const setting = await neighborComponentsSetting();
+  const url = `/api/${document.location.pathname.split('/')[1]}/molecules/${molecule_id}/neighbors/?type=pca&skip=${skip}&limit=${limit}`;
+
+  if (setting) {
+    return fetch(`${url}&components=${encodeURIComponent(setting)}`, {signal: signal});
+  }
+
+  let response = await fetch(url, {signal: signal});
+  if (response.status === 400) {
+    // Backends from before the automatic choice always ask for three components and
+    // reject libraries that have two. Ask for two explicitly.
+    response = await fetch(`${url}&components=${encodeURIComponent("1,2")}`, {signal: signal});
+  }
+  return response;
+}
+
+async function pcaComponentNames(molData) {
+  /**
+   * Names of the components a PCA neighbor result holds, for axis labels: ["1", "2", "3"].
+   * @param {Array} molData Result of fetchPcaNeighbors.
+   * @return {Array<string>} One name per component.
+   */
+  const setting = await neighborComponentsSetting();
+  const count = molData && molData[0] && molData[0].components ? molData[0].components.length : 2;
+  if (setting) {
+    // The backend returns the components in ascending order.
+    const names = setting.split(',').sort((a, b) => a - b);
+    if (names.length === count) {
+      return names;
+    }
+  }
+  return Array.from({ length: count }, (_, index) => String(index + 1));
+}
+
 function moleculePage(molecule_id) {
   /**
    * Redirects to the molecule page for the molecule on click.
@@ -177,4 +244,4 @@ const extractIdsFromResults = (svg_results) => {
   
 
 
-export { retrieveSVG, retrieveAllSVGs, dynamicGrid, substructureSearch, neighborPage, downloadMoleculeData, extractIdsFromResults };
+export { retrieveSVG, retrieveAllSVGs, dynamicGrid, substructureSearch, neighborPage, downloadMoleculeData, extractIdsFromResults, fetchPcaNeighbors, pcaComponentNames };

@@ -1,7 +1,7 @@
 import Graph from "../components/Graph"
 import React, { useEffect, useState } from 'react';
 import { useParams } from "react-router-dom";
-import { Box, Grid, Container, TextField, MenuItem, Card, CardContent, Select, InputLabel, FormControl, ThemeProvider} from "@mui/material";
+import { Box, Grid, Container, TextField, MenuItem, Card, CardContent, Select, InputLabel, FormControl } from "@mui/material";
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { CircularProgress } from "@mui/material";
@@ -10,7 +10,7 @@ import { NGLStage, Component } from "../components/NGL"
 
 import MoleculeDataTable from "../components/MoleculeDataTable";
 
-import { neighborPage } from "../common/MoleculeUtils";
+import { neighborPage, fetchPcaNeighbors, pcaComponentNames } from "../common/MoleculeUtils";
 
 const MoleculeCard = ({ molData, identifierData }) => {
    // Merging molData and identifierData objects and removing 'conformers_id'
@@ -100,6 +100,29 @@ async function dimensionality(molecule_id, type, components, signal, limit = 10)
 }
 
 
+async function pcaNeighbors(molecule_id, signal, limit = 10) {
+   /**
+    * Requests the PCA neighbors of a molecule. The components are the library's
+    * "neighbor_components" setting, or the backend's choice when there is none.
+    * @param {number} molecule_id Id of the molecule to search on.
+    * @param {AbortSignal} signal AbortSignal object.
+    * @param {number} limit Limit of the search.
+    * @return {json|null} The response JSON or null if there is no PCA.
+    */
+   const response = await fetchPcaNeighbors(molecule_id, limit, 0, signal);
+
+   if (!response.ok) {
+      if (response.status === 500) {
+         console.warn('No data available');
+         return null;
+      }
+      throw new Error('Invalid Molecule Id or other response error');
+   }
+
+   return await response.json();
+}
+
+
 async function identifiers(smiles, signal) {
    /**
     * Requests general umap or pca data from the backend.
@@ -127,7 +150,8 @@ export default function MoleculeInfo() {
    const [ pcaNeighborData, setPcaNeighborData ] = useState([]);
    const [ identifierData, setIdentifierData ] = useState([]);
    const [ neighborData, setNeighborData ] = useState([]);
-   const [ components, setComponents ] = useState(["1", "2", "3", "4"]);
+   const [ components, setComponents ] = useState(["1", "2"]);
+   const [ pcaComponents, setPcaComponents ] = useState(["1", "2"]);
    const [ type, setType ] = useState("pca");
    const [ svg, setSvg ] = useState({});
    const [ allConformers, setAllConformers ] = useState([]);
@@ -157,7 +181,7 @@ export default function MoleculeInfo() {
          setNeighborData(umapNeighborData);
       }
       else {
-         setComponents(["1", "2"]);
+         setComponents(pcaComponents);
          setNeighborData(pcaNeighborData);
       }
    }
@@ -170,10 +194,11 @@ export default function MoleculeInfo() {
          const fetchData = async () => {
             const molecule_data = await molecule(molid, signal);
             const umap_neighbor_data = await dimensionality(molid, "umap", ["1", "2"], signal);
-            const pca_neighbor_data = await dimensionality(molid, "pca", ["1", "2"], signal);
+            const pca_neighbor_data = await pcaNeighbors(molid, signal);
+            const pca_component_names = await pcaComponentNames(pca_neighbor_data);
             const svg_data = await retrieveSVG(molecule_data.smiles, signal);
             const identifier_data = await identifiers(molecule_data.smiles, signal);
-            return [ molecule_data, umap_neighbor_data, pca_neighbor_data, svg_data, identifier_data ]
+            return [ molecule_data, umap_neighbor_data, pca_neighbor_data, svg_data, identifier_data, pca_component_names ]
          }
 
          fetchData()
@@ -186,8 +211,10 @@ export default function MoleculeInfo() {
             setPcaNeighborData(items[2]);
             setSvg(items[3]);
             setIdentifierData(items[4][0]);
-            // Initial set neighbor data to umap so it appears on load.
+            // Initial set neighbor data to pca so it appears on load.
             setNeighborData(items[2]);
+            setPcaComponents(items[5]);
+            setComponents(items[5]);
             // If we have conformers, we can set our states.
             if (items[0].conformers_id.length > 0)
             {

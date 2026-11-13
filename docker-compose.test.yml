@@ -1,119 +1,80 @@
-version: '3'
+# Runs the backend API tests. Nothing is published on the host, so this is safe
+# to run next to other stacks:
+#
+#   docker compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from tests
+#   docker compose -f docker-compose.test.yml down -v
+#
+# One database container holds two small libraries and one backend image serves
+# both, the way production runs many libraries from a single image:
+#   demo     string IDs (aryl-1 ...), no pubchem_id column, DFT data only
+#   numeric  integer IDs, a pubchem_id column, ML and DFT data
 
 services:
-  test_reverse-proxy:
-    # The official v2 Traefik docker image
-    image: traefik:v2.8
-    # Enables the web UI and tells Traefik to listen to docker
-    container_name: reverse_proxy_test
-    command: 
-      - --api.insecure=true 
-      - --api.dashboard=true
-      - --api.debug=true
-      - --providers.docker
-      - --entrypoints.web.address=:80
-    ports:
-      # The HTTP port
-      - "80:80"
-      # The Web UI (enabled by --api.insecure=true)
-      - "8080:8080"
-      #
-    volumes:
-      # So that Traefik can listen to the Docker events
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - web-test
-      - db-test
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.api.service=api@internal"
-
-  test_database:
-    image: 'mcs07/postgres-rdkit'
-    container_name: database_test
-    shm_size: '4gb'
-    ports:
-      - "5432:5432"
-    volumes:
-      - ./tests/db:/docker-entrypoint-initdb.d
-    healthcheck:
-      test: ["CMD-SHELL", "psql -U postgres -d postgres -c 'SELECT molecule_id FROM molecule LIMIT 1;' || exit 1"]
-      interval: 5s
-      timeout: 2s
-      retries: 5
+  database:
+    build:
+      context: ./database
+    shm_size: "1gb"
     environment:
-      POSTGRES_HOST_AUTH_METHOD: trust
-      POSTGRES_DB: postgres
-    networks:
-      - db-test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: demo_data
+    tmpfs:
+      - /var/lib/postgresql/data
+    volumes:
+      - ./tests/demo_data/csv:/docker-entrypoint-initdb.d/csv:ro
+      - ./database/init-db.sql:/docker-entrypoint-initdb.d/01-init-db.sql:ro
+      - ./database/load-data.sql:/docker-entrypoint-initdb.d/02-load-data.sql:ro
+      - ./tests/fixtures/numeric-ids.sql:/docker-entrypoint-initdb.d/03-numeric-ids.sql:ro
+    healthcheck:
+      # The numeric library is loaded last, and the server only listens on the
+      # network (-h localhost) once every init script has finished.
+      test: ["CMD-SHELL", "psql -h localhost -U postgres -d test_numeric -c 'SELECT molecule_id FROM molecule LIMIT 1;' || exit 1"]
+      interval: 3s
+      timeout: 3s
+      retries: 40
 
-  test_backend:
-    image: 'phosphines-backend:latest'
-    container_name: backend_test
+  backend_demo:
     build:
       context: ./backend
-      dockerfile: backend.dockerfile
-    volumes:
-      - "./backend/app:/app"
-    environment:
-      POSTGRES_SERVER: database_test
+    image: descriptor-backend:test
+    environment: &backend_env
+      POSTGRES_SERVER: database
       POSTGRES_USER: postgres
-      POSTGRES_PASSWD: testing-password
-      POSTGRES_DB: postgres
+      POSTGRES_PASSWD: postgres
+      POSTGRES_DB: demo_data
+      API_PREFIX: demo
     entrypoint: bash prestart.sh
     depends_on:
-      test_database:
+      database:
         condition: service_healthy
-    networks:
-      - web-test
-      - db-test
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`localhost`) && PathPrefix(`/api`)"
-      - "traefik.http.services.backend.loadbalancer.server.port=8080"
+    healthcheck: &backend_health
+      test: ["CMD-SHELL", "/opt/conda/bin/python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8080/api/$${API_PREFIX}/version')\""]
+      interval: 3s
+      timeout: 3s
+      retries: 40
 
-  test_cdk-depict:
-    image: 'simolecule/cdkdepict:latest'
-    container_name: cdk_depict_test
-    networks:
-      - web-test
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.cdk-depict.rule=Host(`localhost`) && PathPrefix(`/depict`)"
+  backend_numeric:
+    image: descriptor-backend:test
+    environment:
+      <<: *backend_env
+      POSTGRES_DB: test_numeric
+      API_PREFIX: numeric
+    entrypoint: bash prestart.sh
+    depends_on:
+      database:
+        condition: service_healthy
+      backend_demo:
+        condition: service_healthy
+    healthcheck: *backend_health
 
-  test_frontend:
-    image: 'phosphines-frontend:latest'
-    container_name: frontend_test
-    volumes:
-      - "./frontend/src:/app/src"
+  tests:
     build:
-      context: .
-      dockerfile: frontend.development.dockerfile
-    networks:
-      - web-test
-    entrypoint: npm start
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`localhost`)"
-      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
-
-  test_documentation:
-    image: "phosphines-docs:latest"
-    container_name: documentation_test
-    build:
-      context: ./docs
-      dockerfile: docs.dockerfile
-    entrypoint: bash start.sh
-    volumes:
-      - "./docs:/docs"
-    networks:
-      - web-test
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.documentation.rule=Host(`localhost`) && PathPrefix(`/docs`)"
-      - "traefik.http.services.documentation.loadbalancer.server.port=5000"
-    
-
-networks:
-  web-test:
-  db-test:
+      context: ./tests
+    environment:
+      API_URL: http://backend_demo:8080/api/demo
+      API_URL_NUMERIC: http://backend_numeric:8080/api/numeric
+    depends_on:
+      backend_demo:
+        condition: service_healthy
+      backend_numeric:
+        condition: service_healthy

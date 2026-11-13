@@ -13,9 +13,10 @@
     "@testing-library/user-event": "^13.2.1",
     "cors": "^2.8.5",
     "dompurify": "^3.0.8",
-    "ketcher-core": "*",
-    "ketcher-react": "*", 
-    "ketcher-standalone": "*",
+    "express": "^4.18.3",
+    "ketcher-core": "3.5.0",
+    "ketcher-react": "3.5.0",
+    "ketcher-standalone": "3.5.0",
     "miew": "^0.10.1",
     "ngl": "^2.1.1",
     "plotly.js": "^2.14.0",
@@ -34,6 +35,7 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
+    "lint": "eslint src --ext .js,.jsx",
     "preview": "vite preview --port 3000",
     "serve": "serve -s dist -l 3000",
     "build-and-preview": "vite build && vite preview"
@@ -56,9 +58,14 @@
       "last 1 safari version"
     ]
   },
+  "resolutions": {
+    "ketcher-core": "3.5.0"
+  },
   "devDependencies": {
     "@rollup/plugin-replace": "^5.0.2",
     "@vitejs/plugin-react": "^4.0.2",
+    "eslint": "^8.57.0",
+    "eslint-config-react-app": "^7.0.1",
     "vite": "^4.4.2",
     "vite-plugin-node-polyfills": "^0.9.0",
     "vite-plugin-raw": "^1.0.3",

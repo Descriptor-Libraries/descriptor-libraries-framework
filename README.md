@@ -58,19 +58,32 @@ The application supports multiple molecular libraries through a **namespace-base
 ### Configuration Pattern
 Libraries are configured through environment variables. The frontend uses `VITE_BASE_URL=/<namespace>` (like `/demo`), the backend uses `API_PREFIX=<namespace>` (like `demo`), and each gets its own database with `POSTGRES_DB=<namespace>_data` (like `demo_data`). This creates clean URL routing where frontends are served at `/<namespace>`, APIs at `/api/<namespace>`, and documentation at `/api/<namespace>/docs`.
 
+### Library Settings in `names.json`
+
+Each library's `public/brand/names.json` holds its name, tagline and title, plus these optional keys:
+
+| Key | Meaning | When left out |
+|---|---|---|
+| `default_smiles` | Structure pre-filled on the search page | `C=C` |
+| `default_display` | Projection on the home page plot: `"pca"` or `"umap"` | `umap` |
+| `neighbor_components` | Principal components the neighbor search measures distance in, for example `"1,2"` | The backend uses the first three, or the first two if the library has only two |
+
+Changing `neighbor_components` changes which molecules are listed as neighbors.
+
 ### Service Components
 
 The Docker Compose deployment consists of these services, each with specialized startup processes:
 
 - **reverse-proxy (Traefik)**: Entrypoint starts Traefik with dashboard and routes requests to services based on URL
 - **database (PostgreSQL + RDKit)**: Entrypoint initializes PostgreSQL; on first start creates the demo database and runs bundled SQL to set up tables and load demo data
-- **backend (FastAPI)**: Entrypoint runs `prestart.sh`, which prepares the Python environment and starts the API with auto-reload
+- **backend (FastAPI)**: Entrypoint runs `prestart.sh`, which prepares the Python environment and starts the API (the demo Compose file passes `--reload` for auto-reload; production runs it without)
 - **cdk-depict**: Entrypoint starts the depiction service used to render molecule images
 - **frontend (React)**: Entrypoint runs `renameBase-dev.sh`, which updates the app's base path (e.g., `/demo`) and starts the dev server
 
 ### Frontend Base Path Handling
 
 The `renameBase-dev.sh` script is essential for multi-tenant support. It replaces the placeholder `/base_url` in generated files with the value of `VITE_BASE_URL`, allowing the frontend to work under namespace paths like `/demo` instead of only at the site root `/`. After adjusting links and asset paths, it starts the development server so routes and static assets resolve correctly behind the reverse proxy.
+
 Running the Demo Application
 =============================
 
@@ -104,13 +117,58 @@ persistent and mounts a shared scratch directory for imports. Key differences:
 - **Backups and imports**: Use the `data_import/import_dataset.py` helper (with the YAML
   configs under `data_import/configs/`) to load new libraries or refresh an existing one.
 
+- **Backend image**: Build from a clean, tagged checkout and pass the version details, which
+  the API then reports at `/api/<namespace>/version`:
+
+  ```bash
+  docker build -t descriptor-backend:v2026.11.0 \
+    --build-arg VERSION=v2026.11.0 \
+    --build-arg GIT_SHA="$(git rev-parse --short HEAD)" \
+    --build-arg BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    backend
+  ```
+
+  Without these arguments the endpoint reports `dev` / `unknown`.
+
 Other services (reverse proxy, backend, frontend, depiction) run as in the demo compose
 file. Ensure Traefik routes remain consistent with the namespaces you expose publicly.
 
 Testing
 =======
 
-Coming soon - Test suite updates for the namespace-aware architecture are in progress.
+The backend API tests need only Docker. One command builds the backend, loads two
+small test libraries, runs the tests and returns their exit code:
+
+```bash
+docker compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from tests
+docker compose -f docker-compose.test.yml down -v
+```
+
+No ports are published on the host, so this can run next to the demo or any other stack.
+
+The two libraries are built from `tests/demo_data` and served by the same backend image:
+
+| Library | Molecule IDs | `pubchem_id` column | Data |
+|---|---|---|---|
+| `demo` | text (`aryl-1` ...) | no | DFT |
+| `numeric` (`tests/fixtures/numeric-ids.sql`) | integer | yes | DFT and ML |
+
+To run the tests against an API that is already running, such as the demo above, set its
+address (tests that need the second library are skipped):
+
+```bash
+pip install pytest requests
+API_URL=http://localhost/api/demo pytest tests
+```
+
+Tests marked `xfail` describe requests the API currently answers with an error; see the
+notes at the top of `tests/test_backend.py`.
+
+The frontend has a lint check. It fails on errors and lists warnings:
+
+```bash
+cd frontend && yarn install --frozen-lockfile && npm run lint
+```
 
 Acknowledgements
 ----------------
