@@ -10,7 +10,13 @@ dependencies:
   # Pinned series. Changing any of these can change results or break start-up,
   # so bump them deliberately and re-run the comparison against production.
   - python=3.12
-  - rdkit=2025.03      # canonical SMILES depend on the RDKit version
+  # RDKit writes canonical SMILES, and the SMILES API finds a molecule by comparing
+  # them with the canonical_smiles column stored in each library database. Those
+  # stored values match RDKit 2024.03: from 2024.09 on, atoms bonded to a metal are
+  # written with brackets (CCC[CH2][Sn]... instead of CCCC[Sn]...), and tin and iron
+  # compounds can no longer be found by SMILES. Upgrade RDKit only together with
+  # recomputing canonical_smiles in every library database.
+  - rdkit=2024.03.5
   - sqlalchemy=2.0     # 2.1 switches the default PostgreSQL driver to psycopg 3
   - pandas=2.3         # builds the csv/json exports
   - pydantic=2
@@ -22,4 +28,6 @@ dependencies:
   - uvicorn
   - requests
   - curl
-  - openbabel
+  # Writes the SDF/PDB conformer exports from coordinates. 3.2 assigns some ring
+  # bonds and valences differently, which changes the exported files.
+  - openbabel=3.1.1
