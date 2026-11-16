@@ -18,7 +18,7 @@ CREATE TABLE public.molecule (
     molecular_weight double precision,
     pat text,
     morganbv public.bfp,
-    pubchem_id integer
+    pubchem_id text
 );
 
 CREATE TABLE public.conformer (
@@ -80,9 +80,13 @@ UPDATE public.molecule SET mol = mol_from_smiles(smiles::cstring);
 UPDATE public.molecule SET morganbv = morganbv_fp(mol);
 UPDATE public.molecule SET molecular_weight = mol_amw(mol);
 
--- A made-up CID for molecule 1, to prove the value is read from the database
--- and not looked up on PubChem. The other rows are left empty.
-UPDATE public.molecule SET pubchem_id = 999000001 WHERE molecule_id = 1;
+-- Made-up CIDs, to prove the value is read from the database and not looked up
+-- on PubChem. The column is text, as in the production libraries, and some of
+-- those hold the number the way a spreadsheet exported it ("413605.0").
+-- Molecule 3 holds something that is not a number. The other rows are left empty.
+UPDATE public.molecule SET pubchem_id = '999000001' WHERE molecule_id = 1;
+UPDATE public.molecule SET pubchem_id = '999000002.0' WHERE molecule_id = 2;
+UPDATE public.molecule SET pubchem_id = 'not available' WHERE molecule_id = 3;
 
 CREATE INDEX idx_molecule_pca_knn ON public.molecule USING gist (pca);
 CREATE INDEX idx_molecule_umap_knn ON public.molecule USING gist (umap);
