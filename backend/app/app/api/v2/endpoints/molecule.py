@@ -646,6 +646,23 @@ def get_molecule_dimensions(
 
     return results
 
+def _as_cid(value):
+    """
+    Turn a stored pubchem_id into an integer CID, or None if it is not one.
+
+    The column is text in the library databases and some hold the number the way
+    a spreadsheet exported it ("413605.0"). Anything that is not a whole positive
+    number counts as missing, so the caller falls back to asking PubChem.
+    """
+    try:
+        number = float(str(value).strip())
+    except (TypeError, ValueError):
+        return None
+    if not number.is_integer() or number <= 0:
+        return None
+    return int(number)
+
+
 @router.get("/identifiers/", response_model=List[schemas.MoleculeIdentifiers])
 def get_identifiers(smiles: str, db: Session = Depends(deps.get_db)):
     smiles = valid_smiles(smiles)
@@ -670,7 +687,7 @@ def get_identifiers(smiles: str, db: Session = Depends(deps.get_db)):
             text("SELECT pubchem_id FROM molecule WHERE canonical_smiles = :smiles"),
             {"smiles": smiles},
         ).fetchone()
-        pubchem_id = int(row[0]) if row and row[0] is not None else None
+        pubchem_id = _as_cid(row[0]) if row else None
 
     # --- Fallback to PubChem if not in DB or column missing ---
     if pubchem_id is None:

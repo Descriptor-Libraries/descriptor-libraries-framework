@@ -411,6 +411,24 @@ def test_identifiers_cid_from_database(numeric):
     assert body["PubChemCID"] == 999000001
 
 
+def test_identifiers_cid_stored_as_decimal_text(numeric):
+    # Some production libraries store the CID as text like "413605.0".
+    smiles = numeric.get("/molecules/2").json()["smiles"]
+    r = numeric.get("/molecules/identifiers/", smiles=smiles)
+    assert r.status_code == 200
+    assert r.json()[0]["PubChemCID"] == 999000002
+
+
+def test_identifiers_cid_not_a_number(numeric):
+    # A stored value that is not a number counts as missing: the request still
+    # succeeds and the CID is whatever PubChem says (None if it cannot be reached).
+    smiles = numeric.get("/molecules/3").json()["smiles"]
+    r = numeric.get("/molecules/identifiers/", smiles=smiles)
+    assert r.status_code == 200
+    cid = r.json()[0]["PubChemCID"]
+    assert cid is None or (isinstance(cid, int) and cid < 999000000)
+
+
 def test_identifiers_empty_pubchem_column(numeric):
     # Column present but empty for this molecule: falls back to PubChem.
     r = numeric.get("/molecules/identifiers/", smiles=ARYL_4_STORED)
