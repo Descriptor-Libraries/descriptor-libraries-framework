@@ -489,7 +489,11 @@ def search_neighbors(
     if type not in ["pca", "umap"]:
         raise HTTPException(status_code=400, detail="Invalid neighbor type.")
 
-    max_dims = _max_dimensions(type, db)
+    try:
+        max_dims = _max_dimensions(type, db)
+    except IndexError:
+        # No molecule has coordinates of this type, so there are no neighbors.
+        return []
 
     if components is None:
         components = _default_components(type, max_dims)
