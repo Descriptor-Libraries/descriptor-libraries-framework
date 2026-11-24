@@ -10,7 +10,7 @@ import { NGLStage, Component } from "../components/NGL"
 
 import MoleculeDataTable from "../components/MoleculeDataTable";
 
-import { neighborPage, fetchPcaNeighbors, pcaComponentNames, libraryHasUmap } from "../common/MoleculeUtils";
+import { neighborPage, fetchPcaNeighbors, pcaComponentNames } from "../common/MoleculeUtils";
 
 const MoleculeCard = ({ molData, identifierData }) => {
    // Merging molData and identifierData objects and removing 'conformers_id'
@@ -193,8 +193,7 @@ export default function MoleculeInfo() {
        */
          const fetchData = async () => {
             const molecule_data = await molecule(molid, signal);
-            // A library without UMAP coordinates is not asked for UMAP neighbors.
-            const umap_neighbor_data = await libraryHasUmap() ? await dimensionality(molid, "umap", ["1", "2"], signal) : null;
+            const umap_neighbor_data = await dimensionality(molid, "umap", ["1", "2"], signal);
             const pca_neighbor_data = await pcaNeighbors(molid, signal);
             const pca_component_names = await pcaComponentNames(pca_neighbor_data);
             const svg_data = await retrieveSVG(molecule_data.smiles, signal);

@@ -28,41 +28,26 @@ async function substructureSearch(substructure, limit=48, skip=0, signal) {
     }
 }
 
-// Read once per page load; see brandSettings().
-let brandSettingsPromise;
+// Read once per page load; see neighborComponentsSetting().
+let neighborComponentsPromise;
 
-function brandSettings() {
-  /**
-   * The library's settings from brand/names.json.
-   * @return {Promise<object>} The settings, or an empty object when the file cannot be read.
-   */
-  if (!brandSettingsPromise) {
-    brandSettingsPromise = fetch(`/${document.location.pathname.split('/')[1]}/brand/names.json`)
-      .then(response => response.json())
-      .then(data => (data && data[0]) || {})
-      .catch(() => ({}));
-  }
-  return brandSettingsPromise;
-}
-
-async function neighborComponentsSetting() {
+function neighborComponentsSetting() {
   /**
    * The library's own choice of principal components for the neighbor search: the optional
    * "neighbor_components" key in brand/names.json, for example "1,2".
    * @return {Promise<string|null>} The setting, or null when the library leaves the choice to the backend.
    */
-  const value = (await brandSettings()).neighbor_components;
-  const cleaned = typeof value === 'string' ? value.replace(/\s/g, '') : '';
-  return /^\d+(,\d+)*$/.test(cleaned) ? cleaned : null;
-}
-
-async function libraryHasUmap() {
-  /**
-   * Whether the library has UMAP coordinates. A library without them says so with
-   * "default_display": "pca" in brand/names.json, the same key the home page plots by.
-   * @return {Promise<boolean>} False only for a library that displays PCA by default.
-   */
-  return (await brandSettings()).default_display !== 'pca';
+  if (!neighborComponentsPromise) {
+    neighborComponentsPromise = fetch(`/${document.location.pathname.split('/')[1]}/brand/names.json`)
+      .then(response => response.json())
+      .then(data => {
+        const value = data && data[0] && data[0].neighbor_components;
+        const cleaned = typeof value === 'string' ? value.replace(/\s/g, '') : '';
+        return /^\d+(,\d+)*$/.test(cleaned) ? cleaned : null;
+      })
+      .catch(() => null);
+  }
+  return neighborComponentsPromise;
 }
 
 async function fetchPcaNeighbors(molecule_id, limit, skip, signal) {
@@ -259,4 +244,4 @@ const extractIdsFromResults = (svg_results) => {
   
 
 
-export { retrieveSVG, retrieveAllSVGs, dynamicGrid, substructureSearch, neighborPage, downloadMoleculeData, extractIdsFromResults, fetchPcaNeighbors, pcaComponentNames, libraryHasUmap };
+export { retrieveSVG, retrieveAllSVGs, dynamicGrid, substructureSearch, neighborPage, downloadMoleculeData, extractIdsFromResults, fetchPcaNeighbors, pcaComponentNames };
