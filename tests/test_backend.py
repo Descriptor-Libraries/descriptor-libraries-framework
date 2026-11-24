@@ -352,6 +352,18 @@ def test_neighbors_default_umap_components(lib):
     assert lib.get(f"/molecules/{lib.id(1)}/neighbors/", type="umap", limit=2).status_code == 200
 
 
+def test_umap_neighbors_of_a_library_without_umap_are_empty(pca_only):
+    for params in ({"components": "1,2"}, {}):
+        r = pca_only.get("/molecules/1/neighbors/", type="umap", limit=5, **params)
+        assert r.status_code == 200
+        assert r.json() == []
+
+
+def test_pca_neighbors_of_a_library_without_umap(pca_only, numeric):
+    path, params = "/molecules/1/neighbors/", {"type": "pca", "components": "1,2", "limit": 5}
+    assert pca_only.get(path, **params).json() == numeric.get(path, **params).json()
+
+
 @pytest.mark.parametrize("type", ["pca", "umap"])
 def test_dimensions(lib, type):
     r = lib.get("/molecules/dimensions/", type=type, components="1,2", limit=100)

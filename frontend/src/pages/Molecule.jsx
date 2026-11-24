@@ -207,12 +207,13 @@ export default function MoleculeInfo() {
          })
          .then( (items )=> {
             setMolData(items[0]);
-            setUmapNeighborData(items[1]);
-            setPcaNeighborData(items[2]);
+            // A library without UMAP (or PCA) coordinates gives null here.
+            setUmapNeighborData(items[1] || []);
+            setPcaNeighborData(items[2] || []);
             setSvg(items[3]);
             setIdentifierData(items[4][0]);
             // Initial set neighbor data to pca so it appears on load.
-            setNeighborData(items[2]);
+            setNeighborData(items[2] || []);
             setPcaComponents(items[5]);
             setComponents(items[5]);
             // If we have conformers, we can set our states.
@@ -321,7 +322,7 @@ export default function MoleculeInfo() {
                   onChange={event => switchDimensionality(event)}
                   sx={{ mb: 1 }}
                   >
-                        <MenuItem value={"umap"}>UMAP</MenuItem>
+                        {umapNeighborData.length > 0 && <MenuItem value={"umap"}>UMAP</MenuItem>}
                         <MenuItem value={"pca"}>PCA</MenuItem>
                   </TextField>
                   <Container sx={{ display: 'flex', height: 600, mb: 10}}>

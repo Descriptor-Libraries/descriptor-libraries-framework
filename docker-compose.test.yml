@@ -4,10 +4,11 @@
 #   docker compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from tests
 #   docker compose -f docker-compose.test.yml down -v
 #
-# One database container holds two small libraries and one backend image serves
-# both, the way production runs many libraries from a single image:
-#   demo     string IDs (aryl-1 ...), no pubchem_id column, DFT data only
-#   numeric  integer IDs, a pubchem_id column, ML and DFT data
+# One database container holds three small libraries and one backend image serves
+# them all, the way production runs many libraries from a single image:
+#   demo      string IDs (aryl-1 ...), no pubchem_id column, DFT data only
+#   numeric   integer IDs, a pubchem_id column, ML and DFT data
+#   pca_only  the numeric library without UMAP coordinates
 
 services:
   database:
@@ -25,10 +26,11 @@ services:
       - ./database/init-db.sql:/docker-entrypoint-initdb.d/01-init-db.sql:ro
       - ./database/load-data.sql:/docker-entrypoint-initdb.d/02-load-data.sql:ro
       - ./tests/fixtures/numeric-ids.sql:/docker-entrypoint-initdb.d/03-numeric-ids.sql:ro
+      - ./tests/fixtures/pca-only.sql:/docker-entrypoint-initdb.d/04-pca-only.sql:ro
     healthcheck:
-      # The numeric library is loaded last, and the server only listens on the
+      # The PCA-only library is loaded last, and the server only listens on the
       # network (-h localhost) once every init script has finished.
-      test: ["CMD-SHELL", "psql -h localhost -U postgres -d test_numeric -c 'SELECT molecule_id FROM molecule LIMIT 1;' || exit 1"]
+      test: ["CMD-SHELL", "psql -h localhost -U postgres -d test_pca_only -c 'SELECT molecule_id FROM molecule LIMIT 1;' || exit 1"]
       interval: 3s
       timeout: 3s
       retries: 40
@@ -67,13 +69,30 @@ services:
         condition: service_healthy
     healthcheck: *backend_health
 
+  backend_pca_only:
+    image: descriptor-backend:test
+    environment:
+      <<: *backend_env
+      POSTGRES_DB: test_pca_only
+      API_PREFIX: pca_only
+    entrypoint: bash prestart.sh
+    depends_on:
+      database:
+        condition: service_healthy
+      backend_demo:
+        condition: service_healthy
+    healthcheck: *backend_health
+
   tests:
     build:
       context: ./tests
     environment:
       API_URL: http://backend_demo:8080/api/demo
       API_URL_NUMERIC: http://backend_numeric:8080/api/numeric
+      API_URL_PCA_ONLY: http://backend_pca_only:8080/api/pca_only
     depends_on:
+      backend_pca_only:
+        condition: service_healthy
       backend_demo:
         condition: service_healthy
       backend_numeric:

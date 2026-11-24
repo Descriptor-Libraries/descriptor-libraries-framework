@@ -5,13 +5,14 @@ The tests talk to running backends over HTTP. Where they are is a setting:
 
     API_URL          library with string IDs and no pubchem_id column (the demo data)
     API_URL_NUMERIC  library with integer IDs, a pubchem_id column and ML data
+    API_URL_PCA_ONLY the numeric library without UMAP coordinates
 
-`docker-compose.test.yml` starts both and sets both variables. To run against
+`docker-compose.test.yml` starts all three and sets all three variables. To run against
 the demo stack from the README instead, only the first one is needed:
 
     API_URL=http://localhost/api/demo pytest tests
 
-Tests that need the second library are skipped when API_URL_NUMERIC is not set.
+Tests that need the second or third library are skipped when its variable is not set.
 """
 import os
 
@@ -39,4 +40,12 @@ def numeric():
     url = os.environ.get("API_URL_NUMERIC")
     if not url:
         pytest.skip("API_URL_NUMERIC is not set")
+    return Api(url)
+
+
+@pytest.fixture(scope="session")
+def pca_only():
+    url = os.environ.get("API_URL_PCA_ONLY")
+    if not url:
+        pytest.skip("API_URL_PCA_ONLY is not set")
     return Api(url)
